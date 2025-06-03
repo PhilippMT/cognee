@@ -1,0 +1,2159 @@
+<?xml version="1.0"?>
+<Ontology xmlns="http://www.w3.org/2002/07/owl#"
+     xml:base="http://destilink.tui.com/ontology/java"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:xml="http://www.w3.org/XML/1998/namespace"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     ontologyIRI="http://destilink.tui.com/ontology/java"
+     versionIRI="http://destilink.tui.com/ontology/java/2.0.0">
+    <Prefix name="" IRI="http://destilink.tui.com/ontology/java#"/>
+    <Prefix name="owl" IRI="http://www.w3.org/2002/07/owl#"/>
+    <Prefix name="rdf" IRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+    <Prefix name="xml" IRI="http://www.w3.org/XML/1998/namespace"/>
+    <Prefix name="xsd" IRI="http://www.w3.org/2001/XMLSchema#"/>
+    <Prefix name="rdfs" IRI="http://www.w3.org/2000/01/rdf-schema#"/>
+    <Annotation>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <Literal>Comprehensive ontology representing Java language constructs, types, and relationships including modern features up to Java 21+</Literal>
+    </Annotation>
+    <Annotation>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <Literal>Java Programming Language Ontology</Literal>
+    </Annotation>
+    <Annotation>
+        <AnnotationProperty abbreviatedIRI="rdfs:seeAlso"/>
+        <Literal>https://openjdk.org/projects/jdk/21/</Literal>
+    </Annotation>
+    <Annotation>
+        <AnnotationProperty abbreviatedIRI="owl:priorVersion"/>
+        <IRI>/1.0.0</IRI>
+    </Annotation>
+    <Annotation>
+        <AnnotationProperty abbreviatedIRI="owl:versionInfo"/>
+        <Literal>2.0.0</Literal>
+    </Annotation>
+    <Declaration>
+        <Class IRI="#AbstractModifiable"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#AccessModifiable"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#AnnotatableElement"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Annotation"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#AnnotationInstance"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#AnnotationType"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#CheckedException"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Class"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#CompilationUnit"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Constructor"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Enum"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#ExceptionType"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Field"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#FinalModifiable"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#FunctionalInterface"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#GenericType"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Interface"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#JavaElement"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#JavaProject"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#LambdaExpression"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#LocalVariable"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Member"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Method"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#MethodReference"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Module"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#NamedElement"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Package"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Parameter"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#ParameterizedType"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#PatternMatching"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#PrimitiveType"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Record"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#ReferenceType"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#SealedClass"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#SourceElement"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#StaticModifiable"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#SwitchExpression"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#TextBlock"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Type"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#TypeParameter"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#UncheckedException"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#VirtualThread"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#WildcardType"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#accessesField"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#annotationType"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#calls"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#containsClass"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#extendsClass"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#extendsInterface"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#hasAnnotation"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#hasBound"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#hasConstructor"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#hasField"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#hasFieldType"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#hasLambdaBody"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#hasLambdaParameters"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#hasMethod"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#hasPackage"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#hasParameter"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#hasParameterType"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#hasReturnType"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#hasTypeParameter"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#implementsInterface"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#instantiates"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#overloads"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#overrides"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#permitsSubclass"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#referencesMethod"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#throwsException"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#columnNumber"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#cyclomaticComplexity"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#fullyQualifiedName"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#hasInferredType"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#isAbstract"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#isFinal"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#isFunctional"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#isNative"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#isOverloaded"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#isOverridden"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#isPrivate"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#isProtected"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#isPublic"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#isSealed"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#isStatic"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#isSynchronized"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#isTransient"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#isVolatile"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#lineNumber"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#linesOfCode"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#name"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#numberOfFields"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#numberOfMethods"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#packageName"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#sourceFile"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#SuppressWarnings"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#double"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#int"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#String"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#Predicate"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#Object"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#IllegalArgumentException"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#long"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#Supplier"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#Optional"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#Integer"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#char"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#boolean"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#void"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#Stream"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#Exception"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#Deprecated"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#IOException"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#Override"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#short"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#Consumer"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#byte"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#Function"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#float"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#RuntimeException"/>
+    </Declaration>
+    <SubClassOf>
+        <Class IRI="#Annotation"/>
+        <Class IRI="#Interface"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#AnnotationInstance"/>
+        <Class IRI="#AnnotatableElement"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#AnnotationType"/>
+        <Class IRI="#Interface"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#CheckedException"/>
+        <Class IRI="#ExceptionType"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Class"/>
+        <ObjectIntersectionOf>
+            <Class IRI="#AbstractModifiable"/>
+            <Class IRI="#AccessModifiable"/>
+            <Class IRI="#FinalModifiable"/>
+            <Class IRI="#ReferenceType"/>
+            <Class IRI="#StaticModifiable"/>
+        </ObjectIntersectionOf>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#CompilationUnit"/>
+        <ObjectIntersectionOf>
+            <Class IRI="#NamedElement"/>
+            <Class IRI="#SourceElement"/>
+        </ObjectIntersectionOf>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Constructor"/>
+        <ObjectIntersectionOf>
+            <Class IRI="#AnnotatableElement"/>
+            <Class IRI="#Member"/>
+        </ObjectIntersectionOf>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Enum"/>
+        <Class IRI="#Class"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#ExceptionType"/>
+        <Class IRI="#Class"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Field"/>
+        <ObjectIntersectionOf>
+            <Class IRI="#FinalModifiable"/>
+            <Class IRI="#Member"/>
+            <Class IRI="#StaticModifiable"/>
+        </ObjectIntersectionOf>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#FunctionalInterface"/>
+        <Class IRI="#Interface"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#GenericType"/>
+        <Class IRI="#Type"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Interface"/>
+        <ObjectIntersectionOf>
+            <Class IRI="#AccessModifiable"/>
+            <Class IRI="#ReferenceType"/>
+            <Class IRI="#StaticModifiable"/>
+        </ObjectIntersectionOf>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#JavaProject"/>
+        <Class IRI="#NamedElement"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#LambdaExpression"/>
+        <Class IRI="#JavaElement"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#LocalVariable"/>
+        <ObjectIntersectionOf>
+            <Class IRI="#NamedElement"/>
+            <Class IRI="#SourceElement"/>
+        </ObjectIntersectionOf>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Member"/>
+        <ObjectIntersectionOf>
+            <Class IRI="#AccessModifiable"/>
+            <Class IRI="#AnnotatableElement"/>
+            <Class IRI="#NamedElement"/>
+            <Class IRI="#SourceElement"/>
+        </ObjectIntersectionOf>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Method"/>
+        <ObjectIntersectionOf>
+            <Class IRI="#AbstractModifiable"/>
+            <Class IRI="#FinalModifiable"/>
+            <Class IRI="#Member"/>
+            <Class IRI="#StaticModifiable"/>
+        </ObjectIntersectionOf>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#MethodReference"/>
+        <Class IRI="#JavaElement"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Module"/>
+        <Class IRI="#NamedElement"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#NamedElement"/>
+        <Class IRI="#JavaElement"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Package"/>
+        <Class IRI="#NamedElement"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Parameter"/>
+        <ObjectIntersectionOf>
+            <Class IRI="#AnnotatableElement"/>
+            <Class IRI="#NamedElement"/>
+        </ObjectIntersectionOf>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#ParameterizedType"/>
+        <Class IRI="#ReferenceType"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#PatternMatching"/>
+        <Class IRI="#JavaElement"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#PrimitiveType"/>
+        <Class IRI="#Type"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Record"/>
+        <Class IRI="#Class"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#ReferenceType"/>
+        <Class IRI="#Type"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#SealedClass"/>
+        <Class IRI="#Class"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#SourceElement"/>
+        <Class IRI="#JavaElement"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#SwitchExpression"/>
+        <Class IRI="#JavaElement"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#TextBlock"/>
+        <Class IRI="#JavaElement"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Type"/>
+        <ObjectIntersectionOf>
+            <Class IRI="#AnnotatableElement"/>
+            <Class IRI="#NamedElement"/>
+            <Class IRI="#SourceElement"/>
+        </ObjectIntersectionOf>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#TypeParameter"/>
+        <Class IRI="#NamedElement"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#UncheckedException"/>
+        <Class IRI="#ExceptionType"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#VirtualThread"/>
+        <Class IRI="#Class"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#WildcardType"/>
+        <Class IRI="#Type"/>
+    </SubClassOf>
+    <ClassAssertion>
+        <Class IRI="#FunctionalInterface"/>
+        <NamedIndividual IRI="#Consumer"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#AnnotationType"/>
+        <NamedIndividual IRI="#Deprecated"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#CheckedException"/>
+        <NamedIndividual IRI="#Exception"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#FunctionalInterface"/>
+        <NamedIndividual IRI="#Function"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#CheckedException"/>
+        <NamedIndividual IRI="#IOException"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#UncheckedException"/>
+        <NamedIndividual IRI="#IllegalArgumentException"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#Class"/>
+        <NamedIndividual IRI="#Integer"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#Class"/>
+        <NamedIndividual IRI="#Object"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#Class"/>
+        <NamedIndividual IRI="#Optional"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#AnnotationType"/>
+        <NamedIndividual IRI="#Override"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#FunctionalInterface"/>
+        <NamedIndividual IRI="#Predicate"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#UncheckedException"/>
+        <NamedIndividual IRI="#RuntimeException"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#Class"/>
+        <NamedIndividual IRI="#Stream"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#Class"/>
+        <NamedIndividual IRI="#String"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#FunctionalInterface"/>
+        <NamedIndividual IRI="#Supplier"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#AnnotationType"/>
+        <NamedIndividual IRI="#SuppressWarnings"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#PrimitiveType"/>
+        <NamedIndividual IRI="#boolean"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#PrimitiveType"/>
+        <NamedIndividual IRI="#byte"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#PrimitiveType"/>
+        <NamedIndividual IRI="#char"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#PrimitiveType"/>
+        <NamedIndividual IRI="#double"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#PrimitiveType"/>
+        <NamedIndividual IRI="#float"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#PrimitiveType"/>
+        <NamedIndividual IRI="#int"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#PrimitiveType"/>
+        <NamedIndividual IRI="#long"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#PrimitiveType"/>
+        <NamedIndividual IRI="#short"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#PrimitiveType"/>
+        <NamedIndividual IRI="#void"/>
+    </ClassAssertion>
+    <ObjectPropertyAssertion>
+        <ObjectProperty IRI="#extendsClass"/>
+        <NamedIndividual IRI="#IOException"/>
+        <NamedIndividual IRI="#Exception"/>
+    </ObjectPropertyAssertion>
+    <ObjectPropertyAssertion>
+        <ObjectProperty IRI="#extendsClass"/>
+        <NamedIndividual IRI="#IllegalArgumentException"/>
+        <NamedIndividual IRI="#RuntimeException"/>
+    </ObjectPropertyAssertion>
+    <ObjectPropertyAssertion>
+        <ObjectProperty IRI="#extendsClass"/>
+        <NamedIndividual IRI="#Integer"/>
+        <NamedIndividual IRI="#Object"/>
+    </ObjectPropertyAssertion>
+    <ObjectPropertyAssertion>
+        <ObjectProperty IRI="#extendsClass"/>
+        <NamedIndividual IRI="#String"/>
+        <NamedIndividual IRI="#Object"/>
+    </ObjectPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#fullyQualifiedName"/>
+        <NamedIndividual IRI="#Consumer"/>
+        <Literal>java.util.function.Consumer</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#isFunctional"/>
+        <NamedIndividual IRI="#Consumer"/>
+        <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#boolean">true</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#name"/>
+        <NamedIndividual IRI="#Consumer"/>
+        <Literal>Consumer</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#fullyQualifiedName"/>
+        <NamedIndividual IRI="#Deprecated"/>
+        <Literal>java.lang.Deprecated</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#name"/>
+        <NamedIndividual IRI="#Deprecated"/>
+        <Literal>Deprecated</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#fullyQualifiedName"/>
+        <NamedIndividual IRI="#Exception"/>
+        <Literal>java.lang.Exception</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#name"/>
+        <NamedIndividual IRI="#Exception"/>
+        <Literal>Exception</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#fullyQualifiedName"/>
+        <NamedIndividual IRI="#Function"/>
+        <Literal>java.util.function.Function</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#isFunctional"/>
+        <NamedIndividual IRI="#Function"/>
+        <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#boolean">true</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#name"/>
+        <NamedIndividual IRI="#Function"/>
+        <Literal>Function</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#fullyQualifiedName"/>
+        <NamedIndividual IRI="#IOException"/>
+        <Literal>java.io.IOException</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#name"/>
+        <NamedIndividual IRI="#IOException"/>
+        <Literal>IOException</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#fullyQualifiedName"/>
+        <NamedIndividual IRI="#IllegalArgumentException"/>
+        <Literal>java.lang.IllegalArgumentException</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#name"/>
+        <NamedIndividual IRI="#IllegalArgumentException"/>
+        <Literal>IllegalArgumentException</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#fullyQualifiedName"/>
+        <NamedIndividual IRI="#Integer"/>
+        <Literal>java.lang.Integer</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#name"/>
+        <NamedIndividual IRI="#Integer"/>
+        <Literal>Integer</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#fullyQualifiedName"/>
+        <NamedIndividual IRI="#Object"/>
+        <Literal>java.lang.Object</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#name"/>
+        <NamedIndividual IRI="#Object"/>
+        <Literal>Object</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#fullyQualifiedName"/>
+        <NamedIndividual IRI="#Optional"/>
+        <Literal>java.util.Optional</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#name"/>
+        <NamedIndividual IRI="#Optional"/>
+        <Literal>Optional</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#fullyQualifiedName"/>
+        <NamedIndividual IRI="#Override"/>
+        <Literal>java.lang.Override</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#name"/>
+        <NamedIndividual IRI="#Override"/>
+        <Literal>Override</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#fullyQualifiedName"/>
+        <NamedIndividual IRI="#Predicate"/>
+        <Literal>java.util.function.Predicate</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#isFunctional"/>
+        <NamedIndividual IRI="#Predicate"/>
+        <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#boolean">true</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#name"/>
+        <NamedIndividual IRI="#Predicate"/>
+        <Literal>Predicate</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#fullyQualifiedName"/>
+        <NamedIndividual IRI="#RuntimeException"/>
+        <Literal>java.lang.RuntimeException</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#name"/>
+        <NamedIndividual IRI="#RuntimeException"/>
+        <Literal>RuntimeException</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#fullyQualifiedName"/>
+        <NamedIndividual IRI="#Stream"/>
+        <Literal>java.util.stream.Stream</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#name"/>
+        <NamedIndividual IRI="#Stream"/>
+        <Literal>Stream</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#fullyQualifiedName"/>
+        <NamedIndividual IRI="#String"/>
+        <Literal>java.lang.String</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#name"/>
+        <NamedIndividual IRI="#String"/>
+        <Literal>String</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#fullyQualifiedName"/>
+        <NamedIndividual IRI="#Supplier"/>
+        <Literal>java.util.function.Supplier</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#isFunctional"/>
+        <NamedIndividual IRI="#Supplier"/>
+        <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#boolean">true</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#name"/>
+        <NamedIndividual IRI="#Supplier"/>
+        <Literal>Supplier</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#fullyQualifiedName"/>
+        <NamedIndividual IRI="#SuppressWarnings"/>
+        <Literal>java.lang.SuppressWarnings</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#name"/>
+        <NamedIndividual IRI="#SuppressWarnings"/>
+        <Literal>SuppressWarnings</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#name"/>
+        <NamedIndividual IRI="#boolean"/>
+        <Literal>boolean</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#name"/>
+        <NamedIndividual IRI="#byte"/>
+        <Literal>byte</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#name"/>
+        <NamedIndividual IRI="#char"/>
+        <Literal>char</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#name"/>
+        <NamedIndividual IRI="#double"/>
+        <Literal>double</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#name"/>
+        <NamedIndividual IRI="#float"/>
+        <Literal>float</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#name"/>
+        <NamedIndividual IRI="#int"/>
+        <Literal>int</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#name"/>
+        <NamedIndividual IRI="#long"/>
+        <Literal>long</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#name"/>
+        <NamedIndividual IRI="#short"/>
+        <Literal>short</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#name"/>
+        <NamedIndividual IRI="#void"/>
+        <Literal>void</Literal>
+    </DataPropertyAssertion>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#accessesField"/>
+        <Class IRI="#Method"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#annotationType"/>
+        <Class IRI="#Annotation"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#calls"/>
+        <Class IRI="#Method"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#containsClass"/>
+        <Class IRI="#Package"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#extendsClass"/>
+        <Class IRI="#Class"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#extendsInterface"/>
+        <Class IRI="#Interface"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#hasAnnotation"/>
+        <Class IRI="#AnnotatableElement"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#hasBound"/>
+        <Class IRI="#TypeParameter"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#hasConstructor"/>
+        <Class IRI="#Class"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#hasField"/>
+        <Class IRI="#Class"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#hasFieldType"/>
+        <Class IRI="#Field"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#hasLambdaBody"/>
+        <Class IRI="#LambdaExpression"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#hasLambdaParameters"/>
+        <Class IRI="#LambdaExpression"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#hasMethod"/>
+        <Class IRI="#Class"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#hasPackage"/>
+        <Class IRI="#JavaProject"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#hasParameter"/>
+        <ObjectUnionOf>
+            <Class IRI="#Constructor"/>
+            <Class IRI="#Method"/>
+        </ObjectUnionOf>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#hasParameterType"/>
+        <Class IRI="#Parameter"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#hasReturnType"/>
+        <Class IRI="#Method"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#hasTypeParameter"/>
+        <Class IRI="#GenericType"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#implementsInterface"/>
+        <Class IRI="#Class"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#instantiates"/>
+        <Class IRI="#Method"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#overloads"/>
+        <Class IRI="#Method"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#overrides"/>
+        <Class IRI="#Method"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#permitsSubclass"/>
+        <Class IRI="#SealedClass"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#referencesMethod"/>
+        <Class IRI="#MethodReference"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#throwsException"/>
+        <ObjectUnionOf>
+            <Class IRI="#Constructor"/>
+            <Class IRI="#Method"/>
+        </ObjectUnionOf>
+    </ObjectPropertyDomain>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#accessesField"/>
+        <Class IRI="#Field"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#annotationType"/>
+        <Class IRI="#AnnotationType"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#calls"/>
+        <Class IRI="#Method"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#containsClass"/>
+        <Class IRI="#Class"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#extendsClass"/>
+        <Class IRI="#Class"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#extendsInterface"/>
+        <Class IRI="#Interface"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#hasAnnotation"/>
+        <Class IRI="#Annotation"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#hasBound"/>
+        <Class IRI="#Type"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#hasConstructor"/>
+        <Class IRI="#Constructor"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#hasField"/>
+        <Class IRI="#Field"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#hasFieldType"/>
+        <Class IRI="#Type"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#hasLambdaBody"/>
+        <Class IRI="#JavaElement"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#hasLambdaParameters"/>
+        <Class IRI="#Parameter"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#hasMethod"/>
+        <Class IRI="#Method"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#hasPackage"/>
+        <Class IRI="#Package"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#hasParameter"/>
+        <Class IRI="#Parameter"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#hasParameterType"/>
+        <Class IRI="#Type"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#hasReturnType"/>
+        <Class IRI="#Type"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#hasTypeParameter"/>
+        <Class IRI="#TypeParameter"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#implementsInterface"/>
+        <Class IRI="#Interface"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#instantiates"/>
+        <Class IRI="#Class"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#overloads"/>
+        <Class IRI="#Method"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#overrides"/>
+        <Class IRI="#Method"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#permitsSubclass"/>
+        <Class IRI="#Class"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#referencesMethod"/>
+        <Class IRI="#Method"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#throwsException"/>
+        <Class IRI="#ExceptionType"/>
+    </ObjectPropertyRange>
+    <DataPropertyDomain>
+        <DataProperty IRI="#columnNumber"/>
+        <Class IRI="#SourceElement"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#cyclomaticComplexity"/>
+        <Class IRI="#Method"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#fullyQualifiedName"/>
+        <Class IRI="#Type"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#hasInferredType"/>
+        <Class IRI="#LocalVariable"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#isAbstract"/>
+        <Class IRI="#AbstractModifiable"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#isFinal"/>
+        <Class IRI="#FinalModifiable"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#isFunctional"/>
+        <Class IRI="#Interface"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#isNative"/>
+        <Class IRI="#Method"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#isOverloaded"/>
+        <Class IRI="#Method"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#isOverridden"/>
+        <Class IRI="#Method"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#isPrivate"/>
+        <Class IRI="#AccessModifiable"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#isProtected"/>
+        <Class IRI="#AccessModifiable"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#isPublic"/>
+        <Class IRI="#AccessModifiable"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#isSealed"/>
+        <Class IRI="#Class"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#isStatic"/>
+        <Class IRI="#StaticModifiable"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#isSynchronized"/>
+        <Class IRI="#Method"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#isTransient"/>
+        <Class IRI="#Field"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#isVolatile"/>
+        <Class IRI="#Field"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#lineNumber"/>
+        <Class IRI="#SourceElement"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#linesOfCode"/>
+        <ObjectUnionOf>
+            <Class IRI="#Class"/>
+            <Class IRI="#Method"/>
+            <Class IRI="#Package"/>
+        </ObjectUnionOf>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#name"/>
+        <Class IRI="#NamedElement"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#numberOfFields"/>
+        <Class IRI="#Class"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#numberOfMethods"/>
+        <Class IRI="#Class"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#packageName"/>
+        <Class IRI="#Package"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#sourceFile"/>
+        <Class IRI="#CompilationUnit"/>
+    </DataPropertyDomain>
+    <DataPropertyRange>
+        <DataProperty IRI="#columnNumber"/>
+        <Datatype abbreviatedIRI="xsd:int"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#cyclomaticComplexity"/>
+        <Datatype abbreviatedIRI="xsd:int"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#fullyQualifiedName"/>
+        <Datatype abbreviatedIRI="xsd:string"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#hasInferredType"/>
+        <Datatype abbreviatedIRI="xsd:boolean"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#isAbstract"/>
+        <Datatype abbreviatedIRI="xsd:boolean"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#isFinal"/>
+        <Datatype abbreviatedIRI="xsd:boolean"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#isFunctional"/>
+        <Datatype abbreviatedIRI="xsd:boolean"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#isNative"/>
+        <Datatype abbreviatedIRI="xsd:boolean"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#isOverloaded"/>
+        <Datatype abbreviatedIRI="xsd:boolean"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#isOverridden"/>
+        <Datatype abbreviatedIRI="xsd:boolean"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#isPrivate"/>
+        <Datatype abbreviatedIRI="xsd:boolean"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#isProtected"/>
+        <Datatype abbreviatedIRI="xsd:boolean"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#isPublic"/>
+        <Datatype abbreviatedIRI="xsd:boolean"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#isSealed"/>
+        <Datatype abbreviatedIRI="xsd:boolean"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#isStatic"/>
+        <Datatype abbreviatedIRI="xsd:boolean"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#isSynchronized"/>
+        <Datatype abbreviatedIRI="xsd:boolean"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#isTransient"/>
+        <Datatype abbreviatedIRI="xsd:boolean"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#isVolatile"/>
+        <Datatype abbreviatedIRI="xsd:boolean"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#lineNumber"/>
+        <Datatype abbreviatedIRI="xsd:int"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#linesOfCode"/>
+        <Datatype abbreviatedIRI="xsd:int"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#name"/>
+        <Datatype abbreviatedIRI="xsd:string"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#numberOfFields"/>
+        <Datatype abbreviatedIRI="xsd:int"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#numberOfMethods"/>
+        <Datatype abbreviatedIRI="xsd:int"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#packageName"/>
+        <Datatype abbreviatedIRI="xsd:string"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#sourceFile"/>
+        <Datatype abbreviatedIRI="xsd:string"/>
+    </DataPropertyRange>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#AbstractModifiable</IRI>
+        <Literal>Elements that can be abstract</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#AbstractModifiable</IRI>
+        <Literal>Abstract Modifiable</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#AccessModifiable</IRI>
+        <Literal>Elements that can have access modifiers (public, private, protected)</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#AccessModifiable</IRI>
+        <Literal>Access Modifiable</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#AnnotatableElement</IRI>
+        <Literal>Elements that can have annotations</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#AnnotatableElement</IRI>
+        <Literal>Annotatable Element</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#Annotation</IRI>
+        <Literal>Java annotation type definition</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Annotation</IRI>
+        <Literal>Annotation</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#AnnotationInstance</IRI>
+        <Literal>Usage of an annotation on an element</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#AnnotationInstance</IRI>
+        <Literal>Annotation Instance</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#AnnotationType</IRI>
+        <Literal>Definition of an annotation</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#AnnotationType</IRI>
+        <Literal>Annotation Type</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#CheckedException</IRI>
+        <Literal>Exception that must be declared or caught</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#CheckedException</IRI>
+        <Literal>Checked Exception</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#Class</IRI>
+        <Literal>Java class definition</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Class</IRI>
+        <Literal>Class</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#CompilationUnit</IRI>
+        <Literal>A single Java source file</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#CompilationUnit</IRI>
+        <Literal>Compilation Unit</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#Constructor</IRI>
+        <Literal>Class constructor</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Constructor</IRI>
+        <Literal>Constructor</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Consumer</IRI>
+        <Literal>Consumer</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Deprecated</IRI>
+        <Literal>Deprecated</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#Enum</IRI>
+        <Literal>Java enumeration type</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Enum</IRI>
+        <Literal>Enum</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Exception</IRI>
+        <Literal>Exception</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#ExceptionType</IRI>
+        <Literal>Exception or error class</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#ExceptionType</IRI>
+        <Literal>Exception Type</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#Field</IRI>
+        <Literal>Class or instance field</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Field</IRI>
+        <Literal>Field</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#FinalModifiable</IRI>
+        <Literal>Elements that can be final</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#FinalModifiable</IRI>
+        <Literal>Final Modifiable</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Function</IRI>
+        <Literal>Function</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#FunctionalInterface</IRI>
+        <Literal>Interface with exactly one abstract method</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#FunctionalInterface</IRI>
+        <Literal>Functional Interface</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#GenericType</IRI>
+        <Literal>Type with generic parameters</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#GenericType</IRI>
+        <Literal>Generic Type</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#IOException</IRI>
+        <Literal>IOException</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#IllegalArgumentException</IRI>
+        <Literal>IllegalArgumentException</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Integer</IRI>
+        <Literal>Integer</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#Interface</IRI>
+        <Literal>Java interface definition</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Interface</IRI>
+        <Literal>Interface</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#JavaElement</IRI>
+        <Literal>Abstract base class for all Java language elements</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#JavaElement</IRI>
+        <Literal>Java Element</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#JavaProject</IRI>
+        <Literal>Root container for Java source code</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#JavaProject</IRI>
+        <Literal>Java Project</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#LambdaExpression</IRI>
+        <Literal>Lambda expression (e.g., x -&gt; x * 2)</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#LambdaExpression</IRI>
+        <Literal>Lambda Expression</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#LocalVariable</IRI>
+        <Literal>Local variable declaration</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#LocalVariable</IRI>
+        <Literal>Local Variable</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#Member</IRI>
+        <Literal>Abstract base for class members</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Member</IRI>
+        <Literal>Member</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#Method</IRI>
+        <Literal>Class or instance method</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Method</IRI>
+        <Literal>Method</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#MethodReference</IRI>
+        <Literal>Method reference (e.g., String::length)</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#MethodReference</IRI>
+        <Literal>Method Reference</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#Module</IRI>
+        <Literal>Java module (Java 9+)</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Module</IRI>
+        <Literal>Module</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#NamedElement</IRI>
+        <Literal>Elements that have a name</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#NamedElement</IRI>
+        <Literal>Named Element</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Object</IRI>
+        <Literal>Object</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Optional</IRI>
+        <Literal>Optional</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Override</IRI>
+        <Literal>Override</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#Package</IRI>
+        <Literal>Java package containing classes and interfaces</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Package</IRI>
+        <Literal>Package</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#Parameter</IRI>
+        <Literal>Method or constructor parameter</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Parameter</IRI>
+        <Literal>Parameter</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#ParameterizedType</IRI>
+        <Literal>Generic type with specific type arguments</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#ParameterizedType</IRI>
+        <Literal>Parameterized Type</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#PatternMatching</IRI>
+        <Literal>Pattern matching in instanceof and switch</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#PatternMatching</IRI>
+        <Literal>Pattern Matching</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Predicate</IRI>
+        <Literal>Predicate</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#PrimitiveType</IRI>
+        <Literal>Java primitive types (int, boolean, etc.)</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#PrimitiveType</IRI>
+        <Literal>Primitive Type</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#Record</IRI>
+        <Literal>Java record type (Java 14+)</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Record</IRI>
+        <Literal>Record</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#ReferenceType</IRI>
+        <Literal>Types that are references (classes, interfaces, arrays)</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#ReferenceType</IRI>
+        <Literal>Reference Type</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#RuntimeException</IRI>
+        <Literal>RuntimeException</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#SealedClass</IRI>
+        <Literal>Class with restricted inheritance</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#SealedClass</IRI>
+        <Literal>Sealed Class</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#SourceElement</IRI>
+        <Literal>Elements that have source location information</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#SourceElement</IRI>
+        <Literal>Source Element</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#StaticModifiable</IRI>
+        <Literal>Elements that can be static</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#StaticModifiable</IRI>
+        <Literal>Static Modifiable</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Stream</IRI>
+        <Literal>Stream</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#String</IRI>
+        <Literal>String</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Supplier</IRI>
+        <Literal>Supplier</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#SuppressWarnings</IRI>
+        <Literal>SuppressWarnings</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#SwitchExpression</IRI>
+        <Literal>Switch expression with return value</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#SwitchExpression</IRI>
+        <Literal>Switch Expression</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#TextBlock</IRI>
+        <Literal>Multi-line string literal with triple quotes</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#TextBlock</IRI>
+        <Literal>Text Block</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#Type</IRI>
+        <Literal>Abstract base for all Java types</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Type</IRI>
+        <Literal>Type</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#TypeParameter</IRI>
+        <Literal>Generic type parameter (e.g., T, E)</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#TypeParameter</IRI>
+        <Literal>Type Parameter</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#UncheckedException</IRI>
+        <Literal>Runtime exception that doesn&apos;t need to be declared</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#UncheckedException</IRI>
+        <Literal>Unchecked Exception</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#VirtualThread</IRI>
+        <Literal>Lightweight virtual thread</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#VirtualThread</IRI>
+        <Literal>Virtual Thread</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+        <IRI>#WildcardType</IRI>
+        <Literal>Wildcard type parameter (? extends/super)</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#WildcardType</IRI>
+        <Literal>Wildcard Type</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#accessesField</IRI>
+        <Literal>accesses field</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#annotationType</IRI>
+        <Literal>annotation type</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#boolean</IRI>
+        <Literal>boolean</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#byte</IRI>
+        <Literal>byte</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#calls</IRI>
+        <Literal>calls</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#char</IRI>
+        <Literal>char</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#columnNumber</IRI>
+        <Literal>column number</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#containsClass</IRI>
+        <Literal>contains class</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#cyclomaticComplexity</IRI>
+        <Literal>cyclomatic complexity</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#double</IRI>
+        <Literal>double</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#extendsClass</IRI>
+        <Literal>extends class</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#extendsInterface</IRI>
+        <Literal>extends interface</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#float</IRI>
+        <Literal>float</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#fullyQualifiedName</IRI>
+        <Literal>fully qualified name</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#hasAnnotation</IRI>
+        <Literal>has annotation</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#hasBound</IRI>
+        <Literal>has bound</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#hasConstructor</IRI>
+        <Literal>has constructor</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#hasField</IRI>
+        <Literal>has field</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#hasFieldType</IRI>
+        <Literal>has field type</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#hasInferredType</IRI>
+        <Literal>has inferred type (var)</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#hasLambdaBody</IRI>
+        <Literal>has lambda body</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#hasLambdaParameters</IRI>
+        <Literal>has lambda parameters</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#hasMethod</IRI>
+        <Literal>has method</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#hasPackage</IRI>
+        <Literal>has package</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#hasParameter</IRI>
+        <Literal>has parameter</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#hasParameterType</IRI>
+        <Literal>has parameter type</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#hasReturnType</IRI>
+        <Literal>has return type</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#hasTypeParameter</IRI>
+        <Literal>has type parameter</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#implementsInterface</IRI>
+        <Literal>implements interface</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#instantiates</IRI>
+        <Literal>instantiates</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#int</IRI>
+        <Literal>int</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#isAbstract</IRI>
+        <Literal>is abstract</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#isFinal</IRI>
+        <Literal>is final</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#isFunctional</IRI>
+        <Literal>is functional interface</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#isNative</IRI>
+        <Literal>is native</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#isOverloaded</IRI>
+        <Literal>is overloaded</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#isOverridden</IRI>
+        <Literal>is overridden</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#isPrivate</IRI>
+        <Literal>is private</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#isProtected</IRI>
+        <Literal>is protected</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#isPublic</IRI>
+        <Literal>is public</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#isSealed</IRI>
+        <Literal>is sealed</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#isStatic</IRI>
+        <Literal>is static</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#isSynchronized</IRI>
+        <Literal>is synchronized</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#isTransient</IRI>
+        <Literal>is transient</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#isVolatile</IRI>
+        <Literal>is volatile</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#lineNumber</IRI>
+        <Literal>line number</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#linesOfCode</IRI>
+        <Literal>lines of code</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#long</IRI>
+        <Literal>long</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#name</IRI>
+        <Literal>name</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#numberOfFields</IRI>
+        <Literal>number of fields</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#numberOfMethods</IRI>
+        <Literal>number of methods</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#overloads</IRI>
+        <Literal>overloads</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#overrides</IRI>
+        <Literal>overrides</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#packageName</IRI>
+        <Literal>package name</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#permitsSubclass</IRI>
+        <Literal>permits subclass</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#referencesMethod</IRI>
+        <Literal>references method</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#short</IRI>
+        <Literal>short</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#sourceFile</IRI>
+        <Literal>source file</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#throwsException</IRI>
+        <Literal>throws exception</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#void</IRI>
+        <Literal>void</Literal>
+    </AnnotationAssertion>
+</Ontology>
+
+
+
+<!-- Generated by the OWL API (version 4.5.29.2024-05-13T12:11:03Z) https://github.com/owlcs/owlapi -->
+
