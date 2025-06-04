@@ -4,6 +4,7 @@ import importlib
 from typing import AsyncGenerator, Optional
 from uuid import NAMESPACE_OID, uuid5
 import tree_sitter_python as tspython
+import tree_sitter_java as tsjava
 from tree_sitter import Language, Node, Parser, Tree
 from cognee.shared.logging_utils import get_logger
 
@@ -13,9 +14,17 @@ from cognee.shared.CodeGraphEntities import (
     ImportStatement,
     FunctionDefinition,
     ClassDefinition,
+    PackageStatement,
+    InterfaceDefinition,
+    EnumDefinition,
+    MethodDefinition,
+    FieldDefinition,
 )
 
 logger = get_logger()
+
+PY_LANGUAGE = Language(tspython.language())
+JAVA_LANGUAGE = Language(tsjava.language())
 
 
 class FileParser:
@@ -28,8 +37,9 @@ class FileParser:
 
     def __init__(self):
         self.parsed_files = {}
+        self.source_code_parser = Parser()
 
-    async def parse_file(self, file_path: str) -> tuple[str, Tree]:
+    async def parse_file(self, file_path: str) -> Optional[tuple[str, Tree]]:
         """
         Parse a file and return its source code along with its syntax tree representation.
 
@@ -44,15 +54,22 @@ class FileParser:
         Returns:
         --------
 
-            - tuple[str, Tree]: A tuple containing the source code of the file and its
-              corresponding syntax tree representation.
+            - Optional[tuple[str, Tree]]: A tuple containing the source code of the file and its
+              corresponding syntax tree representation, or None if parsing is not supported or fails.
         """
-        PY_LANGUAGE = Language(tspython.language())
-        source_code_parser = Parser(PY_LANGUAGE)
+        if file_path.endswith(".py"):
+            self.source_code_parser.set_language(PY_LANGUAGE)
+        elif file_path.endswith(".java"):
+            self.source_code_parser.set_language(JAVA_LANGUAGE)
+        else:
+            logger.warning(f"Unsupported file type for parsing: {file_path}. Skipping.")
+            return None, None # Or handle as per specific requirements
 
         if file_path not in self.parsed_files:
             source_code = await get_source_code(file_path)
-            source_code_tree = source_code_parser.parse(bytes(source_code, "utf-8"))
+            if source_code is None: # Handle case where file reading failed
+                return None, None
+            source_code_tree = self.source_code_parser.parse(bytes(source_code, "utf-8"))
             self.parsed_files[file_path] = (source_code, source_code_tree)
 
         return self.parsed_files[file_path]
@@ -170,8 +187,19 @@ async def get_local_script_dependencies(
           including its dependencies and definitions.
     """
     code_file_parser = FileParser()
-    source_code, source_code_tree = await code_file_parser.parse_file(script_path)
+    parsed_data = await code_file_parser.parse_file(script_path)
 
+    if parsed_data is None or parsed_data[0] is None or parsed_data[1] is None:
+        # This case handles unsupported file types or files that couldn't be read/parsed.
+        # Create a simple CodeFile node without source code or further analysis.
+        file_path_relative_to_repo = script_path[len(repo_path) + 1 :]
+        return CodeFile(
+            id=uuid5(NAMESPACE_OID, script_path),
+            name=file_path_relative_to_repo,
+            file_path=script_path,
+        )
+
+    source_code, source_code_tree = parsed_data
     file_path_relative_to_repo = script_path[len(repo_path) + 1 :]
 
     if not detailed_extraction:
@@ -229,105 +257,318 @@ def find_node(nodes: list[Node], condition: callable) -> Node:
     return None
 
 
-async def extract_code_parts(
-    tree_root: Node, script_path: str, existing_nodes: list[DataPoint] = {}
+def get_node_text(node: Node) -> str:
+    return node.text.decode("utf-8")
+
+def get_preceding_javadoc(node: Node) -> Optional[str]:
+    """
+    Attempts to find a Javadoc comment (block_comment starting with /**)
+    that immediately precedes the given node.
+    """
+    previous_sibling = node.prev_named_sibling
+    if previous_sibling and previous_sibling.type == 'block_comment':
+        comment_text = get_node_text(previous_sibling)
+        if comment_text.startswith("/**"):
+            return comment_text
+    return None
+
+async def _extract_python_code_parts(
+    tree_root: Node, script_path: str, existing_nodes: dict
 ) -> AsyncGenerator[DataPoint, None]:
-    """
-    Extract code parts from a given AST node tree asynchronously.
-
-    Iteratively yields DataPoint nodes representing import statements, function definitions,
-    and class definitions found in the children of the specified tree root. The function
-    checks
-    if nodes are already present in the existing_nodes dictionary to prevent duplicates.
-    This function has to be used in an asynchronous context, and it requires a valid
-    tree_root
-    and proper initialization of existing_nodes.
-
-    Parameters:
-    -----------
-
-        - tree_root (Node): The root node of the AST tree containing code parts to extract.
-        - script_path (str): The file path of the script from which the AST was generated.
-        - existing_nodes (list[DataPoint]): A dictionary that holds already extracted
-          DataPoint nodes to avoid duplicates. (default {})
-
-    Returns:
-    --------
-
-        Yields DataPoint nodes representing imported modules, functions, and classes.
-    """
     for child_node in tree_root.children:
-        if child_node.type == "import_statement" or child_node.type == "import_from_statement":
-            parts = child_node.text.decode("utf-8").split()
+        node_type = child_node.type
+        node_text_bytes = child_node.text
+
+        if node_type == "import_statement" or node_type == "import_from_statement":
+            parts = get_node_text(child_node).split()
+            module_name = ""
+            function_name = None
 
             if parts[0] == "import":
                 module_name = parts[1]
-                function_name = None
             elif parts[0] == "from":
                 module_name = parts[1]
-                function_name = parts[3]
-
-                if " as " in function_name:
-                    function_name = function_name.split(" as ")[0]
+                if len(parts) > 3:
+                    function_name = parts[3]
+                    if " as " in function_name:
+                        function_name = function_name.split(" as ")[0]
 
             if " as " in module_name:
                 module_name = module_name.split(" as ")[0]
 
-            if function_name and "import " + function_name not in existing_nodes:
-                import_statement_node = ImportStatement(
-                    name=function_name,
-                    module=module_name,
-                    start_point=child_node.start_point,
-                    end_point=child_node.end_point,
-                    file_path=script_path,
-                    source_code=child_node.text,
-                )
-                existing_nodes["import " + function_name] = import_statement_node
-
+            # Yield imported function/member if applicable
             if function_name:
-                yield existing_nodes["import " + function_name]
+                key = f"import:{function_name}:{module_name}:{child_node.start_point[0]}"
+                if key not in existing_nodes:
+                    import_node = ImportStatement(
+                        name=function_name,
+                        module=module_name,
+                        start_point=child_node.start_point,
+                        end_point=child_node.end_point,
+                        file_path=script_path,
+                        source_code=node_text_bytes,
+                    )
+                    existing_nodes[key] = import_node
+                    yield import_node
 
-            if module_name not in existing_nodes:
-                import_statement_node = ImportStatement(
-                    name=module_name,
+            # Yield imported module
+            key = f"module_import:{module_name}:{child_node.start_point[0]}"
+            if key not in existing_nodes:
+                import_node = ImportStatement(
+                    name=module_name, # For module import, name and module can be the same
                     module=module_name,
                     start_point=child_node.start_point,
                     end_point=child_node.end_point,
                     file_path=script_path,
-                    source_code=child_node.text,
+                    source_code=node_text_bytes,
                 )
-                existing_nodes[module_name] = import_statement_node
+                existing_nodes[key] = import_node
+                yield import_node
 
-            yield existing_nodes[module_name]
+        elif node_type == "function_definition":
+            name_node = child_node.child_by_field_name("name")
+            if name_node:
+                func_name = get_node_text(name_node)
+                key = f"function:{func_name}:{child_node.start_point[0]}"
+                if key not in existing_nodes:
+                    func_def_node = FunctionDefinition(
+                        name=func_name,
+                        start_point=child_node.start_point,
+                        end_point=child_node.end_point,
+                        file_path=script_path,
+                        source_code=node_text_bytes,
+                        # TODO: Add parameters, docstring if possible
+                    )
+                    existing_nodes[key] = func_def_node
+                    yield func_def_node
 
-        if child_node.type == "function_definition":
-            function_node = find_node(child_node.children, lambda node: node.type == "identifier")
-            function_node_name = function_node.text
+        elif node_type == "class_definition":
+            name_node = child_node.child_by_field_name("name")
+            if name_node:
+                class_name = get_node_text(name_node)
+                key = f"class:{class_name}:{child_node.start_point[0]}"
+                if key not in existing_nodes:
+                    class_def_node = ClassDefinition(
+                        name=class_name,
+                        start_point=child_node.start_point,
+                        end_point=child_node.end_point,
+                        file_path=script_path,
+                        source_code=node_text_bytes,
+                        # TODO: Add docstring if possible
+                    )
+                    existing_nodes[key] = class_def_node
+                    yield class_def_node
 
-            if function_node_name not in existing_nodes:
-                function_definition_node = FunctionDefinition(
-                    name=function_node_name,
-                    start_point=child_node.start_point,
-                    end_point=child_node.end_point,
-                    file_path=script_path,
-                    source_code=child_node.text,
-                )
-                existing_nodes[function_node_name] = function_definition_node
+                # Recursively parse body of the class for nested definitions
+                body_node = child_node.child_by_field_name("body")
+                if body_node:
+                    async for item in _extract_python_code_parts(body_node, script_path, existing_nodes):
+                        yield item
 
-            yield existing_nodes[function_node_name]
+async def _extract_java_code_parts(
+    tree_root: Node, script_path: str, existing_nodes: dict
+) -> AsyncGenerator[DataPoint, None]:
+    for child_node in tree_root.named_children: # Use named_children for efficiency
+        node_type = child_node.type
+        node_text_bytes = child_node.text
+        javadoc = get_preceding_javadoc(child_node)
 
-        if child_node.type == "class_definition":
-            class_name_node = find_node(child_node.children, lambda node: node.type == "identifier")
-            class_name_node_name = class_name_node.text
+        if node_type == "package_declaration":
+            name_node = find_node(child_node.children, lambda n: n.type in ['identifier', 'scoped_identifier'])
+            if name_node:
+                package_name = get_node_text(name_node)
+                key = f"package:{package_name}:{child_node.start_point[0]}"
+                if key not in existing_nodes:
+                    package_stmt_node = PackageStatement(
+                        name=package_name,
+                        start_point=child_node.start_point,
+                        end_point=child_node.end_point,
+                        file_path=script_path,
+                        source_code=node_text_bytes,
+                        comment=javadoc, # Though Javadoc on package is rare via package-info.java
+                    )
+                    existing_nodes[key] = package_stmt_node
+                    yield package_stmt_node
 
-            if class_name_node_name not in existing_nodes:
-                class_definition_node = ClassDefinition(
-                    name=class_name_node_name,
-                    start_point=child_node.start_point,
-                    end_point=child_node.end_point,
-                    file_path=script_path,
-                    source_code=child_node.text,
-                )
-                existing_nodes[class_name_node_name] = class_definition_node
+        elif node_type == "import_declaration":
+            name_node = find_node(child_node.children, lambda n: n.type in ['identifier', 'scoped_identifier', 'asterisk', 'type_identifier']) # Added type_identifier for some static imports
+            if name_node:
+                import_name = get_node_text(name_node)
+                # For Java, module can be tricky, often it's part of the import_name itself
+                # For simplicity, using the full import string or a part of it as module
+                module_name = import_name if child_node.child_by_field_name('asterisk') else '.'.join(import_name.split('.')[:-1])
+                if not module_name and import_name != '*': # handle default package import like "import SomeClass"
+                    module_name = "default"
 
-            yield existing_nodes[class_name_node_name]
+
+                key = f"import:{import_name}:{child_node.start_point[0]}"
+                if key not in existing_nodes:
+                    import_stmt_node = ImportStatement(
+                        name=import_name,
+                        module=module_name if module_name else import_name,
+                        start_point=child_node.start_point,
+                        end_point=child_node.end_point,
+                        file_path=script_path,
+                        source_code=node_text_bytes,
+                        comment=javadoc,
+                    )
+                    existing_nodes[key] = import_stmt_node
+                    yield import_stmt_node
+
+        elif node_type in ["class_declaration", "interface_declaration", "enum_declaration"]:
+            name_node = child_node.child_by_field_name("name")
+            if name_node:
+                type_name = get_node_text(name_node)
+                body_node = child_node.child_by_field_name("body") # e.g., class_body, interface_body, enum_body
+                body_text = get_node_text(body_node) if body_node else None
+                body_bytes = body_text.encode('utf-8') if body_text else None
+
+                key = f"{node_type}:{type_name}:{child_node.start_point[0]}"
+                if key not in existing_nodes:
+                    if node_type == "class_declaration":
+                        instance = ClassDefinition(
+                            name=type_name,
+                            start_point=child_node.start_point,
+                            end_point=child_node.end_point,
+                            file_path=script_path,
+                            source_code=node_text_bytes,
+                            comment=javadoc,
+                            body=body_bytes,
+                        )
+                    elif node_type == "interface_declaration":
+                        instance = InterfaceDefinition(
+                            name=type_name,
+                            start_point=child_node.start_point,
+                            end_point=child_node.end_point,
+                            file_path=script_path,
+                            source_code=node_text_bytes,
+                            comment=javadoc,
+                            body=body_bytes,
+                        )
+                    elif node_type == "enum_declaration":
+                        instance = EnumDefinition(
+                            name=type_name,
+                            start_point=child_node.start_point,
+                            end_point=child_node.end_point,
+                            file_path=script_path,
+                            source_code=node_text_bytes,
+                            comment=javadoc,
+                            body=body_bytes,
+                        )
+                    else: # Should not happen based on the if condition
+                        continue
+
+                    existing_nodes[key] = instance
+                    yield instance
+
+                if body_node:
+                    async for item in _extract_java_code_parts(body_node, script_path, existing_nodes):
+                        yield item
+
+        elif node_type == "method_declaration":
+            name_node = child_node.child_by_field_name("name")
+            if name_node:
+                method_name = get_node_text(name_node)
+
+                return_type_node = child_node.child_by_field_name("type") # tree-sitter-java uses 'type' for return type
+                return_type_text = get_node_text(return_type_node) if return_type_node else None
+
+                parameters_node = child_node.child_by_field_name("parameters")
+                params_list = []
+                if parameters_node:
+                    for param_node in parameters_node.children_by_field_name("formal_parameter"): # Or 'spread_parameter'
+                        param_type_node = param_node.child_by_field_name("type")
+                        param_name_node = param_node.child_by_field_name("name")
+                        if param_type_node and param_name_node:
+                            params_list.append({
+                                "name": get_node_text(param_name_node),
+                                "type": get_node_text(param_type_node),
+                            })
+
+                body_node = child_node.child_by_field_name("body")
+                body_text = get_node_text(body_node) if body_node else None
+                body_bytes = body_text.encode('utf-8') if body_text else None
+
+                key = f"method:{method_name}:{child_node.start_point[0]}"
+                if key not in existing_nodes:
+                    method_def_node = MethodDefinition(
+                        name=method_name,
+                        start_point=child_node.start_point,
+                        end_point=child_node.end_point,
+                        file_path=script_path,
+                        source_code=node_text_bytes,
+                        comment=javadoc,
+                        parameters=params_list,
+                        return_type=return_type_text,
+                        body=body_bytes,
+                    )
+                    existing_nodes[key] = method_def_node
+                    yield method_def_node
+
+                if body_node:
+                    async for item in _extract_java_code_parts(body_node, script_path, existing_nodes):
+                        yield item
+
+        elif node_type == "field_declaration":
+            field_type_node = child_node.child_by_field_name("type")
+            field_type_text = get_node_text(field_type_node) if field_type_node else None
+
+            # A field declaration can declare multiple variables, e.g., int x, y;
+            for var_declarator in child_node.children_by_field_name("declarator"):
+                name_node = var_declarator.child_by_field_name("name")
+                if name_node:
+                    field_name = get_node_text(name_node)
+                    # The javadoc for a field declaration applies to all variables in it.
+                    # The source_code for FieldDefinition will be the specific variable declarator.
+                    var_declarator_text_bytes = var_declarator.text
+
+                    key = f"field:{field_name}:{var_declarator.start_point[0]}"
+                    if key not in existing_nodes:
+                        field_def_node = FieldDefinition(
+                            name=field_name,
+                            field_type=field_type_text,
+                            start_point=var_declarator.start_point,
+                            end_point=var_declarator.end_point,
+                            file_path=script_path,
+                            source_code=var_declarator_text_bytes,
+                            comment=javadoc,
+                        )
+                        existing_nodes[key] = field_def_node
+                        yield field_def_node
+
+
+async def extract_code_parts(
+    tree_root: Node, script_path: str, existing_nodes: Optional[dict] = None
+) -> AsyncGenerator[DataPoint, None]:
+    """
+    Extract code parts from a given AST node tree asynchronously.
+    Supports both Python and Java.
+
+    Iteratively yields DataPoint nodes representing import statements, function definitions,
+    class definitions, etc. found in the children of the specified tree root.
+    The function checks if nodes are already present in the existing_nodes dictionary
+    to prevent duplicates.
+
+    Parameters:
+    -----------
+        tree_root (Node): The root node of the AST tree.
+        script_path (str): The file path of the script.
+        existing_nodes (Optional[dict]): A dictionary to store already extracted nodes
+                                         to avoid duplicates. Defaults to None,
+                                         which initializes an empty dict.
+    Returns:
+    --------
+        AsyncGenerator[DataPoint, None]: Yields DataPoint nodes.
+    """
+    if existing_nodes is None:
+        existing_nodes = {}
+
+    if script_path.endswith(".py"):
+        async for item in _extract_python_code_parts(tree_root, script_path, existing_nodes):
+            yield item
+    elif script_path.endswith(".java"):
+        async for item in _extract_java_code_parts(tree_root, script_path, existing_nodes):
+            yield item
+    else:
+        logger.warning(f"Unsupported file type for code part extraction: {script_path}")
+        return

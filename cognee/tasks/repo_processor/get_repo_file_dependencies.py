@@ -32,28 +32,47 @@ async def get_source_code_files(repo_path):
     if not os.path.exists(repo_path):
         return {}
 
-    py_files_paths = (
-        os.path.join(root, file)
-        for root, _, files in os.walk(repo_path)
-        for file in files
-        if (
-            file.endswith(".py")
-            and not file.startswith("test_")
-            and not file.endswith("_test")
-            and ".venv" not in file
-        )
-    )
+    source_files_paths = []
+    excluded_python_dirs = [os.path.join(repo_path, ".venv")]
+    excluded_java_dirs = [
+        os.path.join(repo_path, "target"),
+        os.path.join(repo_path, "build"),
+        os.path.join(repo_path, "out"),
+        os.path.join(repo_path, ".gradle"),
+        os.path.join(repo_path, ".mvn"),
+    ]
 
-    source_code_files = set()
-    for file_path in py_files_paths:
-        file_path = os.path.abspath(file_path)
-
-        if os.path.getsize(file_path) == 0:
+    for root, _, files in os.walk(repo_path):
+        # Python specific directory exclusions
+        if any(excluded_dir in root for excluded_dir in excluded_python_dirs):
             continue
 
-        source_code_files.add(file_path)
+        # Java specific directory exclusions
+        if any(excluded_dir in root for excluded_dir in excluded_java_dirs):
+            continue
 
-    return list(source_code_files)
+        for file in files:
+            is_python_file = file.endswith(".py")
+            is_java_file = file.endswith(".java")
+
+            if is_python_file:
+                if file.startswith("test_") or file.endswith("_test.py"):
+                    continue
+            elif is_java_file:
+                if file.endswith("Test.java") or file.startswith("Test"):
+                    continue
+            elif not is_python_file and not is_java_file:
+                continue
+
+            file_path = os.path.join(root, file)
+            file_path = os.path.abspath(file_path)
+
+            if os.path.getsize(file_path) == 0:
+                continue
+
+            source_files_paths.append(file_path)
+
+    return list(set(source_files_paths))
 
 
 def run_coroutine(coroutine_func, *args, **kwargs):
