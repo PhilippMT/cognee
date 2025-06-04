@@ -1,2 +1,3 @@
 from .get_non_code_files import get_non_py_files
 from .get_repo_file_dependencies import get_repo_file_dependencies
+from .get_java_file_dependencies import get_java_repo_file_dependencies
