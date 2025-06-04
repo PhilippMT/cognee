@@ -17,6 +17,7 @@ from cognee.modules.data.methods.get_unique_dataset_id import get_unique_dataset
 from cognee.tasks.graph import extract_graph_from_data
 from cognee.tasks.ingestion import ingest_data
 from cognee.tasks.repo_processor import get_non_py_files, get_repo_file_dependencies
+from cognee.tasks.repo_processor.get_java_file_dependencies import get_java_repo_file_dependencies
 
 from cognee.tasks.storage import add_data_points
 from cognee.tasks.summarization import summarize_text
@@ -28,7 +29,17 @@ logger = get_logger("code_graph_pipeline")
 
 
 @observe
-async def run_code_graph_pipeline(repo_path, include_docs=False):
+async def run_code_graph_pipeline(repo_path, include_docs=False, language="python"):
+    """
+    Run a code graph pipeline for the specified repository path.
+    
+    Parameters:
+    -----------
+    
+        - repo_path (str): The path to the repository to analyze.
+        - include_docs (bool): Whether to include non-code documents in the analysis.
+        - language (str): The programming language to analyze. Supported values: "python", "java".
+    """
     import cognee
     from cognee.low_level import setup
 
@@ -40,8 +51,15 @@ async def run_code_graph_pipeline(repo_path, include_docs=False):
     user = await get_default_user()
     detailed_extraction = True
 
+    # Select the appropriate file dependency function based on the language
+    if language.lower() == "java":
+        file_dependency_func = get_java_repo_file_dependencies
+    else:
+        # Default to Python
+        file_dependency_func = get_repo_file_dependencies
+
     tasks = [
-        Task(get_repo_file_dependencies, detailed_extraction=detailed_extraction),
+        Task(file_dependency_func, detailed_extraction=detailed_extraction),
         # Task(summarize_code, task_config={"batch_size": 500}), # This task takes a long time to complete
         Task(add_data_points, task_config={"batch_size": 500}),
     ]
@@ -81,7 +99,12 @@ async def run_code_graph_pipeline(repo_path, include_docs=False):
 if __name__ == "__main__":
 
     async def main():
-        async for run_status in run_code_graph_pipeline("REPO_PATH"):
+        # Example for Python
+        async for run_status in run_code_graph_pipeline("REPO_PATH", language="python"):
+            print(f"{run_status.pipeline_name}: {run_status.status}")
+
+        # Example for Java
+        async for run_status in run_code_graph_pipeline("REPO_PATH", language="java"):
             print(f"{run_status.pipeline_name}: {run_status.status}")
 
         file_path = os.path.join(
@@ -89,12 +112,24 @@ if __name__ == "__main__":
         )
         await visualize_graph(file_path)
 
-        search_results = await search(
+        # Search Python code
+        python_search_results = await search(
             query_type=SearchType.CODE,
             query_text="How is Relationship weight calculated?",
         )
 
-        for file in search_results:
+        print("Python search results:")
+        for file in python_search_results:
+            print(file["name"])
+
+        # Search Java code
+        java_search_results = await search(
+            query_type=SearchType.CODE,
+            query_text="Find Java classes that implement interfaces",
+        )
+
+        print("Java search results:")
+        for file in java_search_results:
             print(file["name"])
 
     asyncio.run(main())
