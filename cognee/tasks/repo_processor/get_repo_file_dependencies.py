@@ -10,34 +10,35 @@ from cognee.infrastructure.engine import DataPoint
 from cognee.shared.CodeGraphEntities import CodeFile, Repository
 
 
-async def get_source_code_files(repo_path):
+async def get_source_code_files(repo_path, extensions=(".py",)):
     """
-    Retrieve Python source code files from the specified repository path.
+    Retrieve source code files from the specified repository path for given extensions.
 
-    This function scans the given repository path for files that have the .py extension
+    This function scans the given repository path for files that have the specified extensions
     while excluding test files and files within a virtual environment. It returns a list of
     absolute paths to the source code files that are not empty.
 
     Parameters:
     -----------
 
-        - repo_path: The file path to the repository to search for Python source files.
+        - repo_path: The file path to the repository to search for source files.
+        - extensions: A tuple of file extensions to include in the search (default is (".py",)).
 
     Returns:
     --------
 
-        A list of absolute paths to .py files that contain source code, excluding empty
-        files, test files, and files from a virtual environment.
+        A list of absolute paths to files that contain source code, excluding empty files,
+        test files, and files from a virtual environment.
     """
     if not os.path.exists(repo_path):
         return {}
 
-    py_files_paths = (
+    code_files_paths = (
         os.path.join(root, file)
         for root, _, files in os.walk(repo_path)
         for file in files
         if (
-            file.endswith(".py")
+            file.endswith(extensions)
             and not file.startswith("test_")
             and not file.endswith("_test")
             and ".venv" not in file
@@ -45,7 +46,7 @@ async def get_source_code_files(repo_path):
     )
 
     source_code_files = set()
-    for file_path in py_files_paths:
+    for file_path in code_files_paths:
         file_path = os.path.abspath(file_path)
 
         if os.path.getsize(file_path) == 0:
@@ -88,17 +89,17 @@ async def get_repo_file_dependencies(
     repo_path: str, detailed_extraction: bool = False
 ) -> AsyncGenerator[DataPoint, None]:
     """
-    Generate a dependency graph for Python files in the given repository path.
+    Generate a dependency graph for Python and Java files in the given repository path.
 
     Check the validity of the repository path and yield a repository object followed by the
-    dependencies of Python files within that repository. Raise a FileNotFoundError if the
+    dependencies of Python and Java files within that repository. Raise a FileNotFoundError if the
     provided path does not exist. The extraction of detailed dependencies can be controlled
     via the `detailed_extraction` argument.
 
     Parameters:
     -----------
 
-        - repo_path (str): The file path to the repository where Python files are located.
+        - repo_path (str): The file path to the repository where Python and Java files are located.
         - detailed_extraction (bool): A flag indicating whether to perform a detailed
           extraction of dependencies (default is False). (default False)
     """
@@ -106,7 +107,8 @@ async def get_repo_file_dependencies(
     if not os.path.exists(repo_path):
         raise FileNotFoundError(f"Repository path {repo_path} does not exist.")
 
-    source_code_files = await get_source_code_files(repo_path)
+    # Support both .py and .java files
+    source_code_files = await get_source_code_files(repo_path, extensions=(".py", ".java"))
 
     repo = Repository(
         id=uuid5(NAMESPACE_OID, repo_path),
