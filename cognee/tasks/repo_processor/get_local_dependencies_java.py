@@ -15,8 +15,7 @@ class JavaFileParser:
     def __init__(self):
         self.parsed_files = {}
         JAVA_LANGUAGE = Language(tsjava.language())
-        self.source_code_parser = Parser()
-        self.source_code_parser.set_language(JAVA_LANGUAGE)
+        self.source_code_parser = Parser(JAVA_LANGUAGE)
 
     async def parse_file(self, file_path: str) -> tuple[str, Tree]:
         if file_path not in self.parsed_files:
@@ -45,7 +44,7 @@ async def extract_java_code_parts(tree_root: Node, script_path: str, existing_no
                 class_name = class_name_node.text.decode()
                 if class_name not in existing_nodes:
                     class_node = Class(
-                        id=uuid5(NAMESPACE_OID, f"{script_path}:{class_name}"),
+                        id=str(uuid5(NAMESPACE_OID, f"{script_path}:{class_name}")),
                         name=class_name,
                         description="",  # TODO: Extract Javadoc if present
                         constructor_parameters=[],
@@ -61,7 +60,7 @@ async def extract_java_code_parts(tree_root: Node, script_path: str, existing_no
                 method_name = method_name_node.text.decode()
                 if method_name not in existing_nodes:
                     method_node = Function(
-                        id=uuid5(NAMESPACE_OID, f"{script_path}:{method_name}"),
+                        id=str(uuid5(NAMESPACE_OID, f"{script_path}:{method_name}")),
                         name=method_name,
                         description="",  # TODO: Extract Javadoc if present
                         parameters=[],  # TODO: Extract parameters
@@ -80,7 +79,7 @@ async def get_local_java_dependencies(repo_path: str, script_path: str, detailed
     async for part in extract_java_code_parts(source_code_tree.root_node, script_path=script_path):
         nodes.append(part)
     graph = SourceCodeGraph(
-        id=uuid5(NAMESPACE_OID, script_path),
+        id=str(uuid5(NAMESPACE_OID, script_path)),
         name=file_path_relative_to_repo,
         description="Java 21 code graph",
         language="java",
