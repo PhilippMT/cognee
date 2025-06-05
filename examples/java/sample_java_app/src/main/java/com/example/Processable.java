@@ -36,7 +36,7 @@ public interface Processable<T> {
                         return process(data, config);
                     } catch (ProcessingException e) {
                         System.err.println("Processing failed for item: " + data);
-                        return Optional.empty();
+                        return Optional.<T>empty();
                     }
                 })
                 .toList();

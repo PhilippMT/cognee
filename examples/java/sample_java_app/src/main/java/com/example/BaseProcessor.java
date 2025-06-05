@@ -54,7 +54,7 @@ public abstract class BaseProcessor<T> implements Processable<T> {
      */
     @Override
     public Optional<T> process(T data, ProcessingConfig config) {
-        if (!isValid(data)) {
+        if (!Processable.isValid(data)) {
             return Optional.empty();
         }
         
