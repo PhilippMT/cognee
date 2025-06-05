@@ -153,54 +153,49 @@ async def get_local_script_dependencies(
 ) -> CodeFile:
     """
     Retrieve local script dependencies and create a CodeFile object.
-
-    Parameters:
-    -----------
-
-        - repo_path (str): The path to the repository that contains the script.
-        - script_path (str): The path of the script for which dependencies are being
-          extracted.
-        - detailed_extraction (bool): A flag indicating whether to perform a detailed
-          extraction of code components.
-
-    Returns:
-    --------
-
-        - CodeFile: Returns a CodeFile object containing information about the script,
-          including its dependencies and definitions.
+    Supports both Python and Java files.
     """
-    code_file_parser = FileParser()
-    source_code, source_code_tree = await code_file_parser.parse_file(script_path)
+    if script_path.endswith(".py"):
+        code_file_parser = FileParser()
+        source_code, source_code_tree = await code_file_parser.parse_file(script_path)
 
-    file_path_relative_to_repo = script_path[len(repo_path) + 1 :]
+        file_path_relative_to_repo = script_path[len(repo_path) + 1 :]
 
-    if not detailed_extraction:
+        if not detailed_extraction:
+            code_file_node = CodeFile(
+                id=uuid5(NAMESPACE_OID, script_path),
+                name=file_path_relative_to_repo,
+                source_code=source_code,
+                file_path=script_path,
+            )
+            return code_file_node
+
         code_file_node = CodeFile(
             id=uuid5(NAMESPACE_OID, script_path),
             name=file_path_relative_to_repo,
-            source_code=source_code,
+            source_code=None,
             file_path=script_path,
         )
+
+        async for part in extract_code_parts(source_code_tree.root_node, script_path=script_path):
+            part.file_path = script_path
+
+            if isinstance(part, FunctionDefinition):
+                code_file_node.provides_function_definition.append(part)
+            if isinstance(part, ClassDefinition):
+                code_file_node.provides_class_definition.append(part)
+            if isinstance(part, ImportStatement):
+                code_file_node.depends_on.append(part)
+
         return code_file_node
+    elif script_path.endswith(".java"):
+        from .get_local_dependencies_java import get_local_java_dependencies
 
-    code_file_node = CodeFile(
-        id=uuid5(NAMESPACE_OID, script_path),
-        name=file_path_relative_to_repo,
-        source_code=None,
-        file_path=script_path,
-    )
-
-    async for part in extract_code_parts(source_code_tree.root_node, script_path=script_path):
-        part.file_path = script_path
-
-        if isinstance(part, FunctionDefinition):
-            code_file_node.provides_function_definition.append(part)
-        if isinstance(part, ClassDefinition):
-            code_file_node.provides_class_definition.append(part)
-        if isinstance(part, ImportStatement):
-            code_file_node.depends_on.append(part)
-
-    return code_file_node
+        graph = await get_local_java_dependencies(repo_path, script_path, detailed_extraction)
+        # Optionally, map SourceCodeGraph to CodeFile or return as is
+        return graph
+    else:
+        raise ValueError(f"Unsupported file type for: {script_path}")
 
 
 def find_node(nodes: list[Node], condition: callable) -> Node:
