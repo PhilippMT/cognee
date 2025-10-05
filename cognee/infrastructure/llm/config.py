@@ -46,6 +46,11 @@ class LLMConfig(BaseSettings):
     llm_temperature: float = 0.0
     llm_streaming: bool = False
     llm_max_completion_tokens: int = 16384
+    
+    # AWS Bedrock specific configuration
+    aws_region_name: Optional[str] = None
+    aws_access_key_id: Optional[str] = None
+    aws_secret_access_key: Optional[str] = None
 
     baml_llm_provider: str = "openai"
     baml_llm_model: str = "gpt-4o-mini"
@@ -200,6 +205,9 @@ class LLMConfig(BaseSettings):
             "fallback_api_key": self.fallback_api_key,
             "fallback_endpoint": self.fallback_endpoint,
             "fallback_model": self.fallback_model,
+            "aws_region_name": self.aws_region_name,
+            "aws_access_key_id": self.aws_access_key_id,
+            "aws_secret_access_key": self.aws_secret_access_key,
         }
 
 
