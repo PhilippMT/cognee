@@ -11,6 +11,15 @@ client<llm> OpenAI {
     }
 }
 
+// AWS Bedrock client with environment configuration
+client<llm> AWSBedrock {
+    provider aws-bedrock
+    options {
+        model client_registry.model
+        region client_registry.base_url
+    }
+}
+
 function AcreateStructuredOutput(
     text_input: string,
     system_prompt: string,
