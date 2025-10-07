@@ -58,6 +58,10 @@ class LiteLLMEmbeddingEngine(EmbeddingEngine):
         endpoint: str = None,
         api_version: str = None,
         max_completion_tokens: int = 512,
+        aws_region_name: str = None,
+        aws_access_key_id: str = None,
+        aws_secret_access_key: str = None,
+        aws_profile_name: str = None,
     ):
         self.api_key = api_key
         self.endpoint = endpoint
@@ -68,6 +72,12 @@ class LiteLLMEmbeddingEngine(EmbeddingEngine):
         self.max_completion_tokens = max_completion_tokens
         self.tokenizer = self.get_tokenizer()
         self.retry_count = 0
+        
+        # AWS Bedrock specific configuration
+        self.aws_region_name = aws_region_name
+        self.aws_access_key_id = aws_access_key_id
+        self.aws_secret_access_key = aws_secret_access_key
+        self.aws_profile_name = aws_profile_name
 
         enable_mocking = os.getenv("MOCK_EMBEDDING", "false")
         if isinstance(enable_mocking, bool):
@@ -100,13 +110,27 @@ class LiteLLMEmbeddingEngine(EmbeddingEngine):
                 response = {"data": [{"embedding": [0.0] * self.dimensions} for _ in text]}
                 return [data["embedding"] for data in response["data"]]
             else:
-                response = await litellm.aembedding(
-                    model=self.model,
-                    input=text,
-                    api_key=self.api_key,
-                    api_base=self.endpoint,
-                    api_version=self.api_version,
-                )
+                # Prepare kwargs for litellm.aembedding
+                embedding_kwargs = {
+                    "model": self.model,
+                    "input": text,
+                    "api_key": self.api_key,
+                    "api_base": self.endpoint,
+                    "api_version": self.api_version,
+                }
+                
+                # Add AWS-specific parameters if using Bedrock
+                if "bedrock" in self.provider.lower() or "bedrock" in self.model.lower():
+                    if self.aws_region_name:
+                        embedding_kwargs["aws_region_name"] = self.aws_region_name
+                    if self.aws_profile_name:
+                        embedding_kwargs["aws_profile_name"] = self.aws_profile_name
+                    if self.aws_access_key_id:
+                        embedding_kwargs["aws_access_key_id"] = self.aws_access_key_id
+                    if self.aws_secret_access_key:
+                        embedding_kwargs["aws_secret_access_key"] = self.aws_secret_access_key
+                
+                response = await litellm.aembedding(**embedding_kwargs)
 
                 return [data["embedding"] for data in response.data]
 

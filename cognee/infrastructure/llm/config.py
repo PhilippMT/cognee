@@ -51,6 +51,7 @@ class LLMConfig(BaseSettings):
     aws_region_name: Optional[str] = None
     aws_access_key_id: Optional[str] = None
     aws_secret_access_key: Optional[str] = None
+    aws_profile_name: Optional[str] = None
 
     baml_llm_provider: str = "openai"
     baml_llm_model: str = "gpt-4o-mini"
@@ -219,6 +220,7 @@ class LLMConfig(BaseSettings):
             "aws_region_name": self.aws_region_name,
             "aws_access_key_id": self.aws_access_key_id,
             "aws_secret_access_key": self.aws_secret_access_key,
+            "aws_profile_name": self.aws_profile_name,
         }
 
 

@@ -159,6 +159,7 @@ def get_llm_client(raise_api_key_error: bool = True):
             aws_region_name=llm_config.aws_region_name or llm_config.llm_endpoint or "eu-central-1",
             aws_access_key_id=llm_config.aws_access_key_id or llm_config.llm_api_key,
             aws_secret_access_key=llm_config.aws_secret_access_key or llm_config.llm_api_version,
+            aws_profile_name=llm_config.aws_profile_name,
             fallback_model=llm_config.fallback_model,
             fallback_aws_region_name=llm_config.fallback_endpoint,
         )

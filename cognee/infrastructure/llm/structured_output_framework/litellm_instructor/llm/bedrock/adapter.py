@@ -41,6 +41,7 @@ class BedrockAdapter(LLMInterface):
         aws_region_name: str = None,
         aws_access_key_id: str = None,
         aws_secret_access_key: str = None,
+        aws_profile_name: str = None,
         fallback_model: str = None,
         fallback_aws_region_name: str = None,
     ):
@@ -54,6 +55,7 @@ class BedrockAdapter(LLMInterface):
             aws_region_name (str): AWS region name (e.g., 'eu-central-1', 'eu-west-1')
             aws_access_key_id (str): AWS access key ID (optional, uses default credentials if not provided)
             aws_secret_access_key (str): AWS secret access key (optional)
+            aws_profile_name (str): AWS named profile from ~/.aws/credentials (optional)
             fallback_model (str): Fallback model identifier
             fallback_aws_region_name (str): Fallback AWS region name
         """
@@ -62,6 +64,7 @@ class BedrockAdapter(LLMInterface):
         self.aws_region_name = aws_region_name or "eu-central-1"
         self.aws_access_key_id = aws_access_key_id
         self.aws_secret_access_key = aws_secret_access_key
+        self.aws_profile_name = aws_profile_name
 
         self.fallback_model = fallback_model
         self.fallback_aws_region_name = fallback_aws_region_name
@@ -96,6 +99,8 @@ class BedrockAdapter(LLMInterface):
         """
         # Prepare AWS credentials if provided
         extra_params = {}
+        if self.aws_profile_name:
+            extra_params["aws_profile_name"] = self.aws_profile_name
         if self.aws_access_key_id:
             extra_params["aws_access_key_id"] = self.aws_access_key_id
         if self.aws_secret_access_key:
