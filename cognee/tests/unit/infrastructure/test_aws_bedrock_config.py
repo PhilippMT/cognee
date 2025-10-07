@@ -97,6 +97,19 @@ def test_baml_aws_bedrock_config():
     assert config.baml_llm_endpoint == "eu-central-1"
 
 
+def test_aws_bedrock_with_profile():
+    """Test AWS Bedrock configuration with named profile."""
+    config = LLMConfig(
+        llm_provider="aws_bedrock",
+        llm_model="bedrock/anthropic.claude-3-7-sonnet-20250219-v1:0",
+        aws_region_name="eu-central-1",
+        aws_profile_name="my-profile",
+    )
+    
+    assert config.aws_profile_name == "my-profile"
+    assert config.aws_region_name == "eu-central-1"
+
+
 def test_aws_bedrock_backward_compatibility():
     """Test that AWS Bedrock can use legacy config fields."""
     config = LLMConfig(
@@ -111,6 +124,25 @@ def test_aws_bedrock_backward_compatibility():
     assert config.llm_endpoint == "eu-west-1"
     assert config.llm_api_key == "test_key"
     assert config.llm_api_version == "test_secret"
+
+
+def test_embedding_config_with_aws_bedrock():
+    """Test embedding configuration with AWS Bedrock."""
+    from cognee.infrastructure.databases.vector.embeddings.config import EmbeddingConfig
+    
+    config = EmbeddingConfig(
+        embedding_provider="bedrock",
+        embedding_model="bedrock/amazon.titan-embed-text-v2:0",
+        embedding_dimensions=1024,
+        aws_region_name="eu-central-1",
+        aws_profile_name="my-profile",
+    )
+    
+    assert config.embedding_provider == "bedrock"
+    assert config.embedding_model == "bedrock/amazon.titan-embed-text-v2:0"
+    assert config.embedding_dimensions == 1024
+    assert config.aws_region_name == "eu-central-1"
+    assert config.aws_profile_name == "my-profile"
 
 
 if __name__ == "__main__":
