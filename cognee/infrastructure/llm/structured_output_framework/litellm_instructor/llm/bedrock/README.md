@@ -66,6 +66,90 @@ cognee.config.baml_llm_model = "anthropic.claude-3-7-sonnet-20250219-v1:0"
 cognee.config.baml_llm_endpoint = "eu-central-1"
 ```
 
+### Using AWS Named Profile
+
+You can use AWS named profiles from `~/.aws/credentials`:
+
+**Environment Variable:**
+```bash
+export LLM_PROVIDER=aws_bedrock
+export LLM_MODEL=bedrock/anthropic.claude-3-7-sonnet-20250219-v1:0
+export AWS_PROFILE_NAME=my-profile
+export AWS_REGION_NAME=eu-central-1
+```
+
+**Python Code:**
+```python
+import cognee
+
+cognee.config.llm_provider = "aws_bedrock"
+cognee.config.llm_model = "bedrock/anthropic.claude-3-7-sonnet-20250219-v1:0"
+cognee.config.aws_profile_name = "my-profile"
+cognee.config.aws_region_name = "eu-central-1"
+```
+
+## AWS Bedrock Embeddings
+
+AWS Bedrock also supports embedding models for vector search and RAG applications.
+
+### Supported Embedding Models
+
+- **Amazon Titan Embed Text v2** (`bedrock/amazon.titan-embed-text-v2:0`) - 1024 dimensions
+- **Amazon Titan Embed Text v1** (`bedrock/amazon.titan-embed-text-v1`) - 1536 dimensions
+- **Amazon Titan Embed Image v1** (`bedrock/amazon.titan-embed-image-v1`) - Multimodal embeddings
+- **Cohere Embed English v3** (`bedrock/cohere.embed-english-v3`)
+- **Cohere Embed Multilingual v3** (`bedrock/cohere.embed-multilingual-v3`)
+
+### Configuration
+
+**Environment Variables:**
+```bash
+export EMBEDDING_PROVIDER=bedrock
+export EMBEDDING_MODEL=bedrock/amazon.titan-embed-text-v2:0
+export EMBEDDING_DIMENSIONS=1024
+export AWS_REGION_NAME=eu-central-1
+export AWS_PROFILE_NAME=my-profile  # Optional
+```
+
+**Python Code:**
+```python
+import cognee
+
+cognee.config.embedding_provider = "bedrock"
+cognee.config.embedding_model = "bedrock/amazon.titan-embed-text-v2:0"
+cognee.config.embedding_dimensions = 1024
+cognee.config.aws_region_name = "eu-central-1"
+cognee.config.aws_profile_name = "my-profile"  # Optional
+```
+
+### Cross-Region Embedding Profiles
+
+You can also use cross-region inference profiles for embeddings:
+
+```python
+cognee.config.embedding_model = "bedrock/eu.cohere.embed-multilingual-v4:0"
+```
+
+## AWS Bedrock Reranking
+
+AWS Bedrock provides reranker models to improve the relevance of query responses by reordering search results.
+
+### Supported Reranker Models
+
+- **Cohere Rerank v3.5** (`cohere.rerank-v3-5:0`)
+- **Cohere Rerank English v3** (`cohere.rerank-english-v3:0`)
+- **Cohere Rerank Multilingual v3** (`cohere.rerank-multilingual-v3:0`)
+
+### Usage
+
+AWS Bedrock reranking is primarily used through the Knowledge Bases API for improved RAG (Retrieval-Augmented Generation) applications. The reranker models are integrated into the retrieval pipeline to reorder search results based on relevance to the query.
+
+**Note**: AWS Bedrock reranking requires access to the Bedrock Knowledge Bases API and is configured at the knowledge base level. It is not directly invoked through litellm but can be used in conjunction with Cognee's search and retrieval pipelines.
+
+For more information, see:
+- [AWS Bedrock Reranking Documentation](https://docs.aws.amazon.com/bedrock/latest/userguide/rerank.html)
+- [AWS Bedrock Knowledge Bases](https://docs.aws.amazon.com/bedrock/latest/userguide/knowledge-base.html)
+
 ## Cross-Region Inference
 
 AWS Bedrock supports cross-region inference, which automatically routes requests across multiple regions for higher throughput and availability.
@@ -122,20 +206,38 @@ See [MODELS.md](./MODELS.md) for a comprehensive list of available models in EU 
 
 ## Authentication
 
-### Option 1: Explicit Credentials
+### Option 1: AWS Named Profile (Recommended)
+
+Use a named profile from `~/.aws/credentials`:
+
+```python
+cognee.config.llm_provider = "aws_bedrock"
+cognee.config.llm_model = "bedrock/anthropic.claude-3-7-sonnet-20250219-v1:0"
+cognee.config.aws_profile_name = "my-profile"
+cognee.config.aws_region_name = "eu-central-1"
+```
+
+**Environment Variable:**
+```bash
+export AWS_PROFILE_NAME=my-profile
+export AWS_REGION_NAME=eu-central-1
+```
+
+### Option 2: Explicit Credentials
 
 Provide credentials explicitly via configuration:
 
 ```python
 cognee.config.aws_access_key_id = "YOUR_KEY"
 cognee.config.aws_secret_access_key = "YOUR_SECRET"
+cognee.config.aws_region_name = "eu-central-1"
 ```
 
-### Option 2: Default Credentials Chain
+### Option 3: Default Credentials Chain
 
 Cognee can use AWS default credentials from:
 - Environment variables (`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`)
-- AWS credentials file (`~/.aws/credentials`)
+- AWS credentials file (`~/.aws/credentials`) - default profile
 - IAM role (when running on EC2, ECS, Lambda, etc.)
 
 Just omit the credential configuration:
@@ -146,6 +248,11 @@ cognee.config.llm_model = "bedrock/anthropic.claude-3-7-sonnet-20250219-v1:0"
 cognee.config.aws_region_name = "eu-central-1"
 # Credentials will be loaded automatically
 ```
+
+**Priority Order:**
+1. AWS Profile Name (if specified)
+2. Explicit Access Key/Secret Key
+3. Default credentials chain
 
 ## IAM Permissions
 

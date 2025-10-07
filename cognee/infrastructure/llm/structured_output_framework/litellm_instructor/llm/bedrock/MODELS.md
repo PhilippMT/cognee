@@ -146,6 +146,15 @@ cognee.config.aws_region_name = "eu-west-1"
 
 Set these environment variables to use AWS Bedrock:
 
+**Option 1: Using AWS Profile (Recommended)**
+```bash
+LLM_PROVIDER=aws_bedrock
+LLM_MODEL=bedrock/anthropic.claude-3-7-sonnet-20250219-v1:0
+AWS_REGION_NAME=eu-central-1
+AWS_PROFILE_NAME=my-profile
+```
+
+**Option 2: Using Explicit Credentials**
 ```bash
 LLM_PROVIDER=aws_bedrock
 LLM_MODEL=bedrock/anthropic.claude-3-7-sonnet-20250219-v1:0
@@ -154,9 +163,9 @@ AWS_ACCESS_KEY_ID=your_access_key_id
 AWS_SECRET_ACCESS_KEY=your_secret_access_key
 ```
 
-### Using Default AWS Credentials
+**Option 3: Using Default AWS Credentials**
 
-If you have AWS credentials configured via `aws configure` or IAM roles, you can omit the `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`:
+If you have AWS credentials configured via `aws configure` or IAM roles, you can omit credentials:
 
 ```bash
 LLM_PROVIDER=aws_bedrock
@@ -193,6 +202,157 @@ config.baml_llm_endpoint = "eu-central-1"  # Region as endpoint
 - **Llama 3.2 Vision models**: Multi-modal understanding
 - **Amazon Nova Canvas/Reel**: Image and video generation
 - **Amazon Titan Embeddings**: Text embeddings for RAG/search
+
+## Embedding Models
+
+AWS Bedrock provides embedding models for vector search and RAG applications.
+
+### Amazon Titan Embeddings
+
+#### Titan Text Embeddings V2
+- **Model ID**: `amazon.titan-embed-text-v2:0`
+- **LiteLLM ID**: `bedrock/amazon.titan-embed-text-v2:0`
+- **Dimensions**: 1024 (configurable: 256, 512, 1024)
+- **Max Input**: 8,192 tokens or 50,000 characters
+- **Languages**: Optimized for English with multilingual support (100+ languages)
+- **Regions**: eu-central-1, eu-west-1, eu-west-3
+- **Status**: Generally Available
+
+#### Titan Text Embeddings V1
+- **Model ID**: `amazon.titan-embed-text-v1`
+- **LiteLLM ID**: `bedrock/amazon.titan-embed-text-v1`
+- **Dimensions**: 1536
+- **Max Input**: 8,192 tokens
+- **Languages**: English
+- **Regions**: eu-central-1, eu-west-1, eu-west-2, eu-west-3
+- **Status**: Generally Available
+
+#### Titan Multimodal Embeddings G1
+- **Model ID**: `amazon.titan-embed-image-v1`
+- **LiteLLM ID**: `bedrock/amazon.titan-embed-image-v1`
+- **Dimensions**: 1024
+- **Capabilities**: Text and Image embeddings
+- **Regions**: us-east-1, us-west-2
+- **Status**: Generally Available
+
+### Cohere Embeddings
+
+#### Cohere Embed Multilingual v3
+- **Model ID**: `cohere.embed-multilingual-v3`
+- **LiteLLM ID**: `bedrock/cohere.embed-multilingual-v3`
+- **Dimensions**: 1024
+- **Languages**: 100+ languages
+- **Regions**: eu-central-1, eu-west-1, eu-west-3
+- **Status**: Generally Available
+
+#### Cohere Embed English v3
+- **Model ID**: `cohere.embed-english-v3`
+- **LiteLLM ID**: `bedrock/cohere.embed-english-v3`
+- **Dimensions**: 1024
+- **Languages**: English
+- **Regions**: eu-central-1, eu-west-1, eu-west-3
+- **Status**: Generally Available
+
+#### Cohere Embed v4 (Cross-Region)
+- **Cross-Region ID**: `eu.cohere.embed-multilingual-v4:0`
+- **LiteLLM ID**: `bedrock/eu.cohere.embed-multilingual-v4:0`
+- **Dimensions**: 1024
+- **Languages**: 100+ languages
+- **Regions**: Routes across EU regions
+- **Status**: Generally Available
+
+### Embedding Configuration Examples
+
+**Amazon Titan Embed V2:**
+```bash
+export EMBEDDING_PROVIDER=bedrock
+export EMBEDDING_MODEL=bedrock/amazon.titan-embed-text-v2:0
+export EMBEDDING_DIMENSIONS=1024
+export AWS_REGION_NAME=eu-central-1
+export AWS_PROFILE_NAME=my-profile
+```
+
+**Cohere Multilingual v3:**
+```bash
+export EMBEDDING_PROVIDER=bedrock
+export EMBEDDING_MODEL=bedrock/cohere.embed-multilingual-v3
+export EMBEDDING_DIMENSIONS=1024
+export AWS_REGION_NAME=eu-west-1
+```
+
+**Cross-Region Cohere v4:**
+```bash
+export EMBEDDING_PROVIDER=bedrock
+export EMBEDDING_MODEL=bedrock/eu.cohere.embed-multilingual-v4:0
+export EMBEDDING_DIMENSIONS=1024
+export AWS_REGION_NAME=eu-central-1
+```
+
+## Reranker Models
+
+AWS Bedrock provides reranker models to improve relevance of query responses.
+
+### Cohere Rerank Models
+
+#### Cohere Rerank v3.5
+- **Model ID**: `cohere.rerank-v3-5:0`
+- **API**: Bedrock Rerank API
+- **Languages**: Multilingual (100+ languages)
+- **Regions**: eu-central-1, eu-west-1, us-east-1, us-west-2
+- **Status**: Generally Available
+- **Use Case**: General-purpose reranking with state-of-the-art performance
+
+#### Cohere Rerank English v3
+- **Model ID**: `cohere.rerank-english-v3:0`
+- **API**: Bedrock Rerank API
+- **Languages**: English
+- **Regions**: eu-central-1, eu-west-1, us-east-1, us-west-2
+- **Status**: Generally Available
+- **Use Case**: English-optimized reranking
+
+#### Cohere Rerank Multilingual v3
+- **Model ID**: `cohere.rerank-multilingual-v3:0`
+- **API**: Bedrock Rerank API
+- **Languages**: Multilingual (100+ languages)
+- **Regions**: eu-central-1, eu-west-1, us-east-1, us-west-2
+- **Status**: Generally Available
+- **Use Case**: Multilingual search and retrieval
+
+### Reranking Usage
+
+Reranker models in AWS Bedrock are primarily used through:
+
+1. **Knowledge Bases API**: Configure reranking at the knowledge base level for improved RAG
+2. **Bedrock Rerank API**: Direct API access for custom reranking workflows
+3. **Integration with Search**: Use with vector search to reorder results by relevance
+
+**Example API Call (via boto3):**
+```python
+import boto3
+
+bedrock_agent_runtime = boto3.client('bedrock-agent-runtime', region_name='eu-central-1')
+
+response = bedrock_agent_runtime.rerank(
+    queries=[
+        {'textQuery': {'text': 'What is machine learning?'}}
+    ],
+    sources=[
+        {'textDocument': {'text': 'Machine learning is...'}},
+        {'textDocument': {'text': 'Deep learning involves...'}},
+        # More documents
+    ],
+    rerankingConfiguration={
+        'bedrockRerankingConfiguration': {
+            'modelConfiguration': {
+                'modelArn': 'arn:aws:bedrock:eu-central-1::foundation-model/cohere.rerank-v3-5:0'
+            },
+            'numberOfResults': 10
+        }
+    }
+)
+```
+
+**Note**: AWS Bedrock reranking is not directly supported through litellm but can be integrated into Cognee's search pipelines using boto3 or the AWS SDK.
 
 ## References
 
