@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+         xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+         xmlns:owl="http://www.w3.org/2002/07/owl#"
+         xmlns:jira="http://example.com/jira#">
+
+    <owl:Ontology rdf:about="http://example.com/jira"/>
+
+    <!-- Classes -->
+    <owl:Class rdf:about="http://example.com/jira#Ticket">
+        <rdfs:label>Jira Ticket</rdfs:label>
+        <rdfs:comment>Represents a Jira ticket or issue</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://example.com/jira#User">
+        <rdfs:label>User</rdfs:label>
+        <rdfs:comment>Represents a user in the Jira system</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://example.com/jira#Status">
+        <rdfs:label>Status</rdfs:label>
+        <rdfs:comment>Represents the status of a ticket</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://example.com/jira#Priority">
+        <rdfs:label>Priority</rdfs:label>
+        <rdfs:comment>Represents the priority level of a ticket</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://example.com/jira#TicketType">
+        <rdfs:label>Ticket Type</rdfs:label>
+        <rdfs:comment>Represents the type of a ticket (Story, Bug, Feature, Task)</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://example.com/jira#Component">
+        <rdfs:label>Component</rdfs:label>
+        <rdfs:comment>Represents a component or module in the project</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://example.com/jira#Label">
+        <rdfs:label>Label</rdfs:label>
+        <rdfs:comment>Represents a label or tag for categorization</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://example.com/jira#HistoryChange">
+        <rdfs:label>History Change</rdfs:label>
+        <rdfs:comment>Represents a change in ticket history</rdfs:comment>
+    </owl:Class>
+
+    <!-- Object Properties (Relationships) -->
+    <owl:ObjectProperty rdf:about="http://example.com/jira#hasStatus">
+        <rdfs:domain rdf:resource="http://example.com/jira#Ticket"/>
+        <rdfs:range rdf:resource="http://example.com/jira#Status"/>
+        <rdfs:label>has status</rdfs:label>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="http://example.com/jira#hasPriority">
+        <rdfs:domain rdf:resource="http://example.com/jira#Ticket"/>
+        <rdfs:range rdf:resource="http://example.com/jira#Priority"/>
+        <rdfs:label>has priority</rdfs:label>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="http://example.com/jira#hasType">
+        <rdfs:domain rdf:resource="http://example.com/jira#Ticket"/>
+        <rdfs:range rdf:resource="http://example.com/jira#TicketType"/>
+        <rdfs:label>has type</rdfs:label>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="http://example.com/jira#reportedBy">
+        <rdfs:domain rdf:resource="http://example.com/jira#Ticket"/>
+        <rdfs:range rdf:resource="http://example.com/jira#User"/>
+        <rdfs:label>reported by</rdfs:label>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="http://example.com/jira#assignedTo">
+        <rdfs:domain rdf:resource="http://example.com/jira#Ticket"/>
+        <rdfs:range rdf:resource="http://example.com/jira#User"/>
+        <rdfs:label>assigned to</rdfs:label>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="http://example.com/jira#hasComponent">
+        <rdfs:domain rdf:resource="http://example.com/jira#Ticket"/>
+        <rdfs:range rdf:resource="http://example.com/jira#Component"/>
+        <rdfs:label>has component</rdfs:label>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="http://example.com/jira#hasLabel">
+        <rdfs:domain rdf:resource="http://example.com/jira#Ticket"/>
+        <rdfs:range rdf:resource="http://example.com/jira#Label"/>
+        <rdfs:label>has label</rdfs:label>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="http://example.com/jira#hasChange">
+        <rdfs:domain rdf:resource="http://example.com/jira#Ticket"/>
+        <rdfs:range rdf:resource="http://example.com/jira#HistoryChange"/>
+        <rdfs:label>has change</rdfs:label>
+    </owl:ObjectProperty>
+
+    <!-- Data Properties -->
+    <owl:DatatypeProperty rdf:about="http://example.com/jira#ticketId">
+        <rdfs:domain rdf:resource="http://example.com/jira#Ticket"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <rdfs:label>ticket ID</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://example.com/jira#summary">
+        <rdfs:domain rdf:resource="http://example.com/jira#Ticket"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <rdfs:label>summary</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://example.com/jira#description">
+        <rdfs:domain rdf:resource="http://example.com/jira#Ticket"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <rdfs:label>description</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://example.com/jira#createdDate">
+        <rdfs:domain rdf:resource="http://example.com/jira#Ticket"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#dateTime"/>
+        <rdfs:label>created date</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://example.com/jira#updatedDate">
+        <rdfs:domain rdf:resource="http://example.com/jira#Ticket"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#dateTime"/>
+        <rdfs:label>updated date</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://example.com/jira#resolvedDate">
+        <rdfs:domain rdf:resource="http://example.com/jira#Ticket"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#dateTime"/>
+        <rdfs:label>resolved date</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://example.com/jira#changeTimestamp">
+        <rdfs:domain rdf:resource="http://example.com/jira#HistoryChange"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#dateTime"/>
+        <rdfs:label>change timestamp</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://example.com/jira#fieldName">
+        <rdfs:domain rdf:resource="http://example.com/jira#HistoryChange"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <rdfs:label>field name</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://example.com/jira#fromValue">
+        <rdfs:domain rdf:resource="http://example.com/jira#HistoryChange"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <rdfs:label>from value</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://example.com/jira#toValue">
+        <rdfs:domain rdf:resource="http://example.com/jira#HistoryChange"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <rdfs:label>to value</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <!-- Status Individuals -->
+    <jira:Status rdf:about="http://example.com/jira#Open">
+        <rdfs:label>Open</rdfs:label>
+    </jira:Status>
+
+    <jira:Status rdf:about="http://example.com/jira#InProgress">
+        <rdfs:label>In Progress</rdfs:label>
+    </jira:Status>
+
+    <jira:Status rdf:about="http://example.com/jira#Resolved">
+        <rdfs:label>Resolved</rdfs:label>
+    </jira:Status>
+
+    <jira:Status rdf:about="http://example.com/jira#Closed">
+        <rdfs:label>Closed</rdfs:label>
+    </jira:Status>
+
+    <!-- Priority Individuals -->
+    <jira:Priority rdf:about="http://example.com/jira#Low">
+        <rdfs:label>Low</rdfs:label>
+    </jira:Priority>
+
+    <jira:Priority rdf:about="http://example.com/jira#Medium">
+        <rdfs:label>Medium</rdfs:label>
+    </jira:Priority>
+
+    <jira:Priority rdf:about="http://example.com/jira#High">
+        <rdfs:label>High</rdfs:label>
+    </jira:Priority>
+
+    <jira:Priority rdf:about="http://example.com/jira#Critical">
+        <rdfs:label>Critical</rdfs:label>
+    </jira:Priority>
+
+    <!-- Ticket Type Individuals -->
+    <jira:TicketType rdf:about="http://example.com/jira#Story">
+        <rdfs:label>Story</rdfs:label>
+    </jira:TicketType>
+
+    <jira:TicketType rdf:about="http://example.com/jira#Bug">
+        <rdfs:label>Bug</rdfs:label>
+    </jira:TicketType>
+
+    <jira:TicketType rdf:about="http://example.com/jira#Feature">
+        <rdfs:label>Feature</rdfs:label>
+    </jira:TicketType>
+
+    <jira:TicketType rdf:about="http://example.com/jira#Task">
+        <rdfs:label>Task</rdfs:label>
+    </jira:TicketType>
+
+</rdf:RDF>

@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jira-tickets>
+    <ticket>
+        <id>PROJ-123</id>
+        <key>PROJ-123</key>
+        <summary>Implement user authentication system</summary>
+        <description>Need to implement a secure authentication system with JWT tokens. This should include login, logout, and token refresh functionality.</description>
+        <status>In Progress</status>
+        <priority>High</priority>
+        <type>Story</type>
+        <reporter>john.doe@example.com</reporter>
+        <assignee>jane.smith@example.com</assignee>
+        <created>2024-01-15T10:30:00Z</created>
+        <updated>2024-02-20T14:45:00Z</updated>
+        <resolved></resolved>
+        <labels>
+            <label>security</label>
+            <label>authentication</label>
+            <label>backend</label>
+        </labels>
+        <components>
+            <component>API</component>
+            <component>Security</component>
+        </components>
+        <history>
+            <change>
+                <timestamp>2024-01-15T10:30:00Z</timestamp>
+                <field>status</field>
+                <from></from>
+                <to>Open</to>
+                <author>john.doe@example.com</author>
+            </change>
+            <change>
+                <timestamp>2024-01-16T09:00:00Z</timestamp>
+                <field>assignee</field>
+                <from></from>
+                <to>jane.smith@example.com</to>
+                <author>john.doe@example.com</author>
+            </change>
+            <change>
+                <timestamp>2024-02-01T11:20:00Z</timestamp>
+                <field>status</field>
+                <from>Open</from>
+                <to>In Progress</to>
+                <author>jane.smith@example.com</author>
+            </change>
+            <change>
+                <timestamp>2024-02-20T14:45:00Z</timestamp>
+                <field>priority</field>
+                <from>Medium</from>
+                <to>High</to>
+                <author>john.doe@example.com</author>
+            </change>
+        </history>
+    </ticket>
+    
+    <ticket>
+        <id>PROJ-124</id>
+        <key>PROJ-124</key>
+        <summary>Fix database connection pool leak</summary>
+        <description>Database connections are not being properly released, causing connection pool exhaustion after several hours of operation.</description>
+        <status>Resolved</status>
+        <priority>Critical</priority>
+        <type>Bug</type>
+        <reporter>admin@example.com</reporter>
+        <assignee>bob.wilson@example.com</assignee>
+        <created>2024-02-01T08:15:00Z</created>
+        <updated>2024-02-05T16:30:00Z</updated>
+        <resolved>2024-02-05T16:30:00Z</resolved>
+        <labels>
+            <label>database</label>
+            <label>performance</label>
+            <label>critical</label>
+        </labels>
+        <components>
+            <component>Database</component>
+            <component>Backend</component>
+        </components>
+        <history>
+            <change>
+                <timestamp>2024-02-01T08:15:00Z</timestamp>
+                <field>status</field>
+                <from></from>
+                <to>Open</to>
+                <author>admin@example.com</author>
+            </change>
+            <change>
+                <timestamp>2024-02-01T09:00:00Z</timestamp>
+                <field>priority</field>
+                <from>High</from>
+                <to>Critical</to>
+                <author>admin@example.com</author>
+            </change>
+            <change>
+                <timestamp>2024-02-02T10:30:00Z</timestamp>
+                <field>status</field>
+                <from>Open</from>
+                <to>In Progress</to>
+                <author>bob.wilson@example.com</author>
+            </change>
+            <change>
+                <timestamp>2024-02-05T16:00:00Z</timestamp>
+                <field>status</field>
+                <from>In Progress</from>
+                <to>Resolved</to>
+                <author>bob.wilson@example.com</author>
+            </change>
+        </history>
+    </ticket>
+    
+    <ticket>
+        <id>PROJ-125</id>
+        <key>PROJ-125</key>
+        <summary>Add dark mode support to UI</summary>
+        <description>Users have requested dark mode support for better viewing experience in low-light conditions. This should be a toggle in user preferences.</description>
+        <status>Open</status>
+        <priority>Medium</priority>
+        <type>Feature</type>
+        <reporter>alice.jones@example.com</reporter>
+        <assignee></assignee>
+        <created>2024-02-10T13:45:00Z</created>
+        <updated>2024-02-15T10:20:00Z</updated>
+        <resolved></resolved>
+        <labels>
+            <label>ui</label>
+            <label>enhancement</label>
+            <label>user-experience</label>
+        </labels>
+        <components>
+            <component>Frontend</component>
+            <component>UI</component>
+        </components>
+        <history>
+            <change>
+                <timestamp>2024-02-10T13:45:00Z</timestamp>
+                <field>status</field>
+                <from></from>
+                <to>Open</to>
+                <author>alice.jones@example.com</author>
+            </change>
+            <change>
+                <timestamp>2024-02-15T10:20:00Z</timestamp>
+                <field>labels</field>
+                <from></from>
+                <to>user-experience</to>
+                <author>alice.jones@example.com</author>
+            </change>
+        </history>
+    </ticket>
+</jira-tickets>
