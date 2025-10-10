@@ -86,7 +86,14 @@ python src/pipelines/jira_simple_example.py
 python src/pipelines/jira_pipeline.py
 ```
 
-See [JIRA_PIPELINE_README.md](JIRA_PIPELINE_README.md) for detailed documentation and [VERSIONING_ANALYSIS.md](VERSIONING_ANALYSIS.md) for versioning strategy recommendations.
+**Documentation:**
+- [JIRA_PIPELINE_README.md](JIRA_PIPELINE_README.md) - Complete usage guide
+- [VERSIONING_ANALYSIS.md](VERSIONING_ANALYSIS.md) - Versioning strategy recommendations
+- [ONTOLOGY_CONFIGURATION_GUIDE.md](ONTOLOGY_CONFIGURATION_GUIDE.md) - Ontology setup and configuration
+
+**Ontologies:**
+- `jira_ontology.owl` - For custom Jira XML format with history
+- `jira_rss_ontology.owl` - For standard Jira RSS feed format (NEW! 🎉)
 
 ## Graph preview 
 

@@ -1,0 +1,360 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+         xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+         xmlns:owl="http://www.w3.org/2002/07/owl#"
+         xmlns:jira="http://example.com/jira/rss#">
+
+    <owl:Ontology rdf:about="http://example.com/jira/rss"/>
+
+    <!-- Classes -->
+    <owl:Class rdf:about="http://example.com/jira/rss#Issue">
+        <rdfs:label>Jira Issue</rdfs:label>
+        <rdfs:comment>Represents a Jira issue from RSS feed</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://example.com/jira/rss#User">
+        <rdfs:label>User</rdfs:label>
+        <rdfs:comment>Represents a user in the Jira system</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://example.com/jira/rss#Project">
+        <rdfs:label>Project</rdfs:label>
+        <rdfs:comment>Represents a Jira project</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://example.com/jira/rss#Status">
+        <rdfs:label>Status</rdfs:label>
+        <rdfs:comment>Represents the status of an issue</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://example.com/jira/rss#StatusCategory">
+        <rdfs:label>Status Category</rdfs:label>
+        <rdfs:comment>Represents a status category (e.g., indeterminate, done)</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://example.com/jira/rss#Priority">
+        <rdfs:label>Priority</rdfs:label>
+        <rdfs:comment>Represents the priority level of an issue</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://example.com/jira/rss#IssueType">
+        <rdfs:label>Issue Type</rdfs:label>
+        <rdfs:comment>Represents the type of an issue (Story, Bug, Task, Epic)</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://example.com/jira/rss#Component">
+        <rdfs:label>Component</rdfs:label>
+        <rdfs:comment>Represents a component or module in the project</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://example.com/jira/rss#Label">
+        <rdfs:label>Label</rdfs:label>
+        <rdfs:comment>Represents a label or tag for categorization</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://example.com/jira/rss#Resolution">
+        <rdfs:label>Resolution</rdfs:label>
+        <rdfs:comment>Represents the resolution status of an issue</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://example.com/jira/rss#Comment">
+        <rdfs:label>Comment</rdfs:label>
+        <rdfs:comment>Represents a comment on an issue</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://example.com/jira/rss#ParentIssue">
+        <rdfs:label>Parent Issue</rdfs:label>
+        <rdfs:comment>Represents a parent issue (Epic, Story)</rdfs:comment>
+    </owl:Class>
+
+    <!-- Object Properties (Relationships) -->
+    <owl:ObjectProperty rdf:about="http://example.com/jira/rss#belongsToProject">
+        <rdfs:domain rdf:resource="http://example.com/jira/rss#Issue"/>
+        <rdfs:range rdf:resource="http://example.com/jira/rss#Project"/>
+        <rdfs:label>belongs to project</rdfs:label>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="http://example.com/jira/rss#hasStatus">
+        <rdfs:domain rdf:resource="http://example.com/jira/rss#Issue"/>
+        <rdfs:range rdf:resource="http://example.com/jira/rss#Status"/>
+        <rdfs:label>has status</rdfs:label>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="http://example.com/jira/rss#hasStatusCategory">
+        <rdfs:domain rdf:resource="http://example.com/jira/rss#Status"/>
+        <rdfs:range rdf:resource="http://example.com/jira/rss#StatusCategory"/>
+        <rdfs:label>has status category</rdfs:label>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="http://example.com/jira/rss#hasPriority">
+        <rdfs:domain rdf:resource="http://example.com/jira/rss#Issue"/>
+        <rdfs:range rdf:resource="http://example.com/jira/rss#Priority"/>
+        <rdfs:label>has priority</rdfs:label>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="http://example.com/jira/rss#hasType">
+        <rdfs:domain rdf:resource="http://example.com/jira/rss#Issue"/>
+        <rdfs:range rdf:resource="http://example.com/jira/rss#IssueType"/>
+        <rdfs:label>has type</rdfs:label>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="http://example.com/jira/rss#reportedBy">
+        <rdfs:domain rdf:resource="http://example.com/jira/rss#Issue"/>
+        <rdfs:range rdf:resource="http://example.com/jira/rss#User"/>
+        <rdfs:label>reported by</rdfs:label>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="http://example.com/jira/rss#assignedTo">
+        <rdfs:domain rdf:resource="http://example.com/jira/rss#Issue"/>
+        <rdfs:range rdf:resource="http://example.com/jira/rss#User"/>
+        <rdfs:label>assigned to</rdfs:label>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="http://example.com/jira/rss#hasComponent">
+        <rdfs:domain rdf:resource="http://example.com/jira/rss#Issue"/>
+        <rdfs:range rdf:resource="http://example.com/jira/rss#Component"/>
+        <rdfs:label>has component</rdfs:label>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="http://example.com/jira/rss#hasLabel">
+        <rdfs:domain rdf:resource="http://example.com/jira/rss#Issue"/>
+        <rdfs:range rdf:resource="http://example.com/jira/rss#Label"/>
+        <rdfs:label>has label</rdfs:label>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="http://example.com/jira/rss#hasResolution">
+        <rdfs:domain rdf:resource="http://example.com/jira/rss#Issue"/>
+        <rdfs:range rdf:resource="http://example.com/jira/rss#Resolution"/>
+        <rdfs:label>has resolution</rdfs:label>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="http://example.com/jira/rss#hasComment">
+        <rdfs:domain rdf:resource="http://example.com/jira/rss#Issue"/>
+        <rdfs:range rdf:resource="http://example.com/jira/rss#Comment"/>
+        <rdfs:label>has comment</rdfs:label>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="http://example.com/jira/rss#hasParent">
+        <rdfs:domain rdf:resource="http://example.com/jira/rss#Issue"/>
+        <rdfs:range rdf:resource="http://example.com/jira/rss#ParentIssue"/>
+        <rdfs:label>has parent</rdfs:label>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="http://example.com/jira/rss#commentedBy">
+        <rdfs:domain rdf:resource="http://example.com/jira/rss#Comment"/>
+        <rdfs:range rdf:resource="http://example.com/jira/rss#User"/>
+        <rdfs:label>commented by</rdfs:label>
+    </owl:ObjectProperty>
+
+    <!-- Data Properties -->
+    <owl:DatatypeProperty rdf:about="http://example.com/jira/rss#issueKey">
+        <rdfs:domain rdf:resource="http://example.com/jira/rss#Issue"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <rdfs:label>issue key</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://example.com/jira/rss#issueId">
+        <rdfs:domain rdf:resource="http://example.com/jira/rss#Issue"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <rdfs:label>issue ID</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://example.com/jira/rss#title">
+        <rdfs:domain rdf:resource="http://example.com/jira/rss#Issue"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <rdfs:label>title</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://example.com/jira/rss#summary">
+        <rdfs:domain rdf:resource="http://example.com/jira/rss#Issue"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <rdfs:label>summary</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://example.com/jira/rss#description">
+        <rdfs:domain rdf:resource="http://example.com/jira/rss#Issue"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <rdfs:label>description</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://example.com/jira/rss#environment">
+        <rdfs:domain rdf:resource="http://example.com/jira/rss#Issue"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <rdfs:label>environment</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://example.com/jira/rss#link">
+        <rdfs:domain rdf:resource="http://example.com/jira/rss#Issue"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#anyURI"/>
+        <rdfs:label>link</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://example.com/jira/rss#createdDate">
+        <rdfs:domain rdf:resource="http://example.com/jira/rss#Issue"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#dateTime"/>
+        <rdfs:label>created date</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://example.com/jira/rss#updatedDate">
+        <rdfs:domain rdf:resource="http://example.com/jira/rss#Issue"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#dateTime"/>
+        <rdfs:label>updated date</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://example.com/jira/rss#dueDate">
+        <rdfs:domain rdf:resource="http://example.com/jira/rss#Issue"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#dateTime"/>
+        <rdfs:label>due date</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://example.com/jira/rss#votes">
+        <rdfs:domain rdf:resource="http://example.com/jira/rss#Issue"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
+        <rdfs:label>votes</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://example.com/jira/rss#watches">
+        <rdfs:domain rdf:resource="http://example.com/jira/rss#Issue"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
+        <rdfs:label>watches</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://example.com/jira/rss#projectKey">
+        <rdfs:domain rdf:resource="http://example.com/jira/rss#Project"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <rdfs:label>project key</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://example.com/jira/rss#projectId">
+        <rdfs:domain rdf:resource="http://example.com/jira/rss#Project"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <rdfs:label>project ID</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://example.com/jira/rss#projectName">
+        <rdfs:domain rdf:resource="http://example.com/jira/rss#Project"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <rdfs:label>project name</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://example.com/jira/rss#accountId">
+        <rdfs:domain rdf:resource="http://example.com/jira/rss#User"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <rdfs:label>account ID</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://example.com/jira/rss#userName">
+        <rdfs:domain rdf:resource="http://example.com/jira/rss#User"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <rdfs:label>user name</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://example.com/jira/rss#statusName">
+        <rdfs:domain rdf:resource="http://example.com/jira/rss#Status"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <rdfs:label>status name</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://example.com/jira/rss#statusDescription">
+        <rdfs:domain rdf:resource="http://example.com/jira/rss#Status"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <rdfs:label>status description</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://example.com/jira/rss#categoryKey">
+        <rdfs:domain rdf:resource="http://example.com/jira/rss#StatusCategory"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <rdfs:label>category key</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://example.com/jira/rss#categoryColor">
+        <rdfs:domain rdf:resource="http://example.com/jira/rss#StatusCategory"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <rdfs:label>category color</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://example.com/jira/rss#commentId">
+        <rdfs:domain rdf:resource="http://example.com/jira/rss#Comment"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <rdfs:label>comment ID</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://example.com/jira/rss#commentText">
+        <rdfs:domain rdf:resource="http://example.com/jira/rss#Comment"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <rdfs:label>comment text</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://example.com/jira/rss#commentCreated">
+        <rdfs:domain rdf:resource="http://example.com/jira/rss#Comment"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#dateTime"/>
+        <rdfs:label>comment created</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://example.com/jira/rss#iconUrl">
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#anyURI"/>
+        <rdfs:label>icon URL</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <!-- Status Category Individuals -->
+    <jira:StatusCategory rdf:about="http://example.com/jira/rss#Indeterminate">
+        <rdfs:label>Indeterminate</rdfs:label>
+        <jira:categoryKey>indeterminate</jira:categoryKey>
+        <jira:categoryColor>yellow</jira:categoryColor>
+    </jira:StatusCategory>
+
+    <jira:StatusCategory rdf:about="http://example.com/jira/rss#Done">
+        <rdfs:label>Done</rdfs:label>
+        <jira:categoryKey>done</jira:categoryKey>
+        <jira:categoryColor>green</jira:categoryColor>
+    </jira:StatusCategory>
+
+    <jira:StatusCategory rdf:about="http://example.com/jira/rss#ToDo">
+        <rdfs:label>To Do</rdfs:label>
+        <jira:categoryKey>new</jira:categoryKey>
+        <jira:categoryColor>blue-gray</jira:categoryColor>
+    </jira:StatusCategory>
+
+    <!-- Common Issue Types -->
+    <jira:IssueType rdf:about="http://example.com/jira/rss#Story">
+        <rdfs:label>Story</rdfs:label>
+    </jira:IssueType>
+
+    <jira:IssueType rdf:about="http://example.com/jira/rss#Bug">
+        <rdfs:label>Bug</rdfs:label>
+    </jira:IssueType>
+
+    <jira:IssueType rdf:about="http://example.com/jira/rss#Task">
+        <rdfs:label>Task</rdfs:label>
+    </jira:IssueType>
+
+    <jira:IssueType rdf:about="http://example.com/jira/rss#Epic">
+        <rdfs:label>Epic</rdfs:label>
+    </jira:IssueType>
+
+    <jira:IssueType rdf:about="http://example.com/jira/rss#SubTask">
+        <rdfs:label>Sub-task</rdfs:label>
+    </jira:IssueType>
+
+    <!-- Common Priorities -->
+    <jira:Priority rdf:about="http://example.com/jira/rss#Highest">
+        <rdfs:label>Highest</rdfs:label>
+    </jira:Priority>
+
+    <jira:Priority rdf:about="http://example.com/jira/rss#High">
+        <rdfs:label>High</rdfs:label>
+    </jira:Priority>
+
+    <jira:Priority rdf:about="http://example.com/jira/rss#Normal">
+        <rdfs:label>Normal</rdfs:label>
+    </jira:Priority>
+
+    <jira:Priority rdf:about="http://example.com/jira/rss#Low">
+        <rdfs:label>Low</rdfs:label>
+    </jira:Priority>
+
+    <jira:Priority rdf:about="http://example.com/jira/rss#Lowest">
+        <rdfs:label>Lowest</rdfs:label>
+    </jira:Priority>
+
+</rdf:RDF>

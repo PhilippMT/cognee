@@ -4,17 +4,19 @@
 
 ```
 cognee-starter-kit/
-├── Documentation (5 files)
+├── Documentation (6 files)
 │   ├── JIRA_QUICK_START.md           # 🚀 START HERE - 5-minute guide
 │   ├── JIRA_PIPELINE_README.md       # Complete usage documentation
+│   ├── ONTOLOGY_CONFIGURATION_GUIDE.md # 🆕 Ontology setup & config
 │   ├── VERSIONING_ANALYSIS.md        # Strategy comparison & recommendations
 │   ├── IMPLEMENTATION_SUMMARY.md     # Technical overview
 │   └── README.md                     # Updated with Jira section
 │
 ├── src/
-│   ├── data/                         # Example data & ontology
+│   ├── data/                         # Example data & ontologies
 │   │   ├── jira_tickets.xml          # 3 sample tickets with history
-│   │   └── jira_ontology.owl         # Jira domain ontology (OWL)
+│   │   ├── jira_ontology.owl         # Jira ontology (custom format)
+│   │   └── jira_rss_ontology.owl     # 🆕 Jira ontology (RSS format)
 │   │
 │   ├── models/                       # Data models
 │   │   ├── __init__.py
@@ -48,6 +50,15 @@ cognee-starter-kit/
 - 5-minute quick start guide
 - Run simple example
 - Basic concepts
+- ⭐ Best starting point
+
+**ONTOLOGY_CONFIGURATION_GUIDE.md** (11KB) 🆕
+- How to configure ontologies
+- Environment variable setup
+- Automatic application via `.env`
+- Programmatic vs env configuration
+- Available ontologies (RSS vs custom)
+- Troubleshooting guide
 - Common tasks
 - ⭐ Best starting point
 
@@ -55,7 +66,7 @@ cognee-starter-kit/
 - Complete usage documentation
 - Data models explained
 - Versioning strategies detailed
-- Ontology structure
+- Both ontology structures (custom & RSS)
 - Example queries
 - Best practices
 - Integration guide
@@ -92,11 +103,19 @@ cognee-starter-kit/
 - Components and labels
 
 **jira_ontology.owl** (8.8KB)
-- OWL format ontology
+- OWL format ontology for custom XML format
 - 8 classes
 - 8 object properties (relationships)
 - 11 data properties (attributes)
 - Predefined individuals for statuses/priorities
+
+**jira_rss_ontology.owl** (16KB) 🆕
+- OWL format ontology for RSS feed format
+- 12 classes (includes Comment, ParentIssue, etc.)
+- 13 object properties (relationships)
+- 24 data properties (attributes)
+- Support for comments, parent issues, status categories
+- Predefined individuals for statuses, priorities, types
 
 ### 🏗️ Code Files
 

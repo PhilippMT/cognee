@@ -104,12 +104,16 @@ The pipeline tracks temporal information at multiple levels:
 
 ## Ontology
 
-The Jira ontology (`jira_ontology.owl`) defines:
+The pipeline supports two ontologies for different Jira export formats:
 
-### Classes
+### 1. jira_ontology.owl (Custom Format)
+
+For custom Jira XML exports with change history.
+
+**Classes:**
 - Ticket, User, Status, Priority, TicketType, Component, Label, HistoryChange
 
-### Object Properties (Relationships)
+**Object Properties (Relationships):**
 - `hasStatus`: Ticket → Status
 - `hasPriority`: Ticket → Priority
 - `hasType`: Ticket → TicketType
@@ -119,12 +123,52 @@ The Jira ontology (`jira_ontology.owl`) defines:
 - `hasLabel`: Ticket → Label
 - `hasChange`: Ticket → HistoryChange
 
-### Data Properties
+**Data Properties:**
 - `ticketId`, `summary`, `description`
 - `createdDate`, `updatedDate`, `resolvedDate`
 - `changeTimestamp`, `fieldName`, `fromValue`, `toValue`
 
-The ontology ensures that extracted entities and relationships follow the Jira domain model.
+### 2. jira_rss_ontology.owl (RSS Format) 🆕
+
+For standard Jira RSS feed exports.
+
+**Classes:**
+- Issue, User, Project, Status, StatusCategory, Priority, IssueType
+- Component, Label, Resolution, Comment, ParentIssue
+
+**Key Features:**
+- RSS feed structure support (`<item>` in `<channel>`)
+- Comment tracking with authors and timestamps
+- Parent issue relationships (Epic → Story)
+- Status categories (indeterminate, done, todo)
+- Resolution tracking
+- Project information
+
+**Object Properties (Relationships):**
+- `belongsToProject`: Issue → Project
+- `hasStatus`: Issue → Status
+- `hasStatusCategory`: Status → StatusCategory
+- `hasPriority`: Issue → Priority
+- `hasType`: Issue → IssueType
+- `reportedBy`: Issue → User
+- `assignedTo`: Issue → User
+- `hasComponent`: Issue → Component
+- `hasLabel`: Issue → Label
+- `hasResolution`: Issue → Resolution
+- `hasComment`: Issue → Comment
+- `hasParent`: Issue → ParentIssue
+- `commentedBy`: Comment → User
+
+**Data Properties:**
+- Issue: `issueKey`, `issueId`, `title`, `summary`, `description`, `environment`, `link`
+- Timestamps: `createdDate`, `updatedDate`, `dueDate`
+- Project: `projectKey`, `projectId`, `projectName`
+- User: `accountId`, `userName`
+- Status: `statusName`, `statusDescription`
+- Comment: `commentId`, `commentText`, `commentCreated`
+- Metrics: `votes`, `watches`
+
+Both ontologies ensure that extracted entities and relationships follow the Jira domain model. See [ONTOLOGY_CONFIGURATION_GUIDE.md](ONTOLOGY_CONFIGURATION_GUIDE.md) for configuration details.
 
 ## Running the Pipeline
 
