@@ -68,6 +68,26 @@ Custom model uses custom pydantic model for graph extraction. This script catego
 python src/pipelines/custom-model.py
 ```
 
+## Run the Jira Ticket Pipeline (NEW! 🎉)
+
+This pipeline demonstrates temporal-aware ingestion of Jira tickets with ontology support. It includes:
+- XML parsing of Jira tickets with full history tracking
+- Ontology-based knowledge graph construction
+- Two versioning strategies (update vs store all versions)
+- Temporal queries for ticket changes over time
+
+**Simple example** (recommended for getting started):
+```
+python src/pipelines/jira_simple_example.py
+```
+
+**Full pipeline with versioning strategies**:
+```
+python src/pipelines/jira_pipeline.py
+```
+
+See [JIRA_PIPELINE_README.md](JIRA_PIPELINE_README.md) for detailed documentation and [VERSIONING_ANALYSIS.md](VERSIONING_ANALYSIS.md) for versioning strategy recommendations.
+
 ## Graph preview 
 
 cognee provides a visualize_graph function that will render the graph for you.
