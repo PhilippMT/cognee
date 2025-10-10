@@ -34,10 +34,6 @@ def get_embedding_engine() -> EmbeddingEngine:
         config.huggingface_tokenizer,
         llm_config.llm_api_key,
         llm_config.llm_provider,
-        config.aws_region_name,
-        config.aws_access_key_id,
-        config.aws_secret_access_key,
-        config.aws_profile_name,
     )
 
 
@@ -53,10 +49,6 @@ def create_embedding_engine(
     huggingface_tokenizer,
     llm_api_key,
     llm_provider,
-    aws_region_name=None,
-    aws_access_key_id=None,
-    aws_secret_access_key=None,
-    aws_profile_name=None,
 ):
     """
     Create and return an embedding engine based on the specified provider.
@@ -79,10 +71,6 @@ def create_embedding_engine(
           for specific providers.
         - llm_api_key: API key for the LLM service, to be used if embedding_api_key is not
           provided.
-        - aws_region_name: AWS region for Bedrock embeddings
-        - aws_access_key_id: AWS access key for Bedrock
-        - aws_secret_access_key: AWS secret key for Bedrock
-        - aws_profile_name: AWS profile name from ~/.aws/credentials
 
     Returns:
     --------
@@ -120,8 +108,4 @@ def create_embedding_engine(
         model=embedding_model,
         dimensions=embedding_dimensions,
         max_completion_tokens=embedding_max_completion_tokens,
-        aws_region_name=aws_region_name,
-        aws_access_key_id=aws_access_key_id,
-        aws_secret_access_key=aws_secret_access_key,
-        aws_profile_name=aws_profile_name,
     )

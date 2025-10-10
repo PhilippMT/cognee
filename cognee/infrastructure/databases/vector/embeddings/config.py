@@ -20,13 +20,6 @@ class EmbeddingConfig(BaseSettings):
     embedding_api_version: Optional[str] = None
     embedding_max_completion_tokens: Optional[int] = 8191
     huggingface_tokenizer: Optional[str] = None
-    
-    # AWS Bedrock specific configuration for embeddings
-    aws_region_name: Optional[str] = None
-    aws_access_key_id: Optional[str] = None
-    aws_secret_access_key: Optional[str] = None
-    aws_profile_name: Optional[str] = None
-    
     model_config = SettingsConfigDict(env_file=".env", extra="allow")
 
     def to_dict(self) -> dict:
@@ -47,10 +40,6 @@ class EmbeddingConfig(BaseSettings):
             "embedding_api_version": self.embedding_api_version,
             "embedding_max_completion_tokens": self.embedding_max_completion_tokens,
             "huggingface_tokenizer": self.huggingface_tokenizer,
-            "aws_region_name": self.aws_region_name,
-            "aws_access_key_id": self.aws_access_key_id,
-            "aws_secret_access_key": self.aws_secret_access_key,
-            "aws_profile_name": self.aws_profile_name,
         }
 
 

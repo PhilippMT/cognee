@@ -46,12 +46,6 @@ class LLMConfig(BaseSettings):
     llm_temperature: float = 0.0
     llm_streaming: bool = False
     llm_max_completion_tokens: int = 16384
-    
-    # AWS Bedrock specific configuration
-    aws_region_name: Optional[str] = None
-    aws_access_key_id: Optional[str] = None
-    aws_secret_access_key: Optional[str] = None
-    aws_profile_name: Optional[str] = None
 
     baml_llm_provider: str = "openai"
     baml_llm_model: str = "gpt-4o-mini"
@@ -90,11 +84,6 @@ class LLMConfig(BaseSettings):
         elif self.structured_output_framework.lower() == "baml" and ClientRegistry is not None:
             self.baml_registry = ClientRegistry()
 
-            # Map provider names to BAML-compatible names
-            provider_name = self.baml_llm_provider
-            if provider_name == "aws_bedrock":
-                provider_name = "aws-bedrock"
-
             raw_options = {
                 "model": self.baml_llm_model,
                 "temperature": self.baml_llm_temperature,
@@ -103,16 +92,10 @@ class LLMConfig(BaseSettings):
                 "api_version": self.baml_llm_api_version,
             }
 
-            # For AWS Bedrock, use 'region' instead of 'base_url'
-            if provider_name == "aws-bedrock":
-                raw_options["region"] = self.baml_llm_endpoint or self.aws_region_name or "eu-central-1"
-                raw_options.pop("base_url", None)
-                raw_options.pop("api_version", None)
-
             # Note: keep the item only when the value is not None or an empty string (they would override baml default values)
             options = {k: v for k, v in raw_options.items() if v not in (None, "")}
             self.baml_registry.add_llm_client(
-                name=self.baml_llm_provider, provider=provider_name, options=options
+                name=self.baml_llm_provider, provider=self.baml_llm_provider, options=options
             )
             # Sets the primary client
             self.baml_registry.set_primary(self.baml_llm_provider)
@@ -217,10 +200,6 @@ class LLMConfig(BaseSettings):
             "fallback_api_key": self.fallback_api_key,
             "fallback_endpoint": self.fallback_endpoint,
             "fallback_model": self.fallback_model,
-            "aws_region_name": self.aws_region_name,
-            "aws_access_key_id": self.aws_access_key_id,
-            "aws_secret_access_key": self.aws_secret_access_key,
-            "aws_profile_name": self.aws_profile_name,
         }
 
 
