@@ -7,7 +7,7 @@ from cognee.modules.ingestion.exceptions import IngestionError
 from cognee.modules.ingestion import save_data_to_file
 from cognee.shared.logging_utils import get_logger
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from cognee.context_global_variables import tavily_config, soup_crawler_config
+
 
 logger = get_logger()
 
@@ -35,6 +35,12 @@ async def save_data_item_to_storage(data_item: Union[BinaryIO, str, Any]) -> str
 
         return await get_data_from_llama_index(data_item)
 
+    if "docling" in str(type(data_item)):
+        from docling_core.types import DoclingDocument
+
+        if isinstance(data_item, DoclingDocument):
+            data_item = data_item.export_to_text()
+
     # data is a file object coming from upload.
     if hasattr(data_item, "file"):
         return await save_data_to_file(data_item.file, filename=data_item.filename)
@@ -59,6 +65,7 @@ async def save_data_item_to_storage(data_item: Union[BinaryIO, str, Any]) -> str
         elif parsed_url.scheme == "http" or parsed_url.scheme == "https":
             # Validate URL by sending a HEAD request
             try:
+                from cognee.context_global_variables import tavily_config, soup_crawler_config
                 from cognee.tasks.web_scraper import fetch_page_content
 
                 tavily = tavily_config.get()
