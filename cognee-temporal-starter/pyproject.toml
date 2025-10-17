@@ -1,0 +1,19 @@
+[project]
+name = "cognee-temporal-starter"
+version = "0.1.0"
+description = "Temporal aware memory API extensions and examples for cognee"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "cognee",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.0",
+]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
