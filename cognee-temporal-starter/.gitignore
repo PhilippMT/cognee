@@ -1,0 +1,10 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.data_storage/
+.cognee_system/
+.artifacts/
+*.egg-info/
+dist/
+build/
