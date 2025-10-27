@@ -26,4 +26,4 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
 package-dir = {"" = "src"}
-packages = ["cognee_aws_bedrock", "cognee_aws_bedrock.llm", "cognee_aws_bedrock.embedding", "cognee_aws_bedrock.docs"]
+packages = ["cognee_aws_bedrock", "cognee_aws_bedrock.llm", "cognee_aws_bedrock.embedding"]

@@ -1,8 +1,8 @@
-"""Adapter for AWS Bedrock foundation models API"""
+"""AWS Bedrock LLM Adapter for Cognee"""
 
 import litellm
 import instructor
-from typing import Type
+from typing import Type, Optional
 from pydantic import BaseModel
 from openai import ContentFilterFinishReasonError
 from litellm.exceptions import ContentPolicyViolationError
@@ -16,6 +16,11 @@ from cognee.infrastructure.llm.structured_output_framework.litellm_instructor.ll
     rate_limit_async,
     sleep_and_retry_async,
 )
+from cognee.shared.logging_utils import get_logger
+
+from ..utils import ensure_bedrock_prefix
+
+logger = get_logger("BedrockLLMAdapter")
 
 
 class BedrockLLMAdapter(LLMInterface):
@@ -59,7 +64,7 @@ class BedrockLLMAdapter(LLMInterface):
             fallback_model (str): Fallback model identifier
             fallback_aws_region_name (str): Fallback AWS region name
         """
-        self.model = model if model.startswith("bedrock/") else f"bedrock/{model}"
+        self.model = ensure_bedrock_prefix(model)
         self.max_completion_tokens = max_completion_tokens
         self.aws_region_name = aws_region_name or "eu-central-1"
         self.aws_access_key_id = aws_access_key_id

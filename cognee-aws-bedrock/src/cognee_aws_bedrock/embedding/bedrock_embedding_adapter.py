@@ -16,6 +16,8 @@ from cognee.infrastructure.databases.vector.embeddings.embedding_rate_limiter im
     embedding_sleep_and_retry_async,
 )
 
+from ..utils import ensure_bedrock_prefix
+
 litellm.set_verbose = False
 logger = get_logger("BedrockEmbeddingAdapter")
 
@@ -65,13 +67,16 @@ class BedrockEmbeddingAdapter(EmbeddingEngine):
             aws_profile_name (str): AWS profile name (optional)
         """
         # Ensure model has bedrock/ prefix
-        self.model = model if model.startswith("bedrock/") else f"bedrock/{model}"
+        self.model = ensure_bedrock_prefix(model)
         self.dimensions = dimensions
         self.max_completion_tokens = max_completion_tokens
         self.aws_region_name = aws_region_name
         self.aws_access_key_id = aws_access_key_id
         self.aws_secret_access_key = aws_secret_access_key
         self.aws_profile_name = aws_profile_name
+        # Note: TikTokenizer with model=None may not provide accurate tokenization
+        # for Bedrock models. Consider implementing Bedrock-specific tokenization
+        # or using model-specific tokenizers in the future.
         self.tokenizer = TikTokenTokenizer(model=None, max_completion_tokens=max_completion_tokens)
         self.retry_count = 0
 

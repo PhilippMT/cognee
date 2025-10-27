@@ -2,10 +2,14 @@
 Registration module for AWS Bedrock adapters.
 
 This module provides functions to register AWS Bedrock LLM and embedding adapters
-with the Cognee framework.
+with the Cognee framework using a cleaner registry pattern.
 """
 
-from typing import Optional
+from typing import Optional, Dict, Any
+
+
+# Global registry for Bedrock adapters
+_bedrock_registry: Dict[str, Any] = {}
 
 
 def register_bedrock_adapters(
@@ -18,7 +22,7 @@ def register_bedrock_adapters(
     Register AWS Bedrock adapters for LLM and embeddings with Cognee.
     
     This function registers the BedrockLLMAdapter and BedrockEmbeddingAdapter
-    with Cognee's infrastructure, allowing them to be used as providers.
+    with Cognee's infrastructure, storing configuration for later use.
     
     Parameters:
     -----------
@@ -42,7 +46,7 @@ def register_bedrock_adapters(
             embedding_profile="my-embedding-profile"
         )
         
-        # Configure and use
+        # Configure and use - set provider to "aws_bedrock"
         import cognee
         cognee.config.llm_provider = "aws_bedrock"
         cognee.config.llm_model = "bedrock/anthropic.claude-3-7-sonnet-20250219-v1:0"
@@ -52,47 +56,54 @@ def register_bedrock_adapters(
     from .llm.bedrock_llm_adapter import BedrockLLMAdapter
     from .embedding.bedrock_embedding_adapter import BedrockEmbeddingAdapter
     
-    # Store configuration for later use
-    _bedrock_config = {
+    # Store configuration in registry
+    _bedrock_registry["config"] = {
         "llm_region": llm_region or "eu-central-1",
         "llm_profile": llm_profile,
         "embedding_region": embedding_region or "eu-central-1",
         "embedding_profile": embedding_profile,
     }
     
-    # Register LLM adapter
-    try:
-        from cognee.infrastructure.llm.structured_output_framework.litellm_instructor.llm.get_llm_client import (
-            LLMProvider,
-        )
-        
-        # Add AWS_BEDROCK to the LLMProvider enum if not exists
-        if not hasattr(LLMProvider, "AWS_BEDROCK"):
-            LLMProvider.AWS_BEDROCK = "aws_bedrock"
-            
-    except Exception as e:
-        print(f"Warning: Could not register LLM provider enum: {e}")
-    
-    # Store adapter classes for use by get_llm_client and get_embedding_engine
-    # This allows the core framework to instantiate our adapters
-    import sys
-    if 'cognee_aws_bedrock_adapters' not in sys.modules:
-        sys.modules['cognee_aws_bedrock_adapters'] = type(sys)('cognee_aws_bedrock_adapters')
-    
-    sys.modules['cognee_aws_bedrock_adapters'].BedrockLLMAdapter = BedrockLLMAdapter
-    sys.modules['cognee_aws_bedrock_adapters'].BedrockEmbeddingAdapter = BedrockEmbeddingAdapter
-    sys.modules['cognee_aws_bedrock_adapters'].config = _bedrock_config
+    _bedrock_registry["llm_adapter"] = BedrockLLMAdapter
+    _bedrock_registry["embedding_adapter"] = BedrockEmbeddingAdapter
     
     print("✓ AWS Bedrock adapters registered successfully")
-    print(f"  LLM Region: {_bedrock_config['llm_region']}")
-    if _bedrock_config['llm_profile']:
-        print(f"  LLM Profile: {_bedrock_config['llm_profile']}")
-    print(f"  Embedding Region: {_bedrock_config['embedding_region']}")
-    if _bedrock_config['embedding_profile']:
-        print(f"  Embedding Profile: {_bedrock_config['embedding_profile']}")
+    print(f"  LLM Region: {_bedrock_registry['config']['llm_region']}")
+    if _bedrock_registry['config']['llm_profile']:
+        print(f"  LLM Profile: {_bedrock_registry['config']['llm_profile']}")
+    print(f"  Embedding Region: {_bedrock_registry['config']['embedding_region']}")
+    if _bedrock_registry['config']['embedding_profile']:
+        print(f"  Embedding Profile: {_bedrock_registry['config']['embedding_profile']}")
     
+    print("\nTo use AWS Bedrock:")
+    print("  1. Set cognee.config.llm_provider = 'aws_bedrock'")
+    print("  2. Set cognee.config.llm_model = 'bedrock/your-model-id'")
+    print("  3. Set cognee.config.embedding_provider = 'bedrock'")
+    print("  4. Set cognee.config.embedding_model = 'bedrock/your-embedding-model-id'")
+    
+    return _bedrock_registry
+
+
+def get_bedrock_config() -> Dict[str, Any]:
+    """
+    Get the current Bedrock configuration from the registry.
+    
+    Returns:
+    --------
+        Dict containing the Bedrock configuration
+    """
+    return _bedrock_registry.get("config", {})
+
+
+def get_bedrock_adapters() -> Dict[str, Any]:
+    """
+    Get registered Bedrock adapter classes.
+    
+    Returns:
+    --------
+        Dict containing llm_adapter and embedding_adapter classes
+    """
     return {
-        "llm_adapter": BedrockLLMAdapter,
-        "embedding_adapter": BedrockEmbeddingAdapter,
-        "config": _bedrock_config,
+        "llm_adapter": _bedrock_registry.get("llm_adapter"),
+        "embedding_adapter": _bedrock_registry.get("embedding_adapter"),
     }
