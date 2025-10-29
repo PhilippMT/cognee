@@ -24,6 +24,7 @@ class LLMProvider(Enum):
     - CUSTOM: Represents a custom provider option.
     - GEMINI: Represents the Gemini provider.
     - MISTRAL: Represents the Mistral AI provider.
+    - AWS_BEDROCK: Represents the AWS Bedrock provider.
     """
 
     OPENAI = "openai"
@@ -32,6 +33,7 @@ class LLMProvider(Enum):
     CUSTOM = "custom"
     GEMINI = "gemini"
     MISTRAL = "mistral"
+    AWS_BEDROCK = "aws_bedrock"
 
 
 def get_llm_client(raise_api_key_error: bool = True):
@@ -162,20 +164,33 @@ def get_llm_client(raise_api_key_error: bool = True):
             endpoint=llm_config.llm_endpoint,
         )
 
-    elif provider == LLMProvider.MISTRAL:
-        if llm_config.llm_api_key is None:
-            raise LLMAPIKeyNotSetError()
-
-        from cognee.infrastructure.llm.structured_output_framework.litellm_instructor.llm.mistral.adapter import (
-            MistralAdapter,
-        )
-
-        return MistralAdapter(
-            api_key=llm_config.llm_api_key,
-            model=llm_config.llm_model,
-            max_completion_tokens=max_completion_tokens,
-            endpoint=llm_config.llm_endpoint,
-        )
+    elif provider == LLMProvider.AWS_BEDROCK:
+        try:
+            from cognee_aws_bedrock import get_bedrock_adapters, get_bedrock_config
+            
+            adapters = get_bedrock_adapters()
+            llm_adapter_class = adapters.get("llm_adapter")
+            
+            if not llm_adapter_class:
+                raise ImportError(
+                    "AWS Bedrock adapters not registered. "
+                    "Call register_bedrock_adapters() before using aws_bedrock provider."
+                )
+            
+            # Get the stored configuration
+            bedrock_config = get_bedrock_config()
+            
+            return llm_adapter_class(
+                model=llm_config.llm_model,
+                max_completion_tokens=max_completion_tokens,
+                aws_region_name=bedrock_config.get("llm_region"),
+                aws_profile_name=bedrock_config.get("llm_profile"),
+            )
+        except ImportError as e:
+            raise ImportError(
+                "cognee-aws-bedrock package not installed. "
+                "Install it with: uv pip install -e ./cognee-aws-bedrock"
+            ) from e
 
     else:
         raise UnsupportedLLMProviderError(provider)

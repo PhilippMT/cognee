@@ -293,6 +293,59 @@ app.include_router(
 )
 
 
+def register_temporal_endpoints():
+    """
+    Register temporal endpoints if cognee-temporal-starter is installed.
+    This is called after the main app is fully initialized to avoid circular imports.
+    """
+    try:
+        # Try absolute import first (when installed as package)
+        try:
+            from api.routers.temporal_cognify import get_temporal_cognify_router
+            from api.routers.temporal_search import get_temporal_search_router
+            from api.routers.temporal_events import get_temporal_events_router
+            logger.info("Temporal routers imported via direct path")
+        except ImportError as e1:
+            logger.debug(f"Direct path import failed: {e1}")
+            # Fallback to trying package import
+            try:
+                from cognee_temporal_starter.api.routers.temporal_cognify import get_temporal_cognify_router
+                from cognee_temporal_starter.api.routers.temporal_search import get_temporal_search_router
+                from cognee_temporal_starter.api.routers.temporal_events import get_temporal_events_router
+                logger.info("Temporal routers imported via package name")
+            except ImportError as e2:
+                logger.debug(f"Package import failed: {e2}")
+                raise ImportError(f"Could not import temporal routers: {e1}, {e2}")
+        
+        app.include_router(
+            get_temporal_cognify_router(),
+            prefix="/api/v1/temporal/cognify",
+            tags=["temporal"]
+        )
+        app.include_router(
+            get_temporal_search_router(),
+            prefix="/api/v1/temporal/search",
+            tags=["temporal"]
+        )
+        app.include_router(
+            get_temporal_events_router(),
+            prefix="/api/v1/temporal/events",
+            tags=["temporal"]
+        )
+        logger.info("Temporal endpoints registered successfully")
+        return True
+    except ImportError as e:
+        logger.info(f"Temporal endpoints not available: {e}")
+        return False
+    except Exception as e:
+        logger.error(f"Error registering temporal endpoints: {e}", exc_info=True)
+        return False
+
+
+# Try to register temporal endpoints after main routes are set up
+register_temporal_endpoints()
+
+
 def start_api_server(host: str = "0.0.0.0", port: int = 8000):
     """
     Start the API server using uvicorn.

@@ -9,22 +9,28 @@ services:
     volumes:
       - ./cognee:/app/cognee
       - .env:/app/.env
+      - /mnt/c/Users/phili/.aws:/root/.aws
+      - /mnt/c/Users/phili/.aws/config:/root/.aws/config:ro
     environment:
       - DEBUG=false # Change to true if debugging
       - HOST=0.0.0.0
       - ENVIRONMENT=local
       - LOG_LEVEL=ERROR
+      - AWS_REGION=${AWS_REGION}
+      - AWS_REGION_NAME=${AWS_REGION_NAME}
+      - AWS_PROFILE_NAME=${AWS_PROFILE_NAME}
+      - AWS_PROFILE=${AWS_PROFILE}
     extra_hosts:
       # Allows the container to reach your local machine using "host.docker.internal" instead of "localhost"
       - "host.docker.internal:host-gateway"
     ports:
       - 8000:8000
-      - 5678:5678 # Debugger port
+#      - 5678:5678 # Debugger port
     deploy:
       resources:
         limits:
-          cpus: "4.0"
-          memory: 8GB
+          cpus: "6.0"
+          memory: 12GB
 
   # Cognee MCP Server - Model Context Protocol server for IDE integration
   cognee-mcp:

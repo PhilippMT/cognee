@@ -15,6 +15,26 @@ from cognee.shared.logging_utils import setup_logging
 
 logger = setup_logging()
 
+# Register AWS Bedrock adapters if available
+try:
+    from cognee_aws_bedrock import register_bedrock_adapters
+    import os
+    
+    llm_region = os.getenv("AWS_REGION_NAME") or os.getenv("AWS_REGION", "eu-central-1")
+    llm_profile = os.getenv("AWS_PROFILE_NAME") or os.getenv("AWS_PROFILE")
+    
+    register_bedrock_adapters(
+        llm_region=llm_region,
+        llm_profile=llm_profile,
+        embedding_region=llm_region,
+        embedding_profile=llm_profile
+    )
+    logger.info(f"AWS Bedrock adapters registered (region: {llm_region}, profile: {llm_profile})")
+except ImportError:
+    logger.debug("cognee-aws-bedrock not installed, skipping Bedrock adapter registration")
+except Exception as e:
+    logger.warning(f"Failed to register AWS Bedrock adapters: {e}")
+
 from .api.v1.add import add
 from .api.v1.delete import delete
 from .api.v1.cognify import cognify

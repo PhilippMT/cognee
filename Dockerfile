@@ -30,9 +30,15 @@ RUN apt-get update && apt-get install -y \
 # Copy pyproject.toml and lockfile first for better caching
 COPY README.md pyproject.toml uv.lock entrypoint.sh ./
 
+# Copy additional module pyproject.toml files for dependency resolution
+COPY cognee-aws-bedrock/pyproject.toml ./cognee-aws-bedrock/
+COPY cognee-aws-bedrock/README.md ./cognee-aws-bedrock/
+COPY cognee-temporal-starter/pyproject.toml ./cognee-temporal-starter/
+COPY cognee-temporal-starter/README.md ./cognee-temporal-starter/
+
 # Install the project's dependencies using the lockfile and settings
 RUN --mount=type=cache,target=/root/.cache/uv \
-    uv sync --extra debug --extra api --extra postgres --extra neo4j --extra llama-index --extra ollama --extra mistral --extra groq --extra anthropic --frozen --no-install-project --no-dev --no-editable
+    uv sync --extra codegraph --extra debug --extra api --extra postgres --extra neo4j --extra llama-index --extra ollama --extra mistral --extra groq --extra anthropic --frozen --no-install-project --no-dev --no-editable
 
 # Copy Alembic configuration
 COPY alembic.ini /app/alembic.ini
@@ -42,8 +48,26 @@ COPY alembic/ /app/alembic
 # Installing separately from its dependencies allows optimal layer caching
 COPY ./cognee /app/cognee
 COPY ./distributed /app/distributed
+COPY ./cognee-aws-bedrock/src /app/cognee-aws-bedrock/src
+COPY ./cognee-temporal-starter/src /app/cognee-temporal-starter/src
+
 RUN --mount=type=cache,target=/root/.cache/uv \
-uv sync --extra debug --extra api --extra postgres --extra neo4j --extra llama-index --extra ollama --extra mistral --extra groq --extra anthropic --frozen --no-dev --no-editable
+    uv sync --extra codegraph --extra debug --extra api --extra postgres --extra neo4j \
+    --extra llama-index --extra ollama --extra mistral --extra groq \
+    --extra anthropic --frozen --no-dev --no-editable
+
+# Install cognee-aws-bedrock module
+WORKDIR /app/cognee-aws-bedrock
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv pip install -e .
+
+# Install cognee-temporal-starter module
+WORKDIR /app/cognee-temporal-starter
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv pip install -e .
+
+# Return to main app directory
+WORKDIR /app
 
 FROM python:3.12-slim-bookworm
 
