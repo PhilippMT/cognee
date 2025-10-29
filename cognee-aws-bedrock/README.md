@@ -17,6 +17,8 @@ External adapter package for integrating AWS Bedrock foundation models with Cogn
 pip install -e cognee-aws-bedrock/
 ```
 
+**Note:** This adapter now uses `instructor[bedrock]` for native AWS Bedrock integration instead of litellm. Embeddings still use litellm for compatibility.
+
 ## Quick Start
 
 ```python
@@ -142,6 +144,9 @@ AWS Bedrock supports batch processing for both LLMs and embeddings:
    - Named profile in `~/.aws/credentials` (recommended)
    - Environment variables (`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`)
    - IAM role (when running on EC2, ECS, Lambda, etc.)
+5. Python dependencies:
+   - `instructor[bedrock]>=1.0.0`
+   - `boto3>=1.34.0`
 
 ## Documentation
 

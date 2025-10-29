@@ -1,6 +1,6 @@
 # AWS Bedrock Integration for Cognee
 
-This directory contains the AWS Bedrock adapter for Cognee's LLM infrastructure, supporting both litellm_instructor and BAML frameworks.
+This directory contains the AWS Bedrock adapter for Cognee's LLM infrastructure, using instructor[bedrock] for native integration.
 
 ## Overview
 
@@ -9,12 +9,14 @@ AWS Bedrock provides access to foundation models from leading AI companies inclu
 - Multiple foundation model providers (Claude, Llama, Titan, Nova, etc.)
 - Cross-region inference for higher throughput and availability
 - EU region support (eu-central-1, eu-north-1, eu-west-1)
-- Structured output generation via litellm and BAML
+- Structured output generation via instructor[bedrock] (LLM) and litellm (embeddings)
 - AWS IAM authentication and credentials management
+
+**Note:** As of v0.2.0, LLM operations use instructor[bedrock] for native boto3 integration. Embeddings continue to use litellm.
 
 ## Quick Start
 
-### Using litellm_instructor (Default)
+### Using instructor[bedrock] (Default)
 
 Configure via environment variables:
 
