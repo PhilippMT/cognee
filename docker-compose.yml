@@ -9,8 +9,8 @@ services:
     volumes:
       - ./cognee:/app/cognee
       - .env:/app/.env
-      - /mnt/c/Users/phili/.aws:/root/.aws
-      - /mnt/c/Users/phili/.aws/config:/root/.aws/config:ro
+      - ~/.aws:/root/.aws
+      - ~/.aws/config:/root/.aws/config:ro
     environment:
       - DEBUG=false # Change to true if debugging
       - HOST=0.0.0.0
@@ -26,11 +26,11 @@ services:
     ports:
       - 8000:8000
 #      - 5678:5678 # Debugger port
-    deploy:
-      resources:
-        limits:
-          cpus: "6.0"
-          memory: 12GB
+#    deploy:
+#      resources:
+#        limits:
+#          cpus: "6.0"
+#          memory: 24GB
 
   # Cognee MCP Server - Model Context Protocol server for IDE integration
   cognee-mcp:

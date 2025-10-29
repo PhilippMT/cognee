@@ -74,10 +74,19 @@ class BedrockLLMAdapter(LLMInterface):
         self.fallback_model = fallback_model
         self.fallback_aws_region_name = fallback_aws_region_name
 
+        # Log initialization parameters
+        logger.info(f"Initializing BedrockLLMAdapter with parameters:")
+        logger.info(f"  model: {self.model}")
+        logger.info(f"  max_completion_tokens: {self.max_completion_tokens}")
+        logger.info(f"  aws_region_name: {self.aws_region_name}")
+        logger.info(f"  aws_profile_name: {self.aws_profile_name}")
+        logger.info(f"  fallback_model: {self.fallback_model}")
+        logger.info(f"  fallback_aws_region_name: {self.fallback_aws_region_name}")
+
         # Initialize instructor client with litellm
-        # AWS Bedrock models work with JSON mode in litellm
+        # Use JSON_SCHEMA mode for Bedrock models
         self.aclient = instructor.from_litellm(
-            litellm.acompletion, mode=instructor.Mode.JSON
+            litellm.acompletion, mode=instructor.Mode.JSON_SCHEMA
         )
 
     @sleep_and_retry_async()
@@ -116,15 +125,15 @@ class BedrockLLMAdapter(LLMInterface):
                 model=self.model,
                 messages=[
                     {
-                        "role": "user",
-                        "content": f"""{text_input}""",
-                    },
-                    {
                         "role": "system",
                         "content": system_prompt,
                     },
+                    {
+                        "role": "user",
+                        "content": f"""{text_input}""",
+                    },
                 ],
-                max_retries=5,
+                max_tokens=self.max_completion_tokens,
                 aws_region_name=self.aws_region_name,
                 response_model=response_model,
                 **extra_params,
@@ -157,15 +166,15 @@ class BedrockLLMAdapter(LLMInterface):
                     model=fallback_model,
                     messages=[
                         {
-                            "role": "user",
-                            "content": f"""{text_input}""",
-                        },
-                        {
                             "role": "system",
                             "content": system_prompt,
                         },
+                        {
+                            "role": "user",
+                            "content": f"""{text_input}""",
+                        },
                     ],
-                    max_retries=5,
+                    max_tokens=self.max_completion_tokens,
                     aws_region_name=self.fallback_aws_region_name,
                     response_model=response_model,
                     **extra_params,

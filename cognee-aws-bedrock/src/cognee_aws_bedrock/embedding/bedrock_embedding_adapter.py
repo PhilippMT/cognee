@@ -74,6 +74,15 @@ class BedrockEmbeddingAdapter(EmbeddingEngine):
         self.aws_access_key_id = aws_access_key_id
         self.aws_secret_access_key = aws_secret_access_key
         self.aws_profile_name = aws_profile_name
+
+        # Log initialization parameters
+        logger.info(f"Initializing BedrockEmbeddingAdapter with parameters:")
+        logger.info(f"  model: {self.model}")
+        logger.info(f"  dimensions: {self.dimensions}")
+        logger.info(f"  max_completion_tokens: {self.max_completion_tokens}")
+        logger.info(f"  aws_region_name: {self.aws_region_name}")
+        logger.info(f"  aws_profile_name: {self.aws_profile_name}")
+
         # Note: TikTokenizer with model=None may not provide accurate tokenization
         # for Bedrock models. Consider implementing Bedrock-specific tokenization
         # or using model-specific tokenizers in the future.
