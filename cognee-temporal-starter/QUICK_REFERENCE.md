@@ -45,6 +45,9 @@ python src/api/temporal_server.py
 | `/api/v1/temporal/search` | POST | Search with temporal filters |
 | `/api/v1/temporal/events` | POST | Query events by time range |
 | `/api/v1/temporal/timeline` | GET | Get chronological timeline |
+| `/api/v1/episodes/add` | POST | Add episodes with Graphiti temporal awareness |
+| `/api/v1/episodes/search` | POST | Search episodes with temporal context |
+| `/api/v1/episodes/cognify-with-episodes` | POST | Process episodes with full cognify pipeline |
 
 ### Python Usage
 
@@ -106,6 +109,41 @@ curl -X POST "http://localhost:8000/api/v1/temporal/events" \
 
 # Get Timeline
 curl "http://localhost:8000/api/v1/temporal/timeline?dataset=my_dataset"
+
+# Add Episodes with Graphiti
+curl -X POST "http://localhost:8000/api/v1/episodes/add" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "episodes": [
+      {
+        "name": "episode_1",
+        "text": "Einstein published special relativity in 1905.",
+        "reference_time": "1905-06-30T00:00:00"
+      }
+    ]
+  }'
+
+# Search Episodes
+curl -X POST "http://localhost:8000/api/v1/episodes/search" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "What is relativity?",
+    "top_k": 5
+  }'
+
+# Cognify with Episodes
+curl -X POST "http://localhost:8000/api/v1/episodes/cognify-with-episodes" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "episodes": [
+      {
+        "name": "historical_event",
+        "text": "The Berlin Wall fell on November 9, 1989.",
+        "reference_time": "1989-11-09T00:00:00"
+      }
+    ],
+    "dataset": "historical_events"
+  }'
 ```
 
 ### Key Models

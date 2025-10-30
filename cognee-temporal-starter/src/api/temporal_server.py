@@ -41,6 +41,7 @@ from cognee.api.v1.users.routers import (
 from .routers.temporal_cognify import get_temporal_cognify_router
 from .routers.temporal_search import get_temporal_search_router
 from .routers.temporal_events import get_temporal_events_router
+from .routers.episode_endpoints import get_episode_endpoints_router
 
 logger = get_logger()
 app_environment = os.getenv("ENV", "local")
@@ -103,6 +104,9 @@ async def root():
             "temporal_search": "/api/v1/temporal/search",
             "temporal_events": "/api/v1/temporal/events",
             "timeline": "/api/v1/temporal/timeline",
+            "episode_add": "/api/v1/episodes/add",
+            "episode_search": "/api/v1/episodes/search",
+            "episode_cognify": "/api/v1/episodes/cognify-with-episodes",
         }
     }
 
@@ -141,6 +145,13 @@ app.include_router(
     get_temporal_events_router(),
     prefix="/api/v1/temporal/events",
     tags=["temporal"]
+)
+
+# Include episode-based endpoints
+app.include_router(
+    get_episode_endpoints_router(),
+    prefix="/api/v1/episodes",
+    tags=["episodes"]
 )
 
 
