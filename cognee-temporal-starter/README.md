@@ -73,10 +73,16 @@ python src/api/temporal_server.py
 
 The server will start on `http://localhost:8000` with these additional endpoints:
 
+**Temporal Endpoints:**
 - `POST /api/v1/temporal/cognify` - Run temporal cognify on datasets
 - `POST /api/v1/temporal/search` - Search with temporal filters
 - `POST /api/v1/temporal/events` - Query events by time range
 - `GET /api/v1/temporal/timeline` - Get timeline view of events
+
+**Episode Endpoints (Graphiti-based):**
+- `POST /api/v1/episodes/add` - Add episodes with temporal awareness
+- `POST /api/v1/episodes/search` - Search episodes with temporal context
+- `POST /api/v1/episodes/cognify-with-episodes` - Process episodes with full cognify pipeline
 
 ## API Endpoints
 
@@ -128,6 +134,56 @@ Retrieve a chronological timeline of events:
 curl -X GET "http://localhost:8000/api/v1/temporal/timeline?dataset=my_dataset"
 ```
 
+### Add Episodes (Graphiti-based)
+
+Add episodes with temporal awareness using Graphiti:
+
+```bash
+curl -X POST "http://localhost:8000/api/v1/episodes/add" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "episodes": [
+      {
+        "name": "episode_1",
+        "text": "Albert Einstein published his theory of special relativity in 1905.",
+        "reference_time": "1905-06-30T00:00:00"
+      }
+    ]
+  }'
+```
+
+### Search Episodes
+
+Search episodes with temporal context:
+
+```bash
+curl -X POST "http://localhost:8000/api/v1/episodes/search" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "What is relativity?",
+    "top_k": 5
+  }'
+```
+
+### Cognify with Episodes
+
+Process episodes using the full cognify pipeline with temporal awareness:
+
+```bash
+curl -X POST "http://localhost:8000/api/v1/episodes/cognify-with-episodes" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "episodes": [
+      {
+        "name": "historical_event",
+        "text": "The Berlin Wall fell on November 9, 1989.",
+        "reference_time": "1989-11-09T00:00:00"
+      }
+    ],
+    "dataset": "historical_events"
+  }'
+```
+
 ## Example Pipelines
 
 ### Basic Temporal Pipeline
@@ -144,6 +200,14 @@ The advanced example (`src/pipelines/temporal_advanced.py`) demonstrates:
 - Event relationship tracking
 - Complex temporal queries
 - Visualization of temporal graphs
+
+### Episode-Based Graphiti Pipeline
+
+The episode example (`src/pipelines/episode_graphiti_example.py`) demonstrates:
+- Adding episodes with Graphiti temporal awareness
+- Querying episodes with temporal context
+- Combining episode-based processing with cognify
+- Using Graphiti for enhanced temporal graph building
 
 ## How It Works
 
@@ -174,6 +238,21 @@ Key models from `cognee.tasks.temporal_graph.models`:
 - **Interval**: Represents a time range (starts_at, ends_at)
 - **Event**: Represents an event with name, description, and temporal bounds
 - **QueryInterval**: Used for temporal queries with optional time bounds
+
+### 4. Episode-Based Processing with Graphiti
+
+Episodes are temporal units of information processed using Graphiti:
+
+1. **Add Episodes**: Episodes are added with explicit timestamps
+2. **Build Temporal Graph**: Graphiti constructs a temporal knowledge graph
+3. **Index for Retrieval**: Episodes are indexed for semantic search
+4. **Query with Context**: Retrieve episodes based on semantic similarity and temporal proximity
+
+**Graphiti** is a temporal graph framework that provides:
+- Episode-level granularity for temporal data
+- Automatic entity and relationship extraction
+- Time-aware context building
+- Integration with Neo4j for graph storage
 
 ## Use Cases
 
