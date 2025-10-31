@@ -84,6 +84,23 @@ The server will start on `http://localhost:8000` with these additional endpoints
 - `POST /api/v1/episodes/search` - Search episodes with temporal context
 - `POST /api/v1/episodes/cognify-with-episodes` - Process episodes with full cognify pipeline
 
+**Relationship Tracking Endpoints (NEW):**
+- `POST /api/v1/relationships/add` - Add causal and hierarchical relationships
+- `POST /api/v1/relationships/query` - Query event relationships
+- `POST /api/v1/relationships/causal-chains` - Find causal chains between events
+
+**Temporal Aggregations Endpoints (NEW):**
+- `POST /api/v1/aggregations/frequency` - Analyze event frequency over time
+- `POST /api/v1/aggregations/patterns` - Detect recurring temporal patterns
+- `POST /api/v1/aggregations/statistics` - Compute comprehensive temporal statistics
+- `POST /api/v1/aggregations/cooccurrence` - Analyze event co-occurrence patterns
+
+**Episode Relationship Endpoints (NEW):**
+- `POST /api/v1/episode-relationships/add-links` - Add explicit episode-to-episode links
+- `POST /api/v1/episode-relationships/query-links` - Query episode relationships
+- `POST /api/v1/episode-relationships/sequences` - Find episode sequences
+- `POST /api/v1/episode-relationships/clusters` - Cluster episodes by similarity
+
 ## API Endpoints
 
 ### Temporal Cognify
@@ -181,6 +198,72 @@ curl -X POST "http://localhost:8000/api/v1/episodes/cognify-with-episodes" \
       }
     ],
     "dataset": "historical_events"
+  }'
+```
+
+### Add Event Relationships (NEW)
+
+Add causal and hierarchical relationships between events:
+
+```bash
+curl -X POST "http://localhost:8000/api/v1/relationships/add" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "causal_relationships": [
+      {
+        "cause_event": "stock_market_crash_1929",
+        "effect_event": "great_depression",
+        "confidence": 0.95
+      }
+    ],
+    "hierarchical_relationships": [
+      {
+        "parent_event": "world_war_ii",
+        "child_event": "battle_of_normandy",
+        "hierarchy_type": "contains"
+      }
+    ]
+  }'
+```
+
+### Find Causal Chains (NEW)
+
+Discover cause-effect sequences:
+
+```bash
+curl -X POST "http://localhost:8000/api/v1/relationships/causal-chains" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "start_event": "assassination_archduke_ferdinand",
+    "end_event": "world_war_i",
+    "max_chain_length": 5
+  }'
+```
+
+### Analyze Event Frequency (NEW)
+
+Analyze event distribution over time:
+
+```bash
+curl -X POST "http://localhost:8000/api/v1/aggregations/frequency" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "time_granularity": "year",
+    "time_from": "1900-01-01T00:00:00",
+    "time_to": "2000-12-31T23:59:59"
+  }'
+```
+
+### Detect Patterns (NEW)
+
+Find recurring temporal patterns:
+
+```bash
+curl -X POST "http://localhost:8000/api/v1/aggregations/patterns" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "min_pattern_length": 3,
+    "min_occurrences": 2
   }'
 ```
 

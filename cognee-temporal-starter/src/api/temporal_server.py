@@ -42,6 +42,9 @@ from .routers.temporal_cognify import get_temporal_cognify_router
 from .routers.temporal_search import get_temporal_search_router
 from .routers.temporal_events import get_temporal_events_router
 from .routers.episode_endpoints import get_episode_endpoints_router
+from .routers.relationship_tracking import get_relationship_tracking_router
+from .routers.temporal_aggregations import get_temporal_aggregations_router
+from .routers.episode_relationships import get_episode_relationships_router
 
 logger = get_logger()
 app_environment = os.getenv("ENV", "local")
@@ -98,7 +101,7 @@ async def root():
     """Root endpoint."""
     return {
         "message": "Cognee Temporal Memory API",
-        "version": "1.0.0",
+        "version": "2.0.0",
         "endpoints": {
             "temporal_cognify": "/api/v1/temporal/cognify",
             "temporal_search": "/api/v1/temporal/search",
@@ -107,6 +110,17 @@ async def root():
             "episode_add": "/api/v1/episodes/add",
             "episode_search": "/api/v1/episodes/search",
             "episode_cognify": "/api/v1/episodes/cognify-with-episodes",
+            "relationships_add": "/api/v1/relationships/add",
+            "relationships_query": "/api/v1/relationships/query",
+            "causal_chains": "/api/v1/relationships/causal-chains",
+            "aggregations_frequency": "/api/v1/aggregations/frequency",
+            "aggregations_patterns": "/api/v1/aggregations/patterns",
+            "aggregations_statistics": "/api/v1/aggregations/statistics",
+            "aggregations_cooccurrence": "/api/v1/aggregations/cooccurrence",
+            "episode_relationships_add_links": "/api/v1/episode-relationships/add-links",
+            "episode_relationships_query_links": "/api/v1/episode-relationships/query-links",
+            "episode_relationships_sequences": "/api/v1/episode-relationships/sequences",
+            "episode_relationships_clusters": "/api/v1/episode-relationships/clusters",
         }
     }
 
@@ -152,6 +166,27 @@ app.include_router(
     get_episode_endpoints_router(),
     prefix="/api/v1/episodes",
     tags=["episodes"]
+)
+
+# Include advanced relationship tracking endpoints
+app.include_router(
+    get_relationship_tracking_router(),
+    prefix="/api/v1/relationships",
+    tags=["relationships"]
+)
+
+# Include temporal aggregations endpoints
+app.include_router(
+    get_temporal_aggregations_router(),
+    prefix="/api/v1/aggregations",
+    tags=["aggregations"]
+)
+
+# Include episode relationship endpoints
+app.include_router(
+    get_episode_relationships_router(),
+    prefix="/api/v1/episode-relationships",
+    tags=["episode-relationships"]
 )
 
 

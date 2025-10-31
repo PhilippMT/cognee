@@ -48,6 +48,14 @@ python src/api/temporal_server.py
 | `/api/v1/episodes/add` | POST | Add episodes with Graphiti temporal awareness |
 | `/api/v1/episodes/search` | POST | Search episodes with temporal context |
 | `/api/v1/episodes/cognify-with-episodes` | POST | Process episodes with full cognify pipeline |
+| `/api/v1/relationships/add` | POST | Add causal/hierarchical relationships (NEW) |
+| `/api/v1/relationships/query` | POST | Query event relationships (NEW) |
+| `/api/v1/relationships/causal-chains` | POST | Find causal chains (NEW) |
+| `/api/v1/aggregations/frequency` | POST | Analyze event frequency (NEW) |
+| `/api/v1/aggregations/patterns` | POST | Detect temporal patterns (NEW) |
+| `/api/v1/aggregations/statistics` | POST | Compute temporal statistics (NEW) |
+| `/api/v1/episode-relationships/add-links` | POST | Add episode links (NEW) |
+| `/api/v1/episode-relationships/sequences` | POST | Find episode sequences (NEW) |
 
 ### Python Usage
 
