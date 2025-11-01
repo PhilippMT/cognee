@@ -1633,3 +1633,665 @@ For more information, see:
 - [README.md](README.md) - Project overview and quick start
 - [CONTRIBUTING.md](CONTRIBUTING.md) - Development guidelines
 - [Documentation](https://docs.cognee.ai) - Comprehensive online docs
+
+---
+
+## 24. File Storage & Data Loaders
+
+How Cognee handles different file types and storage backends.
+
+```mermaid
+graph TB
+    subgraph "File & Storage System"
+        subgraph "Storage Backends"
+            LOCAL_FS[Local File System<br/>Default]
+            S3_BACKEND[AWS S3<br/>Cloud storage]
+            AZURE_BLOB[Azure Blob Storage]
+            GCS[Google Cloud Storage]
+        end
+        
+        subgraph "File Manager"
+            FILE_MGR[File Manager]
+            UPLOAD[Upload Files]
+            DOWNLOAD[Download Files]
+            DELETE_FILE[Delete Files]
+            LIST_FILES[List Files]
+        end
+        
+        subgraph "Data Loaders"
+            subgraph "Document Loaders"
+                PDF_L[PDF Loader<br/>pypdf]
+                DOCX_L[DOCX Loader<br/>python-docx]
+                TXT_L[Text Loader]
+                MD_L[Markdown Loader]
+                CSV_L[CSV Loader]
+            end
+            
+            subgraph "Media Loaders"
+                IMG_L[Image Loader<br/>OCR via Vision API]
+                AUDIO_L[Audio Loader<br/>Whisper transcription]
+                VIDEO_L[Video Loader<br/>Frame extraction]
+            end
+            
+            subgraph "Code Loaders"
+                PY_L[Python Loader<br/>AST parsing]
+                JS_L[JavaScript Loader]
+                JAVA_L[Java Loader]
+                GENERIC_CODE[Generic Code Loader]
+            end
+            
+            subgraph "Web Loaders"
+                URL_L[URL Fetcher<br/>HTTP requests]
+                WEB_SCRAPE[Web Scraper<br/>BeautifulSoup]
+                TAVILY_L[Tavily Integration<br/>Advanced search]
+                PLAYWRIGHT_L[Playwright<br/>Dynamic content]
+            end
+        end
+        
+        subgraph "Content Processing"
+            EXTRACT[Content Extraction]
+            CLEAN[Text Cleaning]
+            METADATA_EXT[Metadata Extraction]
+            ENCODING[Encoding Detection]
+        end
+    end
+    
+    FILE_MGR --> LOCAL_FS
+    FILE_MGR --> S3_BACKEND
+    FILE_MGR --> AZURE_BLOB
+    FILE_MGR --> GCS
+    
+    FILE_MGR --> UPLOAD
+    FILE_MGR --> DOWNLOAD
+    FILE_MGR --> DELETE_FILE
+    FILE_MGR --> LIST_FILES
+    
+    DOWNLOAD --> PDF_L
+    DOWNLOAD --> DOCX_L
+    DOWNLOAD --> TXT_L
+    DOWNLOAD --> IMG_L
+    DOWNLOAD --> AUDIO_L
+    DOWNLOAD --> PY_L
+    DOWNLOAD --> URL_L
+    
+    PDF_L --> EXTRACT
+    DOCX_L --> EXTRACT
+    TXT_L --> EXTRACT
+    IMG_L --> EXTRACT
+    AUDIO_L --> EXTRACT
+    PY_L --> EXTRACT
+    URL_L --> WEB_SCRAPE
+    WEB_SCRAPE --> EXTRACT
+    
+    EXTRACT --> CLEAN
+    CLEAN --> METADATA_EXT
+    METADATA_EXT --> ENCODING
+    
+    style FILE_MGR fill:#a8e6cf
+    style PDF_L fill:#ffd3b6
+    style IMG_L fill:#ffaaa5
+    style URL_L fill:#ff8b94
+```
+
+**Description:** Cognee supports multiple file types and storage backends with specialized loaders for each format, automatically detecting and processing content appropriately.
+
+---
+
+## 25. Ontology & Schema Management
+
+How Cognee handles ontologies and custom schemas.
+
+```mermaid
+graph TB
+    subgraph "Ontology System"
+        subgraph "Ontology Sources"
+            RDF[RDF/OWL Files]
+            JSON_LD[JSON-LD]
+            CUSTOM_SCHEMA[Custom Pydantic Models]
+            DEFAULT_ONT[Default Ontology]
+        end
+        
+        subgraph "Ontology Processing"
+            PARSE[Parse Ontology]
+            VALIDATE_ONT[Validate Structure]
+            INDEX_ONT[Index Classes/Properties]
+            CACHE_ONT[Cache Ontology]
+        end
+        
+        subgraph "Entity Mapping"
+            TYPE_MAP[Type Mapping]
+            PROPERTY_MAP[Property Mapping]
+            RELATION_MAP[Relationship Mapping]
+            HIERARCHY[Class Hierarchy]
+        end
+        
+        subgraph "Schema Integration"
+            GRAPH_MODEL[Graph Model<br/>KnowledgeGraph]
+            ENTITY_MODEL[Entity Model]
+            RELATION_MODEL[Relationship Model]
+            CUSTOM_MODEL[Custom Models]
+        end
+        
+        subgraph "Ontology Features"
+            INFERENCE[Inference Rules]
+            CONSTRAINTS[Constraints]
+            VALIDATION_RULES[Validation Rules]
+            EXTENSIONS[Extensions]
+        end
+    end
+    
+    RDF --> PARSE
+    JSON_LD --> PARSE
+    CUSTOM_SCHEMA --> VALIDATE_ONT
+    DEFAULT_ONT --> INDEX_ONT
+    
+    PARSE --> VALIDATE_ONT
+    VALIDATE_ONT --> INDEX_ONT
+    INDEX_ONT --> CACHE_ONT
+    
+    CACHE_ONT --> TYPE_MAP
+    TYPE_MAP --> PROPERTY_MAP
+    PROPERTY_MAP --> RELATION_MAP
+    RELATION_MAP --> HIERARCHY
+    
+    HIERARCHY --> GRAPH_MODEL
+    HIERARCHY --> ENTITY_MODEL
+    HIERARCHY --> RELATION_MODEL
+    HIERARCHY --> CUSTOM_MODEL
+    
+    GRAPH_MODEL --> INFERENCE
+    ENTITY_MODEL --> CONSTRAINTS
+    RELATION_MODEL --> VALIDATION_RULES
+    CUSTOM_MODEL --> EXTENSIONS
+    
+    style PARSE fill:#a8e6cf
+    style TYPE_MAP fill:#ffd3b6
+    style GRAPH_MODEL fill:#ffaaa5
+    style INFERENCE fill:#ff8b94
+```
+
+**Description:** Ontology support allows domain-specific knowledge modeling with custom classes, properties, and relationships, enabling more accurate entity extraction and linking.
+
+---
+
+## 26. Async Processing & Concurrency
+
+How Cognee handles asynchronous operations and parallelism.
+
+```mermaid
+graph TB
+    subgraph "Async Architecture"
+        subgraph "Event Loop"
+            ASYNCIO[AsyncIO Event Loop]
+            TASKS[Async Tasks]
+            FUTURES[Futures]
+            COROUTINES[Coroutines]
+        end
+        
+        subgraph "Concurrency Patterns"
+            PARALLEL_TASKS[Parallel Task Execution]
+            BATCH_PROC[Batch Processing]
+            STREAMING[Streaming Processing]
+            BACKGROUND[Background Jobs]
+        end
+        
+        subgraph "Synchronization"
+            LOCKS[Async Locks]
+            SEMAPHORES[Semaphores<br/>Rate limiting]
+            QUEUES[Async Queues]
+            EVENTS[Async Events]
+        end
+        
+        subgraph "I/O Operations"
+            ASYNC_DB[Async DB Operations<br/>aiosqlite, asyncpg]
+            ASYNC_HTTP[Async HTTP<br/>aiohttp]
+            ASYNC_FILE[Async File I/O<br/>aiofiles]
+            ASYNC_LLM[Async LLM Calls]
+        end
+        
+        subgraph "Error Handling"
+            RETRY[Retry Logic<br/>tenacity]
+            TIMEOUT[Timeout Handling]
+            CANCEL[Task Cancellation]
+            EXCEPTION[Exception Propagation]
+        end
+    end
+    
+    ASYNCIO --> TASKS
+    ASYNCIO --> FUTURES
+    ASYNCIO --> COROUTINES
+    
+    TASKS --> PARALLEL_TASKS
+    TASKS --> BATCH_PROC
+    TASKS --> STREAMING
+    TASKS --> BACKGROUND
+    
+    PARALLEL_TASKS --> LOCKS
+    BATCH_PROC --> SEMAPHORES
+    STREAMING --> QUEUES
+    BACKGROUND --> EVENTS
+    
+    LOCKS --> ASYNC_DB
+    SEMAPHORES --> ASYNC_HTTP
+    QUEUES --> ASYNC_FILE
+    EVENTS --> ASYNC_LLM
+    
+    ASYNC_DB --> RETRY
+    ASYNC_HTTP --> TIMEOUT
+    ASYNC_FILE --> CANCEL
+    ASYNC_LLM --> EXCEPTION
+    
+    style ASYNCIO fill:#a8e6cf
+    style PARALLEL_TASKS fill:#ffd3b6
+    style LOCKS fill:#ffaaa5
+    style RETRY fill:#ff8b94
+```
+
+**Description:** Cognee is built on asyncio for efficient concurrent operations, with proper synchronization primitives and error handling for reliable async processing.
+
+---
+
+## 27. Incremental Processing & Caching
+
+How Cognee optimizes performance through incremental updates and caching.
+
+```mermaid
+graph TB
+    subgraph "Incremental Processing System"
+        subgraph "State Tracking"
+            PIPELINE_STATE[Pipeline State<br/>Per dataset]
+            TASK_STATE[Task State<br/>Per data item]
+            DATA_VERSION[Data Versioning]
+            CHECKPOINT[Checkpoints]
+        end
+        
+        subgraph "Change Detection"
+            FILE_HASH[File Hashing<br/>Content-based]
+            TIMESTAMP[Timestamp Tracking]
+            DIFF_DETECT[Differential Detection]
+            SKIP_LOGIC[Skip Unchanged]
+        end
+        
+        subgraph "Caching Layers"
+            EMBED_CACHE[Embedding Cache<br/>Reuse embeddings]
+            LLM_CACHE[LLM Response Cache<br/>Reduce API calls]
+            QUERY_CACHE[Query Result Cache]
+            GRAPH_CACHE[Graph Fragment Cache]
+        end
+        
+        subgraph "Cache Strategies"
+            TTL[Time-to-Live]
+            LRU[LRU Eviction]
+            INVALIDATION[Cache Invalidation]
+            WARMING[Cache Warming]
+        end
+        
+        subgraph "Incremental Benefits"
+            FASTER[Faster Processing]
+            COST_SAVE[Cost Reduction<br/>Fewer LLM calls]
+            RESUME[Resume Capability]
+            SCALABLE[Better Scalability]
+        end
+    end
+    
+    PIPELINE_STATE --> TASK_STATE
+    TASK_STATE --> DATA_VERSION
+    DATA_VERSION --> CHECKPOINT
+    
+    CHECKPOINT --> FILE_HASH
+    FILE_HASH --> TIMESTAMP
+    TIMESTAMP --> DIFF_DETECT
+    DIFF_DETECT --> SKIP_LOGIC
+    
+    SKIP_LOGIC --> EMBED_CACHE
+    SKIP_LOGIC --> LLM_CACHE
+    SKIP_LOGIC --> QUERY_CACHE
+    SKIP_LOGIC --> GRAPH_CACHE
+    
+    EMBED_CACHE --> TTL
+    LLM_CACHE --> LRU
+    QUERY_CACHE --> INVALIDATION
+    GRAPH_CACHE --> WARMING
+    
+    TTL --> FASTER
+    LRU --> COST_SAVE
+    INVALIDATION --> RESUME
+    WARMING --> SCALABLE
+    
+    style PIPELINE_STATE fill:#a8e6cf
+    style FILE_HASH fill:#ffd3b6
+    style EMBED_CACHE fill:#ffaaa5
+    style FASTER fill:#ff8b94
+```
+
+**Description:** Incremental processing and multi-layer caching enable efficient updates and cost reduction by avoiding reprocessing of unchanged data and caching expensive operations.
+
+---
+
+## 28. Search Result Ranking & Reranking
+
+Advanced result ranking and reranking mechanisms.
+
+```mermaid
+graph TB
+    subgraph "Search Ranking System"
+        subgraph "Initial Retrieval"
+            VEC_SCORES[Vector Similarity Scores<br/>Cosine, Dot Product]
+            LEX_SCORES[Lexical Scores<br/>Jaccard, BM25]
+            GRAPH_SCORES[Graph Relevance<br/>PageRank, Centrality]
+        end
+        
+        subgraph "Score Fusion"
+            NORMALIZE[Normalize Scores]
+            WEIGHTED_SUM[Weighted Sum]
+            RRF[Reciprocal Rank Fusion]
+            HYBRID_SCORE[Hybrid Scoring]
+        end
+        
+        subgraph "Reranking Methods"
+            CROSS_ENCODER[Cross-Encoder<br/>BERT reranker]
+            LLM_RERANK[LLM-based Reranking<br/>Relevance scoring]
+            GRAPH_RERANK[Graph Context<br/>Relationship strength]
+            TEMPORAL_RERANK[Temporal Reranking<br/>Recency boost]
+        end
+        
+        subgraph "Context Enhancement"
+            ENTITY_EXPAND[Entity Expansion<br/>Add related entities]
+            REL_EXPAND[Relationship Expansion<br/>Follow connections]
+            HIERARCHY_EXPAND[Hierarchy Expansion<br/>Parent/child nodes]
+            TEMPORAL_EXPAND[Temporal Context<br/>Time-based]
+        end
+        
+        subgraph "Final Ranking"
+            TOP_K_SELECT[Top-K Selection]
+            DIVERSITY[Diversity Filtering<br/>MMR]
+            DEDUP[Deduplication]
+            FORMAT_RESULTS[Format Results]
+        end
+    end
+    
+    VEC_SCORES --> NORMALIZE
+    LEX_SCORES --> NORMALIZE
+    GRAPH_SCORES --> NORMALIZE
+    
+    NORMALIZE --> WEIGHTED_SUM
+    NORMALIZE --> RRF
+    WEIGHTED_SUM --> HYBRID_SCORE
+    RRF --> HYBRID_SCORE
+    
+    HYBRID_SCORE --> CROSS_ENCODER
+    HYBRID_SCORE --> LLM_RERANK
+    HYBRID_SCORE --> GRAPH_RERANK
+    HYBRID_SCORE --> TEMPORAL_RERANK
+    
+    CROSS_ENCODER --> ENTITY_EXPAND
+    LLM_RERANK --> REL_EXPAND
+    GRAPH_RERANK --> HIERARCHY_EXPAND
+    TEMPORAL_RERANK --> TEMPORAL_EXPAND
+    
+    ENTITY_EXPAND --> TOP_K_SELECT
+    REL_EXPAND --> TOP_K_SELECT
+    HIERARCHY_EXPAND --> TOP_K_SELECT
+    TEMPORAL_EXPAND --> TOP_K_SELECT
+    
+    TOP_K_SELECT --> DIVERSITY
+    DIVERSITY --> DEDUP
+    DEDUP --> FORMAT_RESULTS
+    
+    style VEC_SCORES fill:#a8e6cf
+    style NORMALIZE fill:#ffd3b6
+    style CROSS_ENCODER fill:#ffaaa5
+    style TOP_K_SELECT fill:#ff8b94
+```
+
+**Description:** Sophisticated ranking combines multiple signals (vector similarity, lexical matching, graph structure) with optional reranking and context expansion for optimal results.
+
+---
+
+## 29. Error Handling & Recovery
+
+Comprehensive error handling and recovery mechanisms.
+
+```mermaid
+graph TB
+    subgraph "Error Handling System"
+        subgraph "Error Types"
+            VALIDATION_ERR[Validation Errors<br/>Input/config]
+            PERMISSION_ERR[Permission Errors<br/>Access control]
+            DB_ERR[Database Errors<br/>Connection/query]
+            LLM_ERR[LLM Errors<br/>API failures]
+            FILE_ERR[File Errors<br/>I/O failures]
+            NETWORK_ERR[Network Errors<br/>Connectivity]
+        end
+        
+        subgraph "Error Detection"
+            TRY_CATCH[Try-Catch Blocks]
+            VALIDATION[Input Validation]
+            HEALTH_CHECK[Health Checks]
+            TIMEOUT_CHECK[Timeout Detection]
+        end
+        
+        subgraph "Recovery Strategies"
+            RETRY[Retry with Backoff<br/>Exponential/Fibonacci]
+            FALLBACK[Fallback Options<br/>Alternative providers]
+            CIRCUIT_BREAK[Circuit Breaker<br/>Fail fast]
+            GRACEFUL_DEG[Graceful Degradation]
+        end
+        
+        subgraph "State Management"
+            ROLLBACK[Transaction Rollback]
+            CHECKPOINT_RESTORE[Checkpoint Restore]
+            PARTIAL_SAVE[Partial Progress Save]
+            CLEANUP[Resource Cleanup]
+        end
+        
+        subgraph "Error Reporting"
+            LOGGING[Structured Logging]
+            METRICS[Error Metrics]
+            ALERTS[Alert System]
+            USER_FEEDBACK[User-Friendly Messages]
+        end
+    end
+    
+    VALIDATION_ERR --> TRY_CATCH
+    PERMISSION_ERR --> VALIDATION
+    DB_ERR --> HEALTH_CHECK
+    LLM_ERR --> TIMEOUT_CHECK
+    FILE_ERR --> TRY_CATCH
+    NETWORK_ERR --> HEALTH_CHECK
+    
+    TRY_CATCH --> RETRY
+    VALIDATION --> FALLBACK
+    HEALTH_CHECK --> CIRCUIT_BREAK
+    TIMEOUT_CHECK --> GRACEFUL_DEG
+    
+    RETRY --> ROLLBACK
+    FALLBACK --> CHECKPOINT_RESTORE
+    CIRCUIT_BREAK --> PARTIAL_SAVE
+    GRACEFUL_DEG --> CLEANUP
+    
+    ROLLBACK --> LOGGING
+    CHECKPOINT_RESTORE --> METRICS
+    PARTIAL_SAVE --> ALERTS
+    CLEANUP --> USER_FEEDBACK
+    
+    style VALIDATION_ERR fill:#a8e6cf
+    style TRY_CATCH fill:#ffd3b6
+    style RETRY fill:#ffaaa5
+    style LOGGING fill:#ff8b94
+```
+
+**Description:** Robust error handling with automatic retry, fallback strategies, and state recovery ensures reliable operation even in the face of failures.
+
+---
+
+## 30. Data Privacy & Security
+
+Security features and data privacy mechanisms.
+
+```mermaid
+graph TB
+    subgraph "Security Architecture"
+        subgraph "Data Protection"
+            ENCRYPTION[Encryption at Rest<br/>Database encryption]
+            TRANSIT_ENC[Encryption in Transit<br/>TLS/HTTPS]
+            SECRETS_MGR[Secrets Management<br/>Env vars, vaults]
+            PII_DETECT[PII Detection<br/>Sensitive data]
+        end
+        
+        subgraph "Access Control"
+            AUTH_SYSTEM[Authentication<br/>User verification]
+            AUTHZ_SYSTEM[Authorization<br/>Permission checks]
+            RBAC[Role-Based Access<br/>User roles]
+            ROW_LEVEL[Row-Level Security<br/>Data isolation]
+        end
+        
+        subgraph "Audit & Compliance"
+            AUDIT_LOG[Audit Logging<br/>Who, what, when]
+            COMPLIANCE[Compliance Checks<br/>GDPR, HIPAA]
+            DATA_LINEAGE[Data Lineage<br/>Provenance tracking]
+            RETENTION[Data Retention<br/>Cleanup policies]
+        end
+        
+        subgraph "Security Features"
+            RATE_LIMIT_SEC[Rate Limiting<br/>DDoS protection]
+            INPUT_SANITIZE[Input Sanitization<br/>Injection prevention]
+            SECURE_DEFAULTS[Secure Defaults<br/>Best practices]
+            VULNERABILITY[Vulnerability Scanning]
+        end
+        
+        subgraph "Privacy Controls"
+            DATA_MASKING[Data Masking<br/>Anonymization]
+            RIGHT_DELETE[Right to Delete<br/>GDPR compliance]
+            CONSENT_MGR[Consent Management]
+            EXPORT[Data Export<br/>Portability]
+        end
+    end
+    
+    ENCRYPTION --> AUTH_SYSTEM
+    TRANSIT_ENC --> AUTHZ_SYSTEM
+    SECRETS_MGR --> RBAC
+    PII_DETECT --> ROW_LEVEL
+    
+    AUTH_SYSTEM --> AUDIT_LOG
+    AUTHZ_SYSTEM --> COMPLIANCE
+    RBAC --> DATA_LINEAGE
+    ROW_LEVEL --> RETENTION
+    
+    AUDIT_LOG --> RATE_LIMIT_SEC
+    COMPLIANCE --> INPUT_SANITIZE
+    DATA_LINEAGE --> SECURE_DEFAULTS
+    RETENTION --> VULNERABILITY
+    
+    RATE_LIMIT_SEC --> DATA_MASKING
+    INPUT_SANITIZE --> RIGHT_DELETE
+    SECURE_DEFAULTS --> CONSENT_MGR
+    VULNERABILITY --> EXPORT
+    
+    style ENCRYPTION fill:#a8e6cf
+    style AUTH_SYSTEM fill:#ffd3b6
+    style AUDIT_LOG fill:#ffaaa5
+    style DATA_MASKING fill:#ff8b94
+```
+
+**Description:** Comprehensive security features including encryption, access control, audit logging, and privacy controls ensure data protection and regulatory compliance.
+
+---
+
+## Architecture Summary
+
+This comprehensive architecture documentation provides 30 detailed diagrams covering:
+
+### Core Architecture (1-8)
+- High-level system overview
+- ECL pipeline workflow
+- Component organization
+- Infrastructure layer
+- Database architecture
+- API structure
+- Pipeline system
+- Module dependencies
+
+### Data Flows (9-12)
+- Add operation flow
+- Cognify operation flow
+- Memify operation flow
+- Search operation flow
+
+### Infrastructure Deep Dives (13-15)
+- LLM integration
+- Vector databases
+- Graph databases
+
+### Processing Systems (16-19)
+- Task system
+- Chunking strategies
+- Retrieval mechanisms
+- Knowledge graph construction
+
+### Cross-Cutting Concerns (20-23)
+- Authentication & permissions
+- Configuration management
+- Observability & monitoring
+- Deployment options
+
+### Advanced Topics (24-30)
+- File storage & loaders
+- Ontology & schema management
+- Async processing & concurrency
+- Incremental processing & caching
+- Search ranking & reranking
+- Error handling & recovery
+- Data privacy & security
+
+### Key Architectural Principles
+
+1. **Modularity**: Clear separation of concerns with well-defined interfaces
+2. **Flexibility**: Support for multiple providers (LLMs, databases, storage)
+3. **Scalability**: Async-first design with parallel processing capabilities
+4. **Reliability**: Comprehensive error handling and recovery mechanisms
+5. **Security**: Built-in security features and privacy controls
+6. **Observability**: Extensive logging, monitoring, and tracing
+7. **Developer Experience**: Simple APIs with powerful customization options
+
+### Technology Stack
+
+**Languages**: Python 3.10-3.13
+
+**Core Libraries**:
+- AsyncIO for concurrency
+- Pydantic for data validation
+- SQLAlchemy for database ORM
+- FastAPI for REST API
+- LiteLLM for multi-provider LLM support
+
+**Databases**:
+- Vector: LanceDB (default), Qdrant, Weaviate, PGVector, ChromaDB
+- Graph: Kuzu (default), Neo4j, Memgraph, AWS Neptune
+- Relational: SQLite (default), PostgreSQL
+
+**Infrastructure**:
+- File Storage: Local, AWS S3, Azure Blob, GCS
+- Observability: Langfuse, structlog
+- Testing: pytest, pytest-asyncio
+
+### Design Patterns
+
+- **Pipeline Pattern**: Composable task chains for data processing
+- **Adapter Pattern**: Abstract database and LLM providers
+- **Strategy Pattern**: Pluggable chunking and retrieval strategies
+- **Observer Pattern**: Event-driven monitoring and logging
+- **Factory Pattern**: Dynamic component creation
+- **Repository Pattern**: Data access abstraction
+- **Circuit Breaker**: Fault tolerance for external services
+
+---
+
+For implementation details and usage examples, refer to:
+- [README.md](README.md) - Quick start and basic usage
+- [CONTRIBUTING.md](CONTRIBUTING.md) - Development guidelines
+- [Online Documentation](https://docs.cognee.ai) - Comprehensive guides
+- [Examples Directory](examples/) - Working code samples
+
+**Last Updated**: November 2024
+**Version**: Based on Cognee v0.3.9
