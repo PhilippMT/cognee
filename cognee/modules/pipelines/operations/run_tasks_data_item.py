@@ -69,7 +69,7 @@ async def run_tasks_data_item_incremental(
         async with open_data_file(file_path) as file:
             classified_data = ingestion.classify(file)
             # data_id is the hash of file contents + owner id to avoid duplicate data
-            data_id = ingestion.identify(classified_data, user)
+            data_id = await ingestion.identify(classified_data, user)
     else:
         # If data was already processed by Cognee get data id
         data_id = data_item.id
@@ -115,9 +115,8 @@ async def run_tasks_data_item_incremental(
             data_point = (
                 await session.execute(select(Data).filter(Data.id == data_id))
             ).scalar_one_or_none()
-            data_point.pipeline_status[pipeline_name] = {
-                str(dataset.id): DataItemStatus.DATA_ITEM_PROCESSING_COMPLETED
-            }
+            status_for_pipeline = data_point.pipeline_status.setdefault(pipeline_name, {})
+            status_for_pipeline[str(dataset.id)] = DataItemStatus.DATA_ITEM_PROCESSING_COMPLETED
             await session.merge(data_point)
             await session.commit()
 

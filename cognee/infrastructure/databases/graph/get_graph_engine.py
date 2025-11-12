@@ -33,6 +33,7 @@ def create_graph_engine(
     graph_database_username="",
     graph_database_password="",
     graph_database_port="",
+    graph_database_key="",
 ):
     """
     Create a graph engine based on the specified provider type.
@@ -69,6 +70,7 @@ def create_graph_engine(
             graph_database_url=graph_database_url,
             graph_database_username=graph_database_username,
             graph_database_password=graph_database_password,
+            database_name=graph_database_name,
         )
 
     if graph_database_provider == "neo4j":
@@ -162,5 +164,5 @@ def create_graph_engine(
 
     raise EnvironmentError(
         f"Unsupported graph database provider: {graph_database_provider}. "
-        f"Supported providers are: {', '.join(list(supported_databases.keys()) + ['neo4j', 'kuzu', 'kuzu-remote', 'memgraph', 'neptune', 'neptune_analytics'])}"
+        f"Supported providers are: {', '.join(list(supported_databases.keys()) + ['neo4j', 'kuzu', 'kuzu-remote', 'neptune', 'neptune_analytics'])}"
     )

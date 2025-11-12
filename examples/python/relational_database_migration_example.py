@@ -31,6 +31,9 @@ from cognee.infrastructure.databases.vector.pgvector import (
 
 
 async def main():
+    # Disable backend access control to migrate relational data
+    os.environ["ENABLE_BACKEND_ACCESS_CONTROL"] = "false"
+
     # Clean all data stored in Cognee
     await cognee.prune.prune_data()
     await cognee.prune.prune_system(metadata=True)
@@ -70,23 +73,23 @@ async def main():
     search_results = await cognee.search(
         query_type=SearchType.GRAPH_COMPLETION,
         query_text="What kind of data do you contain?",
-        top_k=1000,
+        top_k=200,
     )
     print(f"Search results: {search_results}")
 
     # Having a top_k value set to too high might overwhelm the LLM context when specific questions need to be answered.
-    # For this kind of question we've set the top_k to 30
+    # For this kind of question we've set the top_k to 50
     search_results = await cognee.search(
         query_type=SearchType.GRAPH_COMPLETION,
         query_text="What invoices are related to Leonie Köhler?",
-        top_k=30,
+        top_k=50,
     )
     print(f"Search results: {search_results}")
 
     search_results = await cognee.search(
         query_type=SearchType.GRAPH_COMPLETION,
         query_text="What invoices are related to Luís Gonçalves?",
-        top_k=30,
+        top_k=50,
     )
     print(f"Search results: {search_results}")
 

@@ -1,8 +1,15 @@
-from typing import Optional, List, Type
+import asyncio
+from typing import Optional, List, Type, Any
 from cognee.modules.graph.cognee_graph.CogneeGraphElements import Edge
 from cognee.shared.logging_utils import get_logger
 from cognee.modules.retrieval.graph_completion_retriever import GraphCompletionRetriever
-from cognee.modules.retrieval.utils.completion import generate_completion
+from cognee.modules.retrieval.utils.completion import generate_completion, summarize_text
+from cognee.modules.retrieval.utils.session_cache import (
+    save_conversation_history,
+    get_conversation_history,
+)
+from cognee.context_global_variables import session_user
+from cognee.infrastructure.databases.cache.config import CacheConfig
 
 logger = get_logger()
 
@@ -47,8 +54,10 @@ class GraphCompletionContextExtensionRetriever(GraphCompletionRetriever):
         self,
         query: str,
         context: Optional[List[Edge]] = None,
+        session_id: Optional[str] = None,
         context_extension_rounds=4,
-    ) -> List[str]:
+        response_model: Type = str,
+    ) -> List[Any]:
         """
         Extends the context for a given query by retrieving related triplets and generating new
         completions based on them.
@@ -64,8 +73,11 @@ class GraphCompletionContextExtensionRetriever(GraphCompletionRetriever):
             - query (str): The input query for which the completion is generated.
             - context (Optional[Any]): The existing context to use for enhancing the query; if
               None, it will be initialized from triplets generated for the query. (default None)
+            - session_id (Optional[str]): Optional session identifier for caching. If None,
+              defaults to 'default_session'. (default None)
             - context_extension_rounds: The maximum number of rounds to extend the context with
               new triplets before halting. (default 4)
+            - response_model (Type): The Pydantic model type for structured output. (default str)
 
         Returns:
         --------
@@ -115,17 +127,48 @@ class GraphCompletionContextExtensionRetriever(GraphCompletionRetriever):
 
             round_idx += 1
 
-        completion = await generate_completion(
-            query=query,
-            context=context_text,
-            user_prompt_path=self.user_prompt_path,
-            system_prompt_path=self.system_prompt_path,
-            system_prompt=self.system_prompt,
-        )
+        # Check if we need to generate context summary for caching
+        cache_config = CacheConfig()
+        user = session_user.get()
+        user_id = getattr(user, "id", None)
+        session_save = user_id and cache_config.caching
+
+        if session_save:
+            conversation_history = await get_conversation_history(session_id=session_id)
+
+            context_summary, completion = await asyncio.gather(
+                summarize_text(context_text),
+                generate_completion(
+                    query=query,
+                    context=context_text,
+                    user_prompt_path=self.user_prompt_path,
+                    system_prompt_path=self.system_prompt_path,
+                    system_prompt=self.system_prompt,
+                    conversation_history=conversation_history,
+                    response_model=response_model,
+                ),
+            )
+        else:
+            completion = await generate_completion(
+                query=query,
+                context=context_text,
+                user_prompt_path=self.user_prompt_path,
+                system_prompt_path=self.system_prompt_path,
+                system_prompt=self.system_prompt,
+                response_model=response_model,
+            )
 
         if self.save_interaction and context_text and triplets and completion:
             await self.save_qa(
                 question=query, answer=completion, context=context_text, triplets=triplets
+            )
+
+        if session_save:
+            await save_conversation_history(
+                query=query,
+                context_summary=context_summary,
+                answer=completion,
+                session_id=session_id,
             )
 
         return [completion]
