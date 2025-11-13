@@ -1,10 +1,13 @@
 # Cognee AWS Bedrock Adapter
 
-External adapter package for integrating AWS Bedrock foundation models with Cognee.
+External adapter package for integrating AWS Bedrock foundation models with Cognee using **instructor[bedrock]** for native tools/function calling support.
 
 ## Features
 
-- **20+ LLM Models**: Claude, Llama, Titan, Nova from Anthropic, Meta, and Amazon
+- **Native Bedrock Integration**: Uses instructor[bedrock] for proper tools/function calling support
+- **30+ LLM Models**: Claude, Llama, Titan, Nova, Mistral, Cohere from Anthropic, Meta, Amazon, Mistral AI, and Cohere
+- **Automatic Mode Selection**: BEDROCK_TOOLS for models with function calling, BEDROCK_JSON for others
+- **Comprehensive Model Configuration**: All models properly configured with correct settings
 - **7 Embedding Models**: Titan and Cohere embeddings with various dimensions
 - **3 Reranking Models**: Cohere reranking models for improved search relevance
 - **Cross-Region Inference**: Automatic load distribution across EU regions
@@ -16,6 +19,11 @@ External adapter package for integrating AWS Bedrock foundation models with Cogn
 ```bash
 pip install -e cognee-aws-bedrock/
 ```
+
+This will automatically install:
+- `instructor[bedrock]>=1.13.0` (includes boto3 and Anthropic SDK)
+- `boto3>=1.34.0`
+- `cognee>=0.1.0`
 
 ## Quick Start
 
@@ -70,16 +78,25 @@ cognee.config.embedding_model = "bedrock/eu.cohere.embed-multilingual-v4:0"
 
 ## Supported Models
 
-See `src/cognee_aws_bedrock/docs/MODELS.md` for a complete list of supported models and configuration examples.
+See `docs/MODELS.md` for a complete list of **30+ supported models** with detailed configuration examples.
 
-### LLM Models (EU Regions)
+### LLM Models (EU Regions: eu-central-1, eu-north-1)
 
-- **Claude 3.7 Sonnet** - Latest, best performance
-- **Claude 3.5 Sonnet v2** - Balanced performance/cost
-- **Claude 3 Haiku** - Fast, cost-effective
-- **Llama 3.1/3.2** - Open-source alternatives (8B-405B)
-- **Amazon Titan** - AWS-native models
-- **Amazon Nova** - Multimodal models
+**With Tools/Function Calling Support (BEDROCK_TOOLS mode):**
+
+- **Claude 3.5 Sonnet v2** (`anthropic.claude-3-5-sonnet-20241022-v2:0`) - Latest, best performance
+- **Claude 3.5 Haiku** (`anthropic.claude-3-5-haiku-20241022-v1:0`) - Fast, cost-effective
+- **Amazon Nova Pro/Lite/Micro** - Multimodal models (text, image, video)
+- **Llama 3.3 70B** (`meta.llama3-3-70b-instruct-v1:0`) - Latest open-source
+- **Llama 3.2 Vision** - 90B and 11B models with image support
+- **Llama 3.2 1B/3B** - Ultra-efficient edge models
+- **Llama 3.1 405B/70B/8B** - Flexible scaling options
+- **Mistral Large 2** (`mistral.mistral-large-2407-v1:0`) - Latest Mistral
+- **Mixtral 8x7B** - Mixture of experts model
+- **Cohere Command R+/R** - Optimized for RAG and search
+
+**JSON Mode Only (BEDROCK_JSON):**
+- **Amazon Titan Text** (Premier, Express, Lite) - AWS-native models
 
 ### Embedding Models
 
