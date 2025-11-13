@@ -25,7 +25,7 @@ logger = get_logger("BedrockEmbeddingAdapter")
 class BedrockEmbeddingAdapter(EmbeddingEngine):
     """
     AWS Bedrock Embedding Adapter for Cognee.
-    
+
     Supports AWS Bedrock embedding models:
     - Amazon Titan Embed Text v1 & v2
     - Amazon Titan Embed Image v1 (Multimodal)
@@ -55,7 +55,7 @@ class BedrockEmbeddingAdapter(EmbeddingEngine):
     ):
         """
         Initialize the BedrockEmbeddingAdapter.
-        
+
         Parameters:
         -----------
             model (str): AWS Bedrock embedding model (e.g., 'bedrock/amazon.titan-embed-text-v2:0')
@@ -90,11 +90,11 @@ class BedrockEmbeddingAdapter(EmbeddingEngine):
     async def embed_text(self, text: List[str]) -> List[List[float]]:
         """
         Embed a list of text strings using AWS Bedrock.
-        
+
         Parameters:
         -----------
             text (List[str]): A list of strings to be embedded.
-            
+
         Returns:
         --------
             List[List[float]]: A list of vectors representing the embedded texts.
@@ -110,7 +110,7 @@ class BedrockEmbeddingAdapter(EmbeddingEngine):
                     "input": text,
                     "aws_region_name": self.aws_region_name,
                 }
-                
+
                 # Add AWS authentication parameters
                 if self.aws_profile_name:
                     embedding_kwargs["aws_profile_name"] = self.aws_profile_name
@@ -118,7 +118,7 @@ class BedrockEmbeddingAdapter(EmbeddingEngine):
                     embedding_kwargs["aws_access_key_id"] = self.aws_access_key_id
                 if self.aws_secret_access_key:
                     embedding_kwargs["aws_secret_access_key"] = self.aws_secret_access_key
-                
+
                 response = await litellm.aembedding(**embedding_kwargs)
                 return [data["embedding"] for data in response.data]
 
@@ -163,7 +163,7 @@ class BedrockEmbeddingAdapter(EmbeddingEngine):
     def get_vector_size(self) -> int:
         """
         Retrieve the dimensionality of the embedding vectors.
-        
+
         Returns:
         --------
             int: The size (dimensionality) of the embedding vectors.
@@ -173,7 +173,7 @@ class BedrockEmbeddingAdapter(EmbeddingEngine):
     def get_tokenizer(self):
         """
         Load and return the appropriate tokenizer.
-        
+
         Returns:
         --------
             The tokenizer instance compatible with the model.

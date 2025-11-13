@@ -13,6 +13,7 @@ from dataclasses import dataclass
 @dataclass
 class ModelConfig:
     """Configuration for a Bedrock model."""
+
     model_id: str
     model_name: str
     provider: str
@@ -438,13 +439,13 @@ EU_CROSS_REGION_PROFILES: Dict[str, str] = {
 def get_model_config(model_id: str) -> ModelConfig:
     """
     Get configuration for a specific model.
-    
+
     Args:
         model_id: The model identifier (e.g., 'anthropic.claude-3-5-sonnet-20241022-v2:0')
-        
+
     Returns:
         ModelConfig for the specified model
-        
+
     Raises:
         ValueError: If model is not found
     """
@@ -453,54 +454,44 @@ def get_model_config(model_id: str) -> ModelConfig:
         base_model = EU_CROSS_REGION_PROFILES.get(model_id)
         if base_model:
             model_id = base_model
-    
+
     # Remove 'bedrock/' prefix if present
     if model_id.startswith("bedrock/"):
         model_id = model_id[8:]
-    
+
     if model_id not in ALL_MODELS:
         raise ValueError(
             f"Model '{model_id}' not found in configuration. "
             f"Available models: {', '.join(ALL_MODELS.keys())}"
         )
-    
+
     return ALL_MODELS[model_id]
 
 
 def get_models_by_provider(provider: str) -> Dict[str, ModelConfig]:
     """Get all models from a specific provider."""
     return {
-        model_id: config 
-        for model_id, config in ALL_MODELS.items() 
-        if config.provider == provider
+        model_id: config for model_id, config in ALL_MODELS.items() if config.provider == provider
     }
 
 
 def get_models_by_region(region: str) -> Dict[str, ModelConfig]:
     """Get all models available in a specific region."""
-    return {
-        model_id: config 
-        for model_id, config in ALL_MODELS.items() 
-        if region in config.regions
-    }
+    return {model_id: config for model_id, config in ALL_MODELS.items() if region in config.regions}
 
 
 def get_models_with_tools_support() -> Dict[str, ModelConfig]:
     """Get all models that support tools/function calling."""
-    return {
-        model_id: config 
-        for model_id, config in ALL_MODELS.items() 
-        if config.supports_tools
-    }
+    return {model_id: config for model_id, config in ALL_MODELS.items() if config.supports_tools}
 
 
 def get_recommended_mode(model_id: str) -> str:
     """
     Get the recommended instructor mode for a model.
-    
+
     Args:
         model_id: The model identifier
-        
+
     Returns:
         Recommended mode string (e.g., 'BEDROCK_TOOLS', 'BEDROCK_JSON')
     """

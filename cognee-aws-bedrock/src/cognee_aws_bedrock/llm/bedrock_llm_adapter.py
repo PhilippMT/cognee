@@ -96,7 +96,7 @@ class BedrockLLMAdapter(LLMInterface):
             "service_name": "bedrock-runtime",
             "region_name": self.aws_region_name,
         }
-        
+
         if aws_profile_name:
             # Use named profile
             session = boto3.Session(profile_name=aws_profile_name)
@@ -115,7 +115,7 @@ class BedrockLLMAdapter(LLMInterface):
             bedrock_client,
             mode=self.mode,
         )
-        
+
         logger.info(
             f"Initialized BedrockLLMAdapter with model={self.model}, "
             f"region={self.aws_region_name}, mode={self.mode}"
@@ -150,13 +150,16 @@ class BedrockLLMAdapter(LLMInterface):
                 "content": text_input,
             }
         ]
-        
+
         # Add system prompt as a system message (Bedrock supports system messages)
         if system_prompt:
-            messages.insert(0, {
-                "role": "system",
-                "content": system_prompt,
-            })
+            messages.insert(
+                0,
+                {
+                    "role": "system",
+                    "content": system_prompt,
+                },
+            )
 
         # Get model ID without bedrock/ prefix
         model_id = self.model.replace("bedrock/", "")
@@ -166,7 +169,7 @@ class BedrockLLMAdapter(LLMInterface):
             # Note: instructor.from_bedrock uses synchronous API, so we need to wrap it
             # AWS Bedrock SDK (boto3) doesn't support async natively
             import asyncio
-            
+
             def _sync_call():
                 return self.aclient.chat.completions.create(
                     modelId=model_id,
@@ -175,13 +178,13 @@ class BedrockLLMAdapter(LLMInterface):
                     max_retries=5,
                     inferenceConfig={
                         "maxTokens": self.max_completion_tokens,
-                    }
+                    },
                 )
-            
+
             # Run sync call in thread pool to avoid blocking
             result = await asyncio.to_thread(_sync_call)
             return result
-            
+
         except InstructorRetryException as error:
             # Check if it's a content policy violation
             if "content management policy" in str(error).lower():
@@ -202,7 +205,7 @@ class BedrockLLMAdapter(LLMInterface):
                     "service_name": "bedrock-runtime",
                     "region_name": self.fallback_aws_region_name,
                 }
-                
+
                 if self.aws_profile_name:
                     session = boto3.Session(profile_name=self.aws_profile_name)
                     fallback_bedrock_client = session.client(**fallback_bedrock_kwargs)
@@ -219,6 +222,7 @@ class BedrockLLMAdapter(LLMInterface):
                 )
 
                 try:
+
                     def _sync_fallback_call():
                         return fallback_client.chat.completions.create(
                             modelId=fallback_model_id,
@@ -227,12 +231,12 @@ class BedrockLLMAdapter(LLMInterface):
                             max_retries=5,
                             inferenceConfig={
                                 "maxTokens": self.max_completion_tokens,
-                            }
+                            },
                         )
-                    
+
                     result = await asyncio.to_thread(_sync_fallback_call)
                     return result
-                    
+
                 except InstructorRetryException as fallback_error:
                     if "content management policy" in str(fallback_error).lower():
                         raise ContentPolicyFilterError(
