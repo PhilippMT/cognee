@@ -45,6 +45,7 @@ from .routers.episode_endpoints import get_episode_endpoints_router
 from .routers.relationship_tracking import get_relationship_tracking_router
 from .routers.temporal_aggregations import get_temporal_aggregations_router
 from .routers.episode_relationships import get_episode_relationships_router
+from .routers.chat_session_endpoints import get_chat_session_router
 
 logger = get_logger()
 app_environment = os.getenv("ENV", "local")
@@ -101,7 +102,7 @@ async def root():
     """Root endpoint."""
     return {
         "message": "Cognee Temporal Memory API",
-        "version": "2.0.0",
+        "version": "2.1.0",
         "endpoints": {
             "temporal_cognify": "/api/v1/temporal/cognify",
             "temporal_search": "/api/v1/temporal/search",
@@ -121,6 +122,11 @@ async def root():
             "episode_relationships_query_links": "/api/v1/episode-relationships/query-links",
             "episode_relationships_sequences": "/api/v1/episode-relationships/sequences",
             "episode_relationships_clusters": "/api/v1/episode-relationships/clusters",
+            "chat_sessions_ingest": "/api/v1/chat-sessions/ingest",
+            "chat_sessions_search": "/api/v1/chat-sessions/search",
+            "chat_sessions_timeline": "/api/v1/chat-sessions/{session_id}/timeline",
+            "chat_sessions_facts": "/api/v1/chat-sessions/{session_id}/facts",
+            "chat_sessions_patterns": "/api/v1/chat-sessions/patterns",
         }
     }
 
@@ -187,6 +193,13 @@ app.include_router(
     get_episode_relationships_router(),
     prefix="/api/v1/episode-relationships",
     tags=["episode-relationships"]
+)
+
+# Include chat session endpoints
+app.include_router(
+    get_chat_session_router(),
+    prefix="/api/v1/chat-sessions",
+    tags=["chat-sessions"]
 )
 
 

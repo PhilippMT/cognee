@@ -7,6 +7,7 @@ from .routers.episode_endpoints import get_episode_endpoints_router
 from .routers.relationship_tracking import get_relationship_tracking_router
 from .routers.temporal_aggregations import get_temporal_aggregations_router
 from .routers.episode_relationships import get_episode_relationships_router
+from .routers.chat_session_endpoints import get_chat_session_router
 
 __all__ = [
     "get_temporal_cognify_router",
@@ -16,4 +17,5 @@ __all__ = [
     "get_relationship_tracking_router",
     "get_temporal_aggregations_router",
     "get_episode_relationships_router",
+    "get_chat_session_router",
 ]
