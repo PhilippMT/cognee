@@ -252,3 +252,280 @@ Use neighborhood exploration to "walk" through your thoughts, following connecti
 - Working memory externalization
 - Reduced organizational overhead
 - Serendipitous discovery support
+
+## Advanced Features
+
+### Web Enrichment
+
+Enrich thoughts with web search results and scraped content:
+
+```python
+from cognee.modules.thought_graph.operations import enrich_with_web_search
+
+# Enrich a thought with web search
+results = await enrich_with_web_search(
+    thought_id=thought.id,
+    max_results=5,
+    search_depth="advanced",  # or "basic"
+    use_tavily=True
+)
+
+# Results include:
+# - search_results: List of relevant web resources
+# - connections_created: New connections to web content
+# - content_added: Amount of new content
+```
+
+**Use Cases:**
+- Research assistance: Pull in external knowledge
+- Context enrichment: Add relevant background information
+- Fact checking: Find supporting or contradicting sources
+- Discovery: Uncover related concepts and ideas
+
+**Requirements:** Set `TAVILY_API_KEY` environment variable for web search
+
+### Project Matching
+
+Automatically match thoughts to projects and repositories:
+
+```python
+from cognee.modules.thought_graph.operations import match_to_projects
+
+# Match thoughts to projects
+results = await match_to_projects(
+    auto_detect=True,  # Auto-detect repo URLs
+    project_patterns={
+        "cognee": ["cognee", "knowledge graph", "memory"],
+        "backend-api": ["api", "server", "backend"]
+    }
+)
+
+# Results include:
+# - thoughts_matched: Number of thoughts matched
+# - projects_found: Set of project names
+# - matches: List of (thought_id, project, confidence)
+```
+
+**Use Cases:**
+- Project organization: Group thoughts by project
+- Repository tracking: Link ideas to code repositories
+- Work planning: See all thoughts related to a project
+- Context switching: Find project-specific ideas
+
+### Edge Weight Management
+
+Manage connection strength with decay and reinforcement:
+
+```python
+from cognee.modules.thought_graph.operations import (
+    decay_edge_weights,
+    reinforce_edge,
+    calculate_potential_connections
+)
+
+# Apply time-based decay
+decay_results = await decay_edge_weights(
+    decay_rate=0.1,        # 10% reduction
+    min_weight=0.15,       # Remove below this
+    time_based=True,       # Decay old edges more
+    days_threshold=30      # Full decay after 30 days
+)
+
+# Reinforce an important connection
+await reinforce_edge(
+    source_id=thought1.id,
+    target_id=thought2.id,
+    reinforcement_amount=0.2
+)
+
+# Find potential new connections
+potentials = await calculate_potential_connections(
+    thought_id=thought.id,
+    min_potential_weight=0.4,
+    max_results=10
+)
+```
+
+**Use Cases:**
+- Graph maintenance: Keep connections relevant
+- Organic evolution: Let graph adapt over time
+- Quality control: Remove noise and weak connections
+- Discovery: Find missing links
+
+**Edge Weight Factors:**
+- Time: Older connections decay faster
+- Usage: Reinforced when actively used
+- Relevance: Maintained by algorithms
+- User feedback: Manually adjusted
+
+### Enhanced Memify
+
+Integrated enrichment pipeline combining all features:
+
+```python
+from cognee.modules.thought_graph.operations import memify_thoughts
+
+# Full enrichment pipeline
+results = await memify_thoughts(
+    thought_ids=None,  # None = all thoughts
+    enable_web_enrichment=True,
+    enable_project_matching=True,
+    enable_edge_decay=True,
+    enable_potential_connections=True,
+    web_search_depth="basic",
+    max_web_results=3,
+    decay_rate=0.1,
+    min_edge_weight=0.1,
+    project_patterns={
+        "my_project": ["keyword1", "keyword2"]
+    }
+)
+
+# Returns comprehensive results:
+# - graph_enrichment: PageRank, communities, etc.
+# - web_enrichment: Search results and connections
+# - project_matching: Project associations
+# - edge_management: Decay and removal stats
+# - potential_connections: New connection suggestions
+```
+
+**Recommended Schedule:**
+- After adding thoughts: Run immediately
+- Daily: For active projects
+- Weekly: For maintenance
+- Monthly: Deep cleanup with higher decay
+
+## Use Cases
+
+### 1. Research Projects
+```python
+# Capture research notes
+thoughts = await add_thoughts_batch([
+    {"content": "Paper on graph neural networks", "tags": ["research", "gnn"]},
+    {"content": "ADHD and working memory limitations", "tags": ["research", "adhd"]}
+])
+
+# Enrich with web research
+for thought in thoughts:
+    await enrich_with_web_search(thought.id, search_depth="advanced")
+
+# Run full enrichment
+await memify_thoughts()
+```
+
+### 2. Project Management
+```python
+# Match existing thoughts to projects
+results = await match_to_projects(
+    project_patterns={
+        "project_alpha": ["alpha", "feature-a", "backend"],
+        "project_beta": ["beta", "frontend", "ui"]
+    }
+)
+
+# Find all thoughts for a project
+clusters = await find_project_clusters()
+project_thoughts = clusters.get("project_alpha", [])
+```
+
+### 3. Knowledge Maintenance
+```python
+# Weekly cleanup
+decay_results = await decay_edge_weights(
+    decay_rate=0.15,
+    min_weight=0.2,
+    time_based=True
+)
+
+# Find and create missing connections
+for thought_id in active_thoughts:
+    potentials = await calculate_potential_connections(thought_id)
+    # Review and create valuable connections
+```
+
+### 4. Discovery & Serendipity
+```python
+# Find surprise connections
+surprises = await find_surprise_connections(min_surprise_score=0.6)
+
+# Get web context for interesting ideas
+for surprise in surprises[:5]:
+    await enrich_with_web_search(surprise.source_id)
+    await enrich_with_web_search(surprise.target_id)
+```
+
+## Configuration
+
+### Environment Variables
+
+```bash
+# Required for web enrichment
+TAVILY_API_KEY=your_tavily_api_key
+
+# Optional: Customize decay behavior
+THOUGHT_GRAPH_DECAY_RATE=0.1
+THOUGHT_GRAPH_MIN_WEIGHT=0.15
+```
+
+### Project Patterns
+
+Define reusable project patterns:
+
+```python
+PROJECT_PATTERNS = {
+    "cognee": [
+        "cognee",
+        "knowledge graph",
+        "thought graph",
+        "memory system"
+    ],
+    "research": [
+        "paper",
+        "study",
+        "research",
+        "publication"
+    ],
+    "personal": [
+        "life",
+        "personal",
+        "self-improvement"
+    ]
+}
+
+# Use in operations
+await match_to_projects(project_patterns=PROJECT_PATTERNS)
+await memify_thoughts(project_patterns=PROJECT_PATTERNS)
+```
+
+## Architecture
+
+### Data Flow
+
+```
+Thoughts → Add/Capture
+    ↓
+Auto-Connect (semantic + tags)
+    ↓
+Enrich (PageRank, communities, transitive)
+    ↓
+Web Enrich (search + scrape) ←─────┐
+    ↓                               │
+Project Match (auto-detect)         │
+    ↓                               │
+Edge Decay (time-based)             │
+    ↓                               │
+Potential Connections               │
+    ↓                               │
+Memify Pipeline ────────────────────┘
+    ↓
+Enriched Knowledge Graph
+```
+
+### Integration Points
+
+- **Vector Search**: Semantic similarity matching
+- **Graph Database**: Node and edge storage
+- **Web Search**: Tavily API integration
+- **LLM**: Future connection inference
+- **Project Systems**: GitHub, GitLab integration
+
