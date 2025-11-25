@@ -1,0 +1,30 @@
+[project]
+name = "cognee-aws-bedrock-baml"
+version = "0.1.0"
+description = "AWS Bedrock adapter for Cognee using BAML - LLM, Embedding, and Reranking support"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [
+    {name = "Cognee Contributors"}
+]
+dependencies = [
+    "cognee>=0.1.0",
+    "baml-py>=0.214.0",
+    "boto3>=1.34.0",
+    "litellm>=1.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-asyncio>=0.21.0",
+]
+
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+packages = ["cognee_aws_bedrock_baml", "cognee_aws_bedrock_baml.llm", "cognee_aws_bedrock_baml.embedding", "cognee_aws_bedrock_baml.baml_src"]
