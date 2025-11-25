@@ -1,9 +1,19 @@
-"""AWS Bedrock LLM Adapter for Cognee using BAML"""
+"""AWS Bedrock LLM Adapter for Cognee using BAML-style configuration
+
+This module provides an AWS Bedrock LLM adapter that follows BAML's configuration
+patterns and uses the AWS Bedrock Converse API (the same API that BAML uses internally).
+
+BAML (Boundary ML) is a DSL for type-safe LLM interactions. This adapter implements
+a compatible approach using boto3's Converse API with BAML-style configuration,
+allowing users to use the same model configurations defined in the .baml files.
+"""
 
 import os
+import json
 import asyncio
 from typing import Type, Optional, Any, Dict
 from pydantic import BaseModel
+import boto3
 
 from cognee.infrastructure.llm.exceptions import ContentPolicyFilterError
 from cognee.infrastructure.llm.structured_output_framework.litellm_instructor.llm.llm_interface import (
@@ -23,20 +33,21 @@ logger = get_logger("BamlBedrockLLMAdapter")
 
 class BamlBedrockLLMAdapter(LLMInterface):
     """
-    Adapter for AWS Bedrock foundation models API using BAML.
+    Adapter for AWS Bedrock foundation models using BAML-style configuration.
 
-    This class initializes the AWS Bedrock API adapter with necessary credentials and configurations for
-    interacting with AWS Bedrock foundation models. It uses BAML's native Bedrock support with
-    proper tools/function calling configuration for structured outputs.
+    This adapter uses AWS Bedrock's Converse API (the same API that BAML uses internally)
+    with configuration patterns matching BAML's aws-bedrock provider. It provides
+    structured output extraction using JSON schema prompting and Pydantic validation.
 
-    BAML provides a type-safe way to interact with LLMs through its domain-specific language,
-    with automatic JSON parsing and validation.
+    The included .baml files define client configurations that can be used with BAML's
+    code generation, while this adapter provides a runtime-configurable alternative
+    that follows the same patterns.
 
     Public methods:
     - acreate_structured_output(text_input: str, system_prompt: str, response_model: Type[BaseModel]) -> BaseModel
     """
 
-    name: str = "AWS Bedrock (BAML)"
+    name: str = "AWS Bedrock (BAML-style)"
     model: str
     aws_region_name: str
 
@@ -52,7 +63,7 @@ class BamlBedrockLLMAdapter(LLMInterface):
         fallback_aws_region_name: str = None,
     ):
         """
-        Initialize the BamlBedrockLLMAdapter with BAML.
+        Initialize the BamlBedrockLLMAdapter.
 
         Parameters:
         -----------
@@ -75,7 +86,7 @@ class BamlBedrockLLMAdapter(LLMInterface):
         self.fallback_model = fallback_model
         self.fallback_aws_region_name = fallback_aws_region_name
 
-        # Get model configuration for BAML
+        # Get model configuration
         model_id_without_prefix = remove_bedrock_prefix(self.model)
         try:
             self._model_config = get_model_config(model_id_without_prefix)
@@ -88,30 +99,38 @@ class BamlBedrockLLMAdapter(LLMInterface):
                 f"using default mode: json"
             )
 
-        # Set environment variables for BAML AWS credentials
-        self._setup_aws_credentials()
+        # Initialize the boto3 Bedrock client (BAML uses the same underlying API)
+        self._bedrock_client = self._create_bedrock_client()
 
         logger.info(
             f"Initialized BamlBedrockLLMAdapter with model={self.model}, "
             f"region={self.aws_region_name}, mode={self._recommended_mode}"
         )
 
-    def _setup_aws_credentials(self):
-        """Set up AWS credentials as environment variables for BAML."""
-        if self.aws_region_name:
-            os.environ["AWS_REGION"] = self.aws_region_name
+    def _create_bedrock_client(self):
+        """Create boto3 Bedrock runtime client with proper credentials."""
+        bedrock_kwargs = {
+            "service_name": "bedrock-runtime",
+            "region_name": self.aws_region_name,
+        }
 
         if self.aws_profile_name:
-            os.environ["AWS_PROFILE"] = self.aws_profile_name
+            session = boto3.Session(profile_name=self.aws_profile_name)
+            return session.client(**bedrock_kwargs)
+        elif self.aws_access_key_id and self.aws_secret_access_key:
+            bedrock_kwargs["aws_access_key_id"] = self.aws_access_key_id
+            bedrock_kwargs["aws_secret_access_key"] = self.aws_secret_access_key
+            return boto3.client(**bedrock_kwargs)
+        else:
+            return boto3.client(**bedrock_kwargs)
 
-        if self.aws_access_key_id:
-            os.environ["AWS_ACCESS_KEY_ID"] = self.aws_access_key_id
+    def get_baml_config(self) -> Dict[str, Any]:
+        """
+        Get BAML-style configuration for this adapter.
 
-        if self.aws_secret_access_key:
-            os.environ["AWS_SECRET_ACCESS_KEY"] = self.aws_secret_access_key
-
-    def _create_baml_client_config(self) -> Dict[str, Any]:
-        """Create BAML client configuration dynamically."""
+        Returns a dictionary matching the BAML client configuration format,
+        useful for reference or for generating .baml files.
+        """
         model_id = remove_bedrock_prefix(self.model)
 
         config = {
@@ -120,6 +139,7 @@ class BamlBedrockLLMAdapter(LLMInterface):
                 "model": model_id,
                 "inference_configuration": {
                     "max_tokens": self.max_completion_tokens,
+                    "temperature": 0.7,
                 },
             },
         }
@@ -130,10 +150,6 @@ class BamlBedrockLLMAdapter(LLMInterface):
         if self.aws_profile_name:
             config["options"]["profile"] = self.aws_profile_name
 
-        if self.aws_access_key_id and self.aws_secret_access_key:
-            config["options"]["access_key_id"] = self.aws_access_key_id
-            config["options"]["secret_access_key"] = self.aws_secret_access_key
-
         return config
 
     @sleep_and_retry_async()
@@ -142,10 +158,10 @@ class BamlBedrockLLMAdapter(LLMInterface):
         self, text_input: str, system_prompt: str, response_model: Type[BaseModel]
     ) -> BaseModel:
         """
-        Generate a response from a user query using AWS Bedrock with BAML.
+        Generate a structured response using AWS Bedrock's Converse API.
 
-        This asynchronous method sends a user query and a system prompt to an AWS Bedrock model and
-        retrieves the generated response using BAML's type-safe extraction capabilities.
+        This method uses the same API that BAML's aws-bedrock provider uses internally,
+        with JSON schema prompting for structured output extraction.
 
         Parameters:
         -----------
@@ -158,38 +174,30 @@ class BamlBedrockLLMAdapter(LLMInterface):
             BaseModel: An instance of the specified response model containing the structured output from the language model.
         """
         try:
-            # Import baml_py for dynamic client creation
-            import baml_py
-            from baml_py import ClientRegistry
-
             # Get model ID without prefix
             model_id = remove_bedrock_prefix(self.model)
 
-            # Create client registry
-            registry = ClientRegistry()
+            # Create the schema from the Pydantic model for structured output
+            schema = response_model.model_json_schema()
 
-            # Add client with dynamic configuration
-            client_config = self._create_baml_client_config()
-
-            # Register the client dynamically
-            registry.add_llm_client(
-                name="bedrock_client",
-                provider="aws-bedrock",
-                options=client_config["options"],
+            # Build the prompt with JSON schema instructions
+            full_prompt = self._build_structured_prompt(
+                text_input=text_input,
+                system_prompt=system_prompt,
+                schema=schema,
             )
 
-            # Create the prompt combining system and user input
-            full_prompt = f"{system_prompt}\n\n{text_input}" if system_prompt else text_input
+            # Prepare messages for the Converse API
+            messages = [{"role": "user", "content": [{"text": full_prompt}]}]
 
-            # Use BAML's type extraction capability
-            # Since BAML generates code from .baml files, we use dynamic invocation
-            result = await self._invoke_baml_extraction(
-                registry=registry,
-                prompt=full_prompt,
-                response_model=response_model,
+            # Call Bedrock using the Converse API (BAML's approach)
+            response = await self._invoke_converse_api(
+                model_id=model_id,
+                messages=messages,
             )
 
-            return result
+            # Parse and validate the response
+            return self._parse_response(response, response_model)
 
         except Exception as error:
             error_str = str(error).lower()
@@ -208,63 +216,32 @@ class BamlBedrockLLMAdapter(LLMInterface):
                     response_model=response_model,
                 )
             else:
-                logger.error(f"Error in BAML Bedrock call: {error}")
+                logger.error(f"Error in BAML-style Bedrock call: {error}")
                 raise error
 
-    async def _invoke_baml_extraction(
-        self,
-        registry: Any,
-        prompt: str,
-        response_model: Type[BaseModel],
-    ) -> BaseModel:
-        """
-        Invoke BAML to extract structured data from the LLM response.
+    def _build_structured_prompt(
+        self, text_input: str, system_prompt: str, schema: Dict[str, Any]
+    ) -> str:
+        """Build a prompt that requests JSON output matching the schema."""
+        base_prompt = f"{system_prompt}\n\n{text_input}" if system_prompt else text_input
 
-        This method uses BAML's runtime extraction capabilities.
-        """
-        import baml_py
-        from baml_py import BamlRuntime
-
-        # Create the schema from the Pydantic model
-        schema = response_model.model_json_schema()
-
-        # For BAML, we need to format the prompt to request JSON output
-        json_prompt = f"""{prompt}
+        return f"""{base_prompt}
 
 Please respond with valid JSON that matches this schema:
-{schema}
+{json.dumps(schema, indent=2)}
 
-Respond ONLY with the JSON object, no additional text."""
+Respond ONLY with the JSON object, no additional text or markdown formatting."""
 
-        # Get model ID
-        model_id = remove_bedrock_prefix(self.model)
+    async def _invoke_converse_api(
+        self, model_id: str, messages: list
+    ) -> Dict[str, Any]:
+        """
+        Invoke AWS Bedrock's Converse API asynchronously.
 
-        # Use boto3 directly with BAML-style configuration
-        # This is a fallback approach since BAML's dynamic API requires generated code
-        import boto3
-        import json
-
-        # Create boto3 client
-        bedrock_kwargs = {
-            "service_name": "bedrock-runtime",
-            "region_name": self.aws_region_name,
-        }
-
-        if self.aws_profile_name:
-            session = boto3.Session(profile_name=self.aws_profile_name)
-            bedrock_client = session.client(**bedrock_kwargs)
-        elif self.aws_access_key_id and self.aws_secret_access_key:
-            bedrock_kwargs["aws_access_key_id"] = self.aws_access_key_id
-            bedrock_kwargs["aws_secret_access_key"] = self.aws_secret_access_key
-            bedrock_client = boto3.client(**bedrock_kwargs)
-        else:
-            bedrock_client = boto3.client(**bedrock_kwargs)
-
-        # Prepare the request using Converse API (BAML's approach)
-        messages = [{"role": "user", "content": [{"text": json_prompt}]}]
-
+        This is the same API that BAML uses internally for aws-bedrock provider.
+        """
         def _sync_call():
-            response = bedrock_client.converse(
+            return self._bedrock_client.converse(
                 modelId=model_id,
                 messages=messages,
                 inferenceConfig={
@@ -272,11 +249,14 @@ Respond ONLY with the JSON object, no additional text."""
                     "temperature": 0.7,
                 },
             )
-            return response
 
-        # Run in thread pool to avoid blocking
-        response = await asyncio.to_thread(_sync_call)
+        # Run sync call in thread pool to avoid blocking
+        return await asyncio.to_thread(_sync_call)
 
+    def _parse_response(
+        self, response: Dict[str, Any], response_model: Type[BaseModel]
+    ) -> BaseModel:
+        """Parse the Bedrock response and validate against the Pydantic model."""
         # Extract the response text
         output = response.get("output", {})
         message = output.get("message", {})
@@ -287,20 +267,19 @@ Respond ONLY with the JSON object, no additional text."""
         else:
             raise ValueError("No content in Bedrock response")
 
-        # Parse the JSON response
+        # Clean up the response text (handle markdown code blocks)
+        json_str = response_text.strip()
+
+        if json_str.startswith("```json"):
+            json_str = json_str[7:]
+        if json_str.startswith("```"):
+            json_str = json_str[3:]
+        if json_str.endswith("```"):
+            json_str = json_str[:-3]
+        json_str = json_str.strip()
+
+        # Parse and validate
         try:
-            # Try to extract JSON from the response
-            json_str = response_text.strip()
-
-            # Handle potential markdown code blocks
-            if json_str.startswith("```json"):
-                json_str = json_str[7:]
-            if json_str.startswith("```"):
-                json_str = json_str[3:]
-            if json_str.endswith("```"):
-                json_str = json_str[:-3]
-            json_str = json_str.strip()
-
             parsed_data = json.loads(json_str)
             return response_model.model_validate(parsed_data)
         except json.JSONDecodeError as e:

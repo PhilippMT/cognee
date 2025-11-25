@@ -1,6 +1,6 @@
 # Cognee AWS Bedrock BAML Adapter
 
-External adapter package for integrating AWS Bedrock foundation models with Cognee using **BAML** (Boundary ML) for type-safe LLM interactions.
+External adapter package for integrating AWS Bedrock foundation models with Cognee using **BAML** (Boundary ML) configuration patterns and the AWS Bedrock Converse API.
 
 ## What is BAML?
 
@@ -10,11 +10,19 @@ External adapter package for integrating AWS Bedrock foundation models with Cogn
 - Automatic JSON parsing and validation
 - Configurable inference parameters
 
+## This Package
+
+This package provides two integration approaches:
+
+1. **BAML Configuration Files** (`baml_src/`): Pre-configured `.baml` files for all AWS Bedrock models that can be used with BAML's code generation to create type-safe clients.
+
+2. **Runtime Adapter**: A Python adapter that uses AWS Bedrock's Converse API (the same API that BAML uses internally) with BAML-style configuration patterns.
+
 ## Features
 
-- **Native BAML Integration**: Uses BAML's `aws-bedrock` provider for type-safe structured outputs
+- **BAML-style Configuration**: Uses the same patterns and API as BAML's aws-bedrock provider
+- **Converse API**: Uses AWS Bedrock's Converse API (same as BAML internally)
 - **30+ LLM Models**: Claude, Llama, Titan, Nova, Mistral, Cohere from Anthropic, Meta, Amazon, Mistral AI, and Cohere
-- **Automatic Configuration**: Models properly configured with correct settings
 - **Comprehensive Model Configuration**: All models from cognee-aws-bedrock are supported
 - **7 Embedding Models**: Titan and Cohere embeddings with various dimensions
 - **Cross-Region Inference**: Automatic load distribution across EU regions
@@ -176,31 +184,27 @@ export EMBEDDING_DIMENSIONS=1024
 
 | Feature | cognee-aws-bedrock | cognee-aws-bedrock-baml |
 |---------|-------------------|-------------------------|
-| LLM Framework | instructor[bedrock] | BAML |
-| Structured Output | Instructor modes | BAML type system |
-| Tools Support | BEDROCK_TOOLS mode | Native BAML support |
-| JSON Fallback | BEDROCK_JSON mode | Automatic |
-| Configuration | Python code | BAML DSL files |
+| LLM Framework | instructor[bedrock] | BAML-style + Converse API |
+| Structured Output | Instructor modes | JSON schema prompting |
+| Tools Support | BEDROCK_TOOLS mode | Schema-based extraction |
+| JSON Fallback | BEDROCK_JSON mode | Primary approach |
+| Configuration | Python code | BAML DSL files + Python |
 | Type Safety | Pydantic | BAML + Pydantic |
 | Embeddings | LiteLLM | LiteLLM |
+| Underlying API | boto3 + instructor | boto3 Converse API |
 
-## BAML vs Instructor
+## When to Use Each
 
-**BAML:**
-- Domain-specific language for AI applications
-- Type-safe structured outputs with validation
-- Declarative client configuration in `.baml` files
-- Automatic retry and error handling
+**Use cognee-aws-bedrock if you:**
+- Prefer Python-centric configuration
+- Want native tools/function calling via instructor
+- Need BEDROCK_TOOLS mode for specific models
 
-**Instructor:**
-- Python library for structured LLM outputs
-- Uses Pydantic for validation
-- Programmatic configuration
-- Multiple mode support (tools, JSON, etc.)
-
-Both approaches work well with AWS Bedrock. Choose based on your preferences:
-- Use **cognee-aws-bedrock** if you prefer Python-centric configuration
-- Use **cognee-aws-bedrock-baml** if you prefer declarative DSL configuration
+**Use cognee-aws-bedrock-baml if you:**
+- Want BAML-compatible configuration patterns
+- Plan to use BAML code generation for type-safe clients
+- Prefer declarative DSL configuration files
+- Want to use the Converse API directly
 
 ## Prerequisites
 
