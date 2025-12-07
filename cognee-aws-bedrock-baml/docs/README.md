@@ -1,57 +1,62 @@
-# AWS Bedrock BAML - Documentation Index
+# AWS Bedrock BAML Documentation
 
-This directory contains comprehensive documentation for the AWS Bedrock BAML integration.
+Welcome to the documentation for the `cognee-aws-bedrock-baml` package.
 
-## Documentation Files
+**Last Updated: December 2025**
 
-| File | Description |
-|------|-------------|
-| [OVERVIEW.md](OVERVIEW.md) | Quick reference and getting started guide |
-| [BAML_CONFIG.md](BAML_CONFIG.md) | BAML client configuration examples |
-| [LLM_MODELS.md](LLM_MODELS.md) | Complete LLM model catalog with specifications |
-| [EMBEDDING_MODELS.md](EMBEDDING_MODELS.md) | Embedding model catalog and configuration |
-| [CROSS_REGION.md](CROSS_REGION.md) | Cross-region inference profiles |
-| [BEST_PRACTICES.md](BEST_PRACTICES.md) | Best practices and recommendations |
+## Documentation Index
 
-## Supported EU Regions
-
-- **eu-central-1** (Frankfurt)
-- **eu-west-1** (Ireland)
-- **eu-north-1** (Stockholm)
-
-## Model Providers
-
-| Provider | LLM Models | Embedding Models |
-|----------|------------|------------------|
-| Anthropic | 5 (Claude 3.x) | - |
-| Amazon | 6 (Nova, Titan) | 3 (Titan Embed) |
-| Meta | 8 (Llama 3.x) | - |
-| Mistral AI | 4 (Mistral, Mixtral) | - |
-| Cohere | 2 (Command R) | 2 (Embed v3) |
-| AI21 Labs | 4 (Jamba, Jurassic) | - |
-
-**Total: 29 LLM models + 5 Embedding models**
+| Document | Description |
+|----------|-------------|
+| [Overview](./OVERVIEW.md) | Quick reference and what's new |
+| [LLM Models](./LLM_MODELS.md) | Complete LLM model catalog (39+ models) |
+| [Embedding Models](./EMBEDDING_MODELS.md) | Embedding model catalog (10 models) |
+| [BAML Configuration](./BAML_CONFIG.md) | BAML client configuration examples |
+| [Cross-Region](./CROSS_REGION.md) | Cross-region inference profiles |
+| [Best Practices](./BEST_PRACTICES.md) | Usage recommendations |
 
 ## Quick Start
 
 ```python
-from cognee_aws_bedrock_baml import register_baml_bedrock_adapters
+from cognee_aws_bedrock_baml import (
+    register_baml_bedrock_adapters,
+    get_model_config,
+    ALL_MODELS,
+    EMBEDDING_MODELS,
+)
 import cognee
 
-# Register adapters
+# Register adapters with cognee
 register_baml_bedrock_adapters()
 
-# Configure LLM
+# Configure cognee
 cognee.config.llm_provider = "aws_bedrock_baml"
-cognee.config.llm_model = "bedrock/anthropic.claude-3-5-sonnet-20241022-v2:0"
-
-# Configure Embeddings
-cognee.config.embedding_provider = "bedrock"
+cognee.config.llm_model = "bedrock/anthropic.claude-sonnet-4-5-20250929-v1:0"
 cognee.config.embedding_model = "bedrock/amazon.titan-embed-text-v2:0"
+
+# Use cognee normally
+await cognee.add("Your data here")
+await cognee.cognify()
+results = await cognee.search("query")
 ```
 
-## References
+## What's New (December 2025)
 
-- [BAML Documentation](https://docs.boundaryml.com/)
-- [AWS Bedrock Documentation](https://docs.aws.amazon.com/bedrock/)
-- [Cognee Documentation](https://docs.cognee.ai/)
+### New Model Providers
+- **Qwen**: Qwen3 32B, 235B, Coder 30B/480B, VL 235B
+- **OpenAI OSS**: GPT OSS 120B, 20B, Safeguard models
+- **Google Gemma**: Gemma 3 4B, 12B, 27B IT models
+- **NVIDIA**: Nemotron Nano 9B, 12B v2
+- **DeepSeek**: V3.1
+- **MiniMax**: M2
+- **TwelveLabs**: Pegasus v1.2, Marengo Embed 2.7/3.0
+
+### Updated Models
+- **Anthropic Claude**: Claude 4.x series (Sonnet 4.5, Sonnet 4, Opus 4.5, Haiku 4.5, Claude 3.7 Sonnet)
+- **Amazon Nova**: Nova 2 Lite with cross-region support
+- **Mistral AI**: Pixtral Large, Ministral 3, Voxtral (audio-capable)
+- **Cohere**: Embed v4 (multimodal)
+
+## Support
+
+For issues or questions, please refer to the main cognee repository documentation.

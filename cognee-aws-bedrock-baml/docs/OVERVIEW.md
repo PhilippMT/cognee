@@ -1,70 +1,85 @@
-# Quick Overview and Reference
+# AWS Bedrock BAML Integration - Overview
 
-## Supported Regions
+Quick reference for the cognee-aws-bedrock-baml package.
 
-| Region | Code | Location |
-|--------|------|----------|
-| Frankfurt | eu-central-1 | Germany |
-| Ireland | eu-west-1 | Ireland |
-| Stockholm | eu-north-1 | Sweden |
+**Last Updated: December 2025**
 
-## Model Summary
+## What's New
 
-### LLM Models with Tools Support
+- **Claude 4.x Series**: Sonnet 4.5, Sonnet 4, Opus 4.5, Haiku 4.5, Claude 3.7 Sonnet
+- **Amazon Nova 2**: Nova 2 Lite with improved multimodal capabilities
+- **Qwen3 Models**: Including Qwen3 Coder 480B for code generation
+- **OpenAI OSS**: GPT OSS 120B and 20B models
+- **Google Gemma 3**: 4B, 12B, and 27B models
+- **NVIDIA Nemotron**: Nano 9B and 12B models
+- **DeepSeek V3.1**: Available in eu-north-1
+- **Mistral Pixtral/Voxtral**: Multimodal and audio-capable models
+- **Cohere Embed v4**: Multimodal embeddings (text + image)
+- **TwelveLabs Marengo**: Video/audio embeddings
 
-| Provider | Models | Best For |
-|----------|--------|----------|
-| **Anthropic Claude** | 5 models | Complex reasoning, multimodal |
-| **Amazon Nova** | 3 models | Multimodal (text, image, video) |
-| **Meta Llama** | 8 models | Open-source, customizable |
-| **Mistral AI** | 4 models | European compliance |
-| **Cohere** | 2 models | RAG, search, multilingual |
-| **AI21 Labs** | 2 models (Jamba) | Long context (256K) |
+## Quick Stats
 
-### LLM Models without Tools Support (JSON mode)
+| Category | Count |
+|----------|-------|
+| LLM Models | 39+ |
+| Embedding Models | 10 |
+| Providers | 11 |
+| EU Regions | 3 |
 
-| Provider | Models | Notes |
-|----------|--------|-------|
-| **Amazon Titan Text** | 3 models | AWS-native |
-| **AI21 Jurassic-2** | 2 models | Text generation |
+## Supported Providers
 
-### Embedding Models
+- **Anthropic**: Claude 4.x, 3.7, 3.5, 3.x
+- **Amazon**: Nova 2, Nova Pro/Lite/Micro
+- **Meta**: Llama 3.2
+- **Mistral AI**: Pixtral, Ministral, Voxtral, Mistral, Mixtral
+- **Qwen**: Qwen3, Qwen3 Coder, Qwen3 VL
+- **OpenAI**: GPT OSS models
+- **DeepSeek**: DeepSeek V3.1
+- **Google**: Gemma 3 models
+- **NVIDIA**: Nemotron Nano
+- **MiniMax**: M2
+- **TwelveLabs**: Pegasus, Marengo
 
-| Model | Dimensions | Languages |
-|-------|------------|-----------|
-| Titan Text Embeddings V2 | 256, 512, 1024 | 100+ |
-| Titan Text Embeddings V1 | 1536 | English |
-| Titan Multimodal G1 | 256, 384, 1024 | English |
-| Cohere Embed English v3 | 1024 | English |
-| Cohere Embed Multilingual v3 | 1024 | 100+ |
-
-## Quick Configuration
-
-### LLM Setup
+## Quick Start
 
 ```python
+from cognee_aws_bedrock_baml import (
+    register_baml_bedrock_adapters,
+    BamlBedrockLLMAdapter,
+    BamlBedrockEmbeddingAdapter,
+)
 import cognee
+
+# Register adapters
+register_baml_bedrock_adapters()
+
+# Configure cognee
 cognee.config.llm_provider = "aws_bedrock_baml"
-cognee.config.llm_model = "bedrock/anthropic.claude-3-5-sonnet-20241022-v2:0"
-cognee.config.aws_region_name = "eu-central-1"
-```
-
-### Embedding Setup
-
-```python
-cognee.config.embedding_provider = "bedrock"
+cognee.config.llm_model = "bedrock/anthropic.claude-sonnet-4-5-20250929-v1:0"
 cognee.config.embedding_model = "bedrock/amazon.titan-embed-text-v2:0"
-cognee.config.embedding_dimensions = 1024
 ```
 
-## Model Selection Guide
+## Model Capabilities
 
-| Use Case | Recommended Model |
-|----------|-------------------|
-| Best overall | Claude 3.5 Sonnet v2 |
-| Fast & cheap | Claude 3.5 Haiku or Nova Micro |
-| Open source | Llama 3.3 70B |
-| Long context | Jamba 1.5 Large (256K) |
-| Multimodal | Nova Pro (text+image+video) |
-| European compliance | Mistral Large 2 |
-| RAG/Search | Command R+ |
+### Multimodal Input
+- **Text + Image**: Claude, Nova, Gemma, NVIDIA Nemotron, Qwen VL, Pixtral
+- **Text + Video**: Nova, Pegasus
+- **Text + Audio**: Voxtral models
+
+### Large Context Windows
+- **300K tokens**: Nova 2 Lite, Nova Pro, Nova Lite
+- **200K tokens**: All Claude models
+- **128K tokens**: Most other models
+
+### All Models Support
+- ✅ Tool/Function calling
+- ✅ Streaming responses
+- ✅ BAML structured outputs
+
+## Documentation
+
+- [LLM Models](./LLM_MODELS.md) - Complete LLM catalog
+- [Embedding Models](./EMBEDDING_MODELS.md) - Embedding catalog
+- [BAML Configuration](./BAML_CONFIG.md) - BAML setup
+- [Cross-Region](./CROSS_REGION.md) - Cross-region inference
+- [Best Practices](./BEST_PRACTICES.md) - Usage recommendations

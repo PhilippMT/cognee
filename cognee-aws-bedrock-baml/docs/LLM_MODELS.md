@@ -1,222 +1,165 @@
-# LLM Models Catalog
+# AWS Bedrock LLM Models - EU Regions
 
-Complete catalog of LLM models available in AWS Bedrock EU regions.
+Complete catalog of LLM models available in eu-central-1, eu-west-1, and eu-north-1.
+
+**Last Updated: December 2025**
+
+## Model Summary
+
+| Provider | Models | Tools Support | Regions |
+|----------|--------|---------------|---------|
+| Anthropic Claude | 7 | Yes | eu-central-1, eu-west-1, eu-north-1 |
+| Amazon Nova | 4 | Yes | eu-central-1, eu-west-1, eu-north-1 |
+| Meta Llama | 2 | Yes | eu-central-1, eu-west-1 |
+| Mistral AI | 8 | Yes | eu-central-1, eu-west-1, eu-north-1 |
+| Qwen | 6 | Yes | eu-central-1, eu-west-1, eu-north-1 |
+| OpenAI OSS | 4 | Yes | eu-central-1, eu-west-1, eu-north-1 |
+| DeepSeek | 1 | Yes | eu-north-1 |
+| Google Gemma | 3 | Yes | eu-west-1 |
+| NVIDIA | 2 | Yes | eu-west-1 |
+| MiniMax | 1 | Yes | eu-west-1 |
+| TwelveLabs | 1 | Yes | eu-central-1, eu-west-1, eu-north-1 |
+
+**Total: 39+ LLM Models**
+
+---
 
 ## Anthropic Claude Models
 
-All Claude models support tools/function calling.
-
-### Claude 3.5 Sonnet v2 (Latest & Recommended)
-
-| Property | Value |
-|----------|-------|
-| **Model ID** | `anthropic.claude-3-5-sonnet-20241022-v2:0` |
-| **Regions** | eu-central-1, eu-west-1, eu-north-1 |
-| **Context Window** | 200,000 tokens |
-| **Max Output** | 8,192 tokens |
-| **Input Modalities** | Text, Image |
-| **Tools Support** | ✅ Yes |
-| **Best For** | Complex reasoning, latest features |
-
-### Claude 3.5 Sonnet v1
-
-| Property | Value |
-|----------|-------|
-| **Model ID** | `anthropic.claude-3-5-sonnet-20240620-v1:0` |
-| **Context Window** | 200,000 tokens |
-| **Max Output** | 8,192 tokens |
-
-### Claude 3.5 Haiku
-
-| Property | Value |
-|----------|-------|
-| **Model ID** | `anthropic.claude-3-5-haiku-20241022-v1:0` |
-| **Context Window** | 200,000 tokens |
-| **Max Output** | 8,192 tokens |
-| **Best For** | Fast responses, cost-effective |
-
-### Claude 3 Sonnet
-
-| Property | Value |
-|----------|-------|
-| **Model ID** | `anthropic.claude-3-sonnet-20240229-v1:0` |
-| **Context Window** | 200,000 tokens |
-| **Max Output** | 4,096 tokens |
-
-### Claude 3 Haiku
-
-| Property | Value |
-|----------|-------|
-| **Model ID** | `anthropic.claude-3-haiku-20240307-v1:0` |
-| **Context Window** | 200,000 tokens |
-| **Max Output** | 4,096 tokens |
+| Model ID | Name | Context | Max Tokens | Modalities |
+|----------|------|---------|------------|------------|
+| `anthropic.claude-sonnet-4-5-20250929-v1:0` | Claude Sonnet 4.5 | 200K | 8192 | Text, Image |
+| `anthropic.claude-sonnet-4-20250514-v1:0` | Claude Sonnet 4 | 200K | 8192 | Text, Image |
+| `anthropic.claude-opus-4-5-20251101-v1:0` | Claude Opus 4.5 | 200K | 8192 | Text, Image |
+| `anthropic.claude-haiku-4-5-20251001-v1:0` | Claude Haiku 4.5 | 200K | 8192 | Text, Image |
+| `anthropic.claude-3-7-sonnet-20250219-v1:0` | Claude 3.7 Sonnet | 200K | 8192 | Text, Image |
+| `anthropic.claude-3-5-haiku-20241022-v1:0` | Claude 3.5 Haiku | 200K | 8192 | Text |
+| `anthropic.claude-3-haiku-20240307-v1:0` | Claude 3 Haiku | 200K | 4096 | Text, Image |
 
 ---
 
 ## Amazon Nova Models
 
-Multimodal models with tools support.
-
-### Nova Pro
-
-| Property | Value |
-|----------|-------|
-| **Model ID** | `amazon.nova-pro-v1:0` |
-| **Regions** | eu-central-1, eu-west-1, eu-north-1 |
-| **Context Window** | 300,000 tokens |
-| **Max Output** | 5,120 tokens |
-| **Input Modalities** | Text, Image, Video |
-| **Tools Support** | ✅ Yes |
-| **Best For** | Multimodal tasks, video analysis |
-
-### Nova Lite
-
-| Property | Value |
-|----------|-------|
-| **Model ID** | `amazon.nova-lite-v1:0` |
-| **Context Window** | 300,000 tokens |
-| **Input Modalities** | Text, Image, Video |
-| **Best For** | Cost-effective multimodal |
-
-### Nova Micro
-
-| Property | Value |
-|----------|-------|
-| **Model ID** | `amazon.nova-micro-v1:0` |
-| **Context Window** | 128,000 tokens |
-| **Input Modalities** | Text only |
-| **Best For** | Extremely cost-effective |
+| Model ID | Name | Context | Max Tokens | Modalities |
+|----------|------|---------|------------|------------|
+| `amazon.nova-2-lite-v1:0` | Nova 2 Lite | 300K | 5120 | Text, Image, Video |
+| `amazon.nova-pro-v1:0` | Nova Pro | 300K | 5120 | Text, Image, Video |
+| `amazon.nova-lite-v1:0` | Nova Lite | 300K | 5120 | Text, Image, Video |
+| `amazon.nova-micro-v1:0` | Nova Micro | 128K | 5120 | Text |
 
 ---
 
 ## Meta Llama Models
 
-Open-source models with tools support.
-
-### Llama 3.3 70B Instruct (Latest)
-
-| Property | Value |
-|----------|-------|
-| **Model ID** | `meta.llama3-3-70b-instruct-v1:0` |
-| **Regions** | eu-central-1, eu-west-1, eu-north-1 |
-| **Context Window** | 128,000 tokens |
-| **Max Output** | 2,048 tokens |
-| **Tools Support** | ✅ Yes |
-| **Best For** | Latest Llama, strong performance |
-
-### Llama 3.2 Vision Models
-
-| Model ID | Size | Vision |
-|----------|------|--------|
-| `meta.llama3-2-90b-instruct-v1:0` | 90B | ✅ Yes |
-| `meta.llama3-2-11b-instruct-v1:0` | 11B | ✅ Yes |
-
-### Llama 3.2 Text Models
-
-| Model ID | Size |
-|----------|------|
-| `meta.llama3-2-3b-instruct-v1:0` | 3B |
-| `meta.llama3-2-1b-instruct-v1:0` | 1B |
-
-### Llama 3.1 Models
-
-| Model ID | Size | Context |
-|----------|------|---------|
-| `meta.llama3-1-405b-instruct-v1:0` | 405B | 128K |
-| `meta.llama3-1-70b-instruct-v1:0` | 70B | 128K |
-| `meta.llama3-1-8b-instruct-v1:0` | 8B | 128K |
+| Model ID | Name | Context | Max Tokens | Modalities |
+|----------|------|---------|------------|------------|
+| `meta.llama3-2-3b-instruct-v1:0` | Llama 3.2 3B | 128K | 2048 | Text |
+| `meta.llama3-2-1b-instruct-v1:0` | Llama 3.2 1B | 128K | 2048 | Text |
 
 ---
 
 ## Mistral AI Models
 
-European AI company, all support tools.
-
-### Mistral Large 2 (2407)
-
-| Property | Value |
-|----------|-------|
-| **Model ID** | `mistral.mistral-large-2407-v1:0` |
-| **Regions** | eu-central-1, eu-west-1, eu-north-1 |
-| **Context Window** | 128,000 tokens |
-| **Max Output** | 8,192 tokens |
-| **Tools Support** | ✅ Yes |
-| **Best For** | Best Mistral, complex reasoning |
-
-### Other Mistral Models
-
-| Model ID | Context |
-|----------|---------|
-| `mistral.mistral-large-2402-v1:0` | 32K |
-| `mistral.mistral-small-2402-v1:0` | 32K |
-| `mistral.mixtral-8x7b-instruct-v0:1` | 32K |
+| Model ID | Name | Context | Max Tokens | Modalities |
+|----------|------|---------|------------|------------|
+| `mistral.pixtral-large-2502-v1:0` | Pixtral Large (25.02) | 128K | 8192 | Text, Image |
+| `mistral.ministral-3-14b-instruct` | Ministral 14B 3.0 | 128K | 8192 | Text |
+| `mistral.ministral-3-8b-instruct` | Ministral 3 8B | 128K | 8192 | Text |
+| `mistral.voxtral-small-24b-2507` | Voxtral Small 24B | 32K | 8192 | Audio, Text |
+| `mistral.voxtral-mini-3b-2507` | Voxtral Mini 3B | 32K | 4096 | Audio, Text |
+| `mistral.mistral-7b-instruct-v0:2` | Mistral 7B Instruct | 32K | 8192 | Text |
+| `mistral.mistral-large-2402-v1:0` | Mistral Large (24.02) | 32K | 8192 | Text |
+| `mistral.mixtral-8x7b-instruct-v0:1` | Mixtral 8x7B | 32K | 4096 | Text |
 
 ---
 
-## Cohere Models
+## Qwen Models (Alibaba Cloud)
 
-Command R series with tools support.
-
-### Command R+
-
-| Property | Value |
-|----------|-------|
-| **Model ID** | `cohere.command-r-plus-v1:0` |
-| **Regions** | eu-central-1, eu-west-1, eu-north-1 |
-| **Context Window** | 128,000 tokens |
-| **Max Output** | 4,096 tokens |
-| **Tools Support** | ✅ Yes |
-| **Best For** | RAG, search, retrieval |
-
-### Command R
-
-| Property | Value |
-|----------|-------|
-| **Model ID** | `cohere.command-r-v1:0` |
-| **Context Window** | 128,000 tokens |
-| **Max Output** | 4,096 tokens |
+| Model ID | Name | Context | Max Tokens | Modalities |
+|----------|------|---------|------------|------------|
+| `qwen.qwen3-32b-v1:0` | Qwen3 32B | 128K | 8192 | Text |
+| `qwen.qwen3-235b-a22b-2507-v1:0` | Qwen3 235B A22B | 128K | 8192 | Text |
+| `qwen.qwen3-coder-30b-a3b-v1:0` | Qwen3 Coder 30B | 128K | 8192 | Text |
+| `qwen.qwen3-coder-480b-a35b-v1:0` | Qwen3 Coder 480B | 128K | 8192 | Text |
+| `qwen.qwen3-next-80b-a3b` | Qwen3 Next 80B | 128K | 8192 | Text |
+| `qwen.qwen3-vl-235b-a22b` | Qwen3 VL 235B | 128K | 8192 | Text, Image |
 
 ---
 
-## AI21 Labs Models
+## OpenAI OSS Models
 
-### Jamba 1.5 Large
-
-| Property | Value |
-|----------|-------|
-| **Model ID** | `ai21.jamba-1-5-large-v1:0` |
-| **Regions** | eu-central-1, eu-west-1 |
-| **Context Window** | 256,000 tokens |
-| **Max Output** | 4,096 tokens |
-| **Tools Support** | ✅ Yes |
-| **Best For** | Very long context, complex documents |
-
-### Jamba 1.5 Mini
-
-| Property | Value |
-|----------|-------|
-| **Model ID** | `ai21.jamba-1-5-mini-v1:0` |
-| **Context Window** | 256,000 tokens |
-| **Max Output** | 4,096 tokens |
-| **Best For** | Long context, cost-effective |
-
-### Jurassic-2 Models (No Tools)
-
-| Model ID | Max Output |
-|----------|------------|
-| `ai21.j2-ultra-v1` | 8,191 tokens |
-| `ai21.j2-mid-v1` | 8,191 tokens |
-
-**Note:** Jurassic-2 models do NOT support tools. Use JSON mode.
+| Model ID | Name | Context | Max Tokens | Modalities |
+|----------|------|---------|------------|------------|
+| `openai.gpt-oss-120b-1:0` | GPT OSS 120B | 128K | 8192 | Text |
+| `openai.gpt-oss-20b-1:0` | GPT OSS 20B | 128K | 8192 | Text |
+| `openai.gpt-oss-safeguard-120b` | GPT OSS Safeguard 120B | 128K | 8192 | Text |
+| `openai.gpt-oss-safeguard-20b` | GPT OSS Safeguard 20B | 128K | 8192 | Text |
 
 ---
 
-## Amazon Titan Text Models
+## DeepSeek Models
 
-**Note:** Titan Text models do NOT support tools. Use JSON mode.
+| Model ID | Name | Context | Max Tokens | Modalities |
+|----------|------|---------|------------|------------|
+| `deepseek.v3-v1:0` | DeepSeek-V3.1 | 128K | 8192 | Text |
 
-| Model ID | Context | Max Output |
-|----------|---------|------------|
-| `amazon.titan-text-premier-v1:0` | 32K | 3,072 |
-| `amazon.titan-text-express-v1` | 8K | 8,192 |
-| `amazon.titan-text-lite-v1` | 4K | 4,096 |
+---
+
+## Google Gemma Models
+
+| Model ID | Name | Context | Max Tokens | Modalities |
+|----------|------|---------|------------|------------|
+| `google.gemma-3-27b-it` | Gemma 3 27B IT | 128K | 8192 | Text, Image |
+| `google.gemma-3-12b-it` | Gemma 3 12B IT | 128K | 8192 | Text, Image |
+| `google.gemma-3-4b-it` | Gemma 3 4B IT | 128K | 8192 | Text, Image |
+
+---
+
+## NVIDIA Models
+
+| Model ID | Name | Context | Max Tokens | Modalities |
+|----------|------|---------|------------|------------|
+| `nvidia.nemotron-nano-12b-v2` | Nemotron Nano 12B v2 VL | 128K | 8192 | Text, Image |
+| `nvidia.nemotron-nano-9b-v2` | Nemotron Nano 9B v2 | 128K | 8192 | Text |
+
+---
+
+## MiniMax Models
+
+| Model ID | Name | Context | Max Tokens | Modalities |
+|----------|------|---------|------------|------------|
+| `minimax.minimax-m2` | MiniMax M2 | 128K | 8192 | Text |
+
+---
+
+## TwelveLabs Models (Video Understanding)
+
+| Model ID | Name | Context | Max Tokens | Modalities |
+|----------|------|---------|------------|------------|
+| `twelvelabs.pegasus-1-2-v1:0` | Pegasus v1.2 | 64K | 4096 | Text, Video |
+
+---
+
+## Usage Example
+
+```python
+from cognee_aws_bedrock_baml import BamlBedrockLLMAdapter
+
+# Latest Claude Sonnet 4.5
+adapter = BamlBedrockLLMAdapter(
+    model_id="anthropic.claude-sonnet-4-5-20250929-v1:0",
+    region_name="eu-central-1"
+)
+
+# Qwen3 for coding
+adapter = BamlBedrockLLMAdapter(
+    model_id="qwen.qwen3-coder-30b-a3b-v1:0",
+    region_name="eu-central-1"
+)
+
+# Mistral Pixtral for vision
+adapter = BamlBedrockLLMAdapter(
+    model_id="mistral.pixtral-large-2502-v1:0",
+    region_name="eu-central-1"
+)
+```

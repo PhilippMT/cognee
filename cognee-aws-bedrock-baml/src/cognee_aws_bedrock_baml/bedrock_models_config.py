@@ -4,9 +4,12 @@ Configuration for AWS Bedrock foundation models available in EU regions.
 This module provides comprehensive model information for all foundation models
 available in AWS Bedrock for eu-central-1, eu-west-1, and eu-north-1 regions,
 including proper configuration for BAML with AWS Bedrock support.
+
+Last updated: December 2025 - Includes all latest models (Claude 4.x, Nova 2,
+Qwen3, DeepSeek, Google Gemma, NVIDIA, Mistral Pixtral, etc.)
 """
 
-from typing import Dict, List, Optional
+from typing import Dict, List
 from dataclasses import dataclass
 
 
@@ -42,12 +45,14 @@ class EmbeddingModelConfig:
     languages: List[str]
 
 
-# Anthropic Claude Models - Full tools support
+# =============================================================================
+# ANTHROPIC CLAUDE MODELS
+# =============================================================================
 CLAUDE_MODELS: Dict[str, ModelConfig] = {
-    # Claude 3.5 Sonnet v2 - Latest generation
-    "anthropic.claude-3-5-sonnet-20241022-v2:0": ModelConfig(
-        model_id="anthropic.claude-3-5-sonnet-20241022-v2:0",
-        model_name="Claude 3.5 Sonnet v2",
+    # Claude Sonnet 4.5 - Latest flagship model (Dec 2025)
+    "anthropic.claude-sonnet-4-5-20250929-v1:0": ModelConfig(
+        model_id="anthropic.claude-sonnet-4-5-20250929-v1:0",
+        model_name="Claude Sonnet 4.5",
         provider="Anthropic",
         regions=["eu-central-1", "eu-west-1", "eu-north-1"],
         supports_tools=True,
@@ -58,10 +63,52 @@ CLAUDE_MODELS: Dict[str, ModelConfig] = {
         context_window=200000,
         recommended_mode="tools",
     ),
-    # Claude 3.5 Sonnet v1
-    "anthropic.claude-3-5-sonnet-20240620-v1:0": ModelConfig(
-        model_id="anthropic.claude-3-5-sonnet-20240620-v1:0",
-        model_name="Claude 3.5 Sonnet",
+    # Claude Sonnet 4 (May 2025)
+    "anthropic.claude-sonnet-4-20250514-v1:0": ModelConfig(
+        model_id="anthropic.claude-sonnet-4-20250514-v1:0",
+        model_name="Claude Sonnet 4",
+        provider="Anthropic",
+        regions=["eu-central-1", "eu-west-1", "eu-north-1"],
+        supports_tools=True,
+        supports_streaming=True,
+        input_modalities=["TEXT", "IMAGE"],
+        output_modalities=["TEXT"],
+        max_tokens=8192,
+        context_window=200000,
+        recommended_mode="tools",
+    ),
+    # Claude Opus 4.5 (Nov 2025)
+    "anthropic.claude-opus-4-5-20251101-v1:0": ModelConfig(
+        model_id="anthropic.claude-opus-4-5-20251101-v1:0",
+        model_name="Claude Opus 4.5",
+        provider="Anthropic",
+        regions=["eu-central-1", "eu-west-1", "eu-north-1"],
+        supports_tools=True,
+        supports_streaming=True,
+        input_modalities=["TEXT", "IMAGE"],
+        output_modalities=["TEXT"],
+        max_tokens=8192,
+        context_window=200000,
+        recommended_mode="tools",
+    ),
+    # Claude Haiku 4.5 (Oct 2025)
+    "anthropic.claude-haiku-4-5-20251001-v1:0": ModelConfig(
+        model_id="anthropic.claude-haiku-4-5-20251001-v1:0",
+        model_name="Claude Haiku 4.5",
+        provider="Anthropic",
+        regions=["eu-central-1", "eu-west-1", "eu-north-1"],
+        supports_tools=True,
+        supports_streaming=True,
+        input_modalities=["TEXT", "IMAGE"],
+        output_modalities=["TEXT"],
+        max_tokens=8192,
+        context_window=200000,
+        recommended_mode="tools",
+    ),
+    # Claude 3.7 Sonnet (Feb 2025)
+    "anthropic.claude-3-7-sonnet-20250219-v1:0": ModelConfig(
+        model_id="anthropic.claude-3-7-sonnet-20250219-v1:0",
+        model_name="Claude 3.7 Sonnet",
         provider="Anthropic",
         regions=["eu-central-1", "eu-west-1", "eu-north-1"],
         supports_tools=True,
@@ -80,23 +127,9 @@ CLAUDE_MODELS: Dict[str, ModelConfig] = {
         regions=["eu-central-1", "eu-west-1", "eu-north-1"],
         supports_tools=True,
         supports_streaming=True,
-        input_modalities=["TEXT", "IMAGE"],
+        input_modalities=["TEXT"],
         output_modalities=["TEXT"],
         max_tokens=8192,
-        context_window=200000,
-        recommended_mode="tools",
-    ),
-    # Claude 3 Sonnet
-    "anthropic.claude-3-sonnet-20240229-v1:0": ModelConfig(
-        model_id="anthropic.claude-3-sonnet-20240229-v1:0",
-        model_name="Claude 3 Sonnet",
-        provider="Anthropic",
-        regions=["eu-central-1", "eu-west-1", "eu-north-1"],
-        supports_tools=True,
-        supports_streaming=True,
-        input_modalities=["TEXT", "IMAGE"],
-        output_modalities=["TEXT"],
-        max_tokens=4096,
         context_window=200000,
         recommended_mode="tools",
     ),
@@ -105,7 +138,7 @@ CLAUDE_MODELS: Dict[str, ModelConfig] = {
         model_id="anthropic.claude-3-haiku-20240307-v1:0",
         model_name="Claude 3 Haiku",
         provider="Anthropic",
-        regions=["eu-central-1", "eu-west-1", "eu-north-1"],
+        regions=["eu-central-1", "eu-west-1"],
         supports_tools=True,
         supports_streaming=True,
         input_modalities=["TEXT", "IMAGE"],
@@ -117,8 +150,24 @@ CLAUDE_MODELS: Dict[str, ModelConfig] = {
 }
 
 
-# Amazon Nova Models - Multimodal capabilities
+# =============================================================================
+# AMAZON NOVA MODELS
+# =============================================================================
 AMAZON_NOVA_MODELS: Dict[str, ModelConfig] = {
+    # Nova 2 Lite - Latest generation (Dec 2025)
+    "amazon.nova-2-lite-v1:0": ModelConfig(
+        model_id="amazon.nova-2-lite-v1:0",
+        model_name="Amazon Nova 2 Lite",
+        provider="Amazon",
+        regions=["eu-central-1", "eu-west-1", "eu-north-1"],
+        supports_tools=True,
+        supports_streaming=True,
+        input_modalities=["TEXT", "IMAGE", "VIDEO"],
+        output_modalities=["TEXT"],
+        max_tokens=5120,
+        context_window=300000,
+        recommended_mode="tools",
+    ),
     # Nova Pro
     "amazon.nova-pro-v1:0": ModelConfig(
         model_id="amazon.nova-pro-v1:0",
@@ -164,56 +213,16 @@ AMAZON_NOVA_MODELS: Dict[str, ModelConfig] = {
 }
 
 
-# Meta Llama Models - Open source models
+# =============================================================================
+# META LLAMA MODELS
+# =============================================================================
 META_LLAMA_MODELS: Dict[str, ModelConfig] = {
-    # Llama 3.3 70B Instruct
-    "meta.llama3-3-70b-instruct-v1:0": ModelConfig(
-        model_id="meta.llama3-3-70b-instruct-v1:0",
-        model_name="Llama 3.3 70B Instruct",
-        provider="Meta",
-        regions=["eu-central-1", "eu-west-1", "eu-north-1"],
-        supports_tools=True,
-        supports_streaming=True,
-        input_modalities=["TEXT"],
-        output_modalities=["TEXT"],
-        max_tokens=2048,
-        context_window=128000,
-        recommended_mode="tools",
-    ),
-    # Llama 3.2 90B Vision Instruct
-    "meta.llama3-2-90b-instruct-v1:0": ModelConfig(
-        model_id="meta.llama3-2-90b-instruct-v1:0",
-        model_name="Llama 3.2 90B Vision Instruct",
-        provider="Meta",
-        regions=["eu-central-1", "eu-west-1", "eu-north-1"],
-        supports_tools=True,
-        supports_streaming=True,
-        input_modalities=["TEXT", "IMAGE"],
-        output_modalities=["TEXT"],
-        max_tokens=2048,
-        context_window=128000,
-        recommended_mode="tools",
-    ),
-    # Llama 3.2 11B Vision Instruct
-    "meta.llama3-2-11b-instruct-v1:0": ModelConfig(
-        model_id="meta.llama3-2-11b-instruct-v1:0",
-        model_name="Llama 3.2 11B Vision Instruct",
-        provider="Meta",
-        regions=["eu-central-1", "eu-west-1", "eu-north-1"],
-        supports_tools=True,
-        supports_streaming=True,
-        input_modalities=["TEXT", "IMAGE"],
-        output_modalities=["TEXT"],
-        max_tokens=2048,
-        context_window=128000,
-        recommended_mode="tools",
-    ),
-    # Llama 3.2 3B Instruct
+    # Llama 3.2 3B Instruct (eu cross-region)
     "meta.llama3-2-3b-instruct-v1:0": ModelConfig(
         model_id="meta.llama3-2-3b-instruct-v1:0",
         model_name="Llama 3.2 3B Instruct",
         provider="Meta",
-        regions=["eu-central-1", "eu-west-1", "eu-north-1"],
+        regions=["eu-central-1", "eu-west-1"],
         supports_tools=True,
         supports_streaming=True,
         input_modalities=["TEXT"],
@@ -222,54 +231,12 @@ META_LLAMA_MODELS: Dict[str, ModelConfig] = {
         context_window=128000,
         recommended_mode="tools",
     ),
-    # Llama 3.2 1B Instruct
+    # Llama 3.2 1B Instruct (eu cross-region)
     "meta.llama3-2-1b-instruct-v1:0": ModelConfig(
         model_id="meta.llama3-2-1b-instruct-v1:0",
         model_name="Llama 3.2 1B Instruct",
         provider="Meta",
-        regions=["eu-central-1", "eu-west-1", "eu-north-1"],
-        supports_tools=True,
-        supports_streaming=True,
-        input_modalities=["TEXT"],
-        output_modalities=["TEXT"],
-        max_tokens=2048,
-        context_window=128000,
-        recommended_mode="tools",
-    ),
-    # Llama 3.1 405B Instruct
-    "meta.llama3-1-405b-instruct-v1:0": ModelConfig(
-        model_id="meta.llama3-1-405b-instruct-v1:0",
-        model_name="Llama 3.1 405B Instruct",
-        provider="Meta",
-        regions=["eu-central-1", "eu-west-1", "eu-north-1"],
-        supports_tools=True,
-        supports_streaming=True,
-        input_modalities=["TEXT"],
-        output_modalities=["TEXT"],
-        max_tokens=2048,
-        context_window=128000,
-        recommended_mode="tools",
-    ),
-    # Llama 3.1 70B Instruct
-    "meta.llama3-1-70b-instruct-v1:0": ModelConfig(
-        model_id="meta.llama3-1-70b-instruct-v1:0",
-        model_name="Llama 3.1 70B Instruct",
-        provider="Meta",
-        regions=["eu-central-1", "eu-west-1", "eu-north-1"],
-        supports_tools=True,
-        supports_streaming=True,
-        input_modalities=["TEXT"],
-        output_modalities=["TEXT"],
-        max_tokens=2048,
-        context_window=128000,
-        recommended_mode="tools",
-    ),
-    # Llama 3.1 8B Instruct
-    "meta.llama3-1-8b-instruct-v1:0": ModelConfig(
-        model_id="meta.llama3-1-8b-instruct-v1:0",
-        model_name="Llama 3.1 8B Instruct",
-        provider="Meta",
-        regions=["eu-central-1", "eu-west-1", "eu-north-1"],
+        regions=["eu-central-1", "eu-west-1"],
         supports_tools=True,
         supports_streaming=True,
         input_modalities=["TEXT"],
@@ -281,14 +248,30 @@ META_LLAMA_MODELS: Dict[str, ModelConfig] = {
 }
 
 
-# Mistral Models
+# =============================================================================
+# MISTRAL AI MODELS
+# =============================================================================
 MISTRAL_MODELS: Dict[str, ModelConfig] = {
-    # Mistral Large 2 (2407)
-    "mistral.mistral-large-2407-v1:0": ModelConfig(
-        model_id="mistral.mistral-large-2407-v1:0",
-        model_name="Mistral Large 2 (2407)",
+    # Pixtral Large 25.02 - Latest multimodal (Dec 2025)
+    "mistral.pixtral-large-2502-v1:0": ModelConfig(
+        model_id="mistral.pixtral-large-2502-v1:0",
+        model_name="Pixtral Large (25.02)",
         provider="Mistral AI",
         regions=["eu-central-1", "eu-west-1", "eu-north-1"],
+        supports_tools=True,
+        supports_streaming=True,
+        input_modalities=["TEXT", "IMAGE"],
+        output_modalities=["TEXT"],
+        max_tokens=8192,
+        context_window=128000,
+        recommended_mode="tools",
+    ),
+    # Ministral 3 14B
+    "mistral.ministral-3-14b-instruct": ModelConfig(
+        model_id="mistral.ministral-3-14b-instruct",
+        model_name="Ministral 14B 3.0",
+        provider="Mistral AI",
+        regions=["eu-west-1"],
         supports_tools=True,
         supports_streaming=True,
         input_modalities=["TEXT"],
@@ -297,12 +280,54 @@ MISTRAL_MODELS: Dict[str, ModelConfig] = {
         context_window=128000,
         recommended_mode="tools",
     ),
-    # Mistral Large (2402)
-    "mistral.mistral-large-2402-v1:0": ModelConfig(
-        model_id="mistral.mistral-large-2402-v1:0",
-        model_name="Mistral Large (2402)",
+    # Ministral 3 8B
+    "mistral.ministral-3-8b-instruct": ModelConfig(
+        model_id="mistral.ministral-3-8b-instruct",
+        model_name="Ministral 3 8B",
         provider="Mistral AI",
-        regions=["eu-central-1", "eu-west-1", "eu-north-1"],
+        regions=["eu-west-1"],
+        supports_tools=True,
+        supports_streaming=True,
+        input_modalities=["TEXT"],
+        output_modalities=["TEXT"],
+        max_tokens=8192,
+        context_window=128000,
+        recommended_mode="tools",
+    ),
+    # Voxtral Small 24B 2507 - Audio capable
+    "mistral.voxtral-small-24b-2507": ModelConfig(
+        model_id="mistral.voxtral-small-24b-2507",
+        model_name="Voxtral Small 24B 2507",
+        provider="Mistral AI",
+        regions=["eu-west-1"],
+        supports_tools=True,
+        supports_streaming=True,
+        input_modalities=["AUDIO", "TEXT"],
+        output_modalities=["TEXT"],
+        max_tokens=8192,
+        context_window=32000,
+        recommended_mode="tools",
+    ),
+    # Voxtral Mini 3B 2507 - Audio capable
+    "mistral.voxtral-mini-3b-2507": ModelConfig(
+        model_id="mistral.voxtral-mini-3b-2507",
+        model_name="Voxtral Mini 3B 2507",
+        provider="Mistral AI",
+        regions=["eu-west-1"],
+        supports_tools=True,
+        supports_streaming=True,
+        input_modalities=["AUDIO", "TEXT"],
+        output_modalities=["TEXT"],
+        max_tokens=4096,
+        context_window=32000,
+        recommended_mode="tools",
+    ),
+    # Mistral 7B Instruct
+    "mistral.mistral-7b-instruct-v0:2": ModelConfig(
+        model_id="mistral.mistral-7b-instruct-v0:2",
+        model_name="Mistral 7B Instruct",
+        provider="Mistral AI",
+        regions=["eu-west-1"],
         supports_tools=True,
         supports_streaming=True,
         input_modalities=["TEXT"],
@@ -311,12 +336,12 @@ MISTRAL_MODELS: Dict[str, ModelConfig] = {
         context_window=32000,
         recommended_mode="tools",
     ),
-    # Mistral Small
-    "mistral.mistral-small-2402-v1:0": ModelConfig(
-        model_id="mistral.mistral-small-2402-v1:0",
-        model_name="Mistral Small (2402)",
+    # Mistral Large (24.02)
+    "mistral.mistral-large-2402-v1:0": ModelConfig(
+        model_id="mistral.mistral-large-2402-v1:0",
+        model_name="Mistral Large (24.02)",
         provider="Mistral AI",
-        regions=["eu-central-1", "eu-west-1", "eu-north-1"],
+        regions=["eu-west-1"],
         supports_tools=True,
         supports_streaming=True,
         input_modalities=["TEXT"],
@@ -330,7 +355,7 @@ MISTRAL_MODELS: Dict[str, ModelConfig] = {
         model_id="mistral.mixtral-8x7b-instruct-v0:1",
         model_name="Mixtral 8x7B Instruct",
         provider="Mistral AI",
-        regions=["eu-central-1", "eu-west-1", "eu-north-1"],
+        regions=["eu-west-1"],
         supports_tools=True,
         supports_streaming=True,
         input_modalities=["TEXT"],
@@ -342,160 +367,349 @@ MISTRAL_MODELS: Dict[str, ModelConfig] = {
 }
 
 
-# Amazon Titan Models
-AMAZON_TITAN_MODELS: Dict[str, ModelConfig] = {
-    # Titan Text Premier
-    "amazon.titan-text-premier-v1:0": ModelConfig(
-        model_id="amazon.titan-text-premier-v1:0",
-        model_name="Amazon Titan Text Premier",
-        provider="Amazon",
+# =============================================================================
+# QWEN MODELS (Alibaba Cloud)
+# =============================================================================
+QWEN_MODELS: Dict[str, ModelConfig] = {
+    # Qwen3 32B (Dense)
+    "qwen.qwen3-32b-v1:0": ModelConfig(
+        model_id="qwen.qwen3-32b-v1:0",
+        model_name="Qwen3 32B",
+        provider="Qwen",
         regions=["eu-central-1", "eu-west-1", "eu-north-1"],
-        supports_tools=False,
-        supports_streaming=True,
-        input_modalities=["TEXT"],
-        output_modalities=["TEXT"],
-        max_tokens=3072,
-        context_window=32000,
-        recommended_mode="json",
-    ),
-    # Titan Text Express
-    "amazon.titan-text-express-v1": ModelConfig(
-        model_id="amazon.titan-text-express-v1",
-        model_name="Amazon Titan Text Express",
-        provider="Amazon",
-        regions=["eu-central-1", "eu-west-1", "eu-north-1"],
-        supports_tools=False,
+        supports_tools=True,
         supports_streaming=True,
         input_modalities=["TEXT"],
         output_modalities=["TEXT"],
         max_tokens=8192,
-        context_window=8000,
-        recommended_mode="json",
-    ),
-    # Titan Text Lite
-    "amazon.titan-text-lite-v1": ModelConfig(
-        model_id="amazon.titan-text-lite-v1",
-        model_name="Amazon Titan Text Lite",
-        provider="Amazon",
-        regions=["eu-central-1", "eu-west-1", "eu-north-1"],
-        supports_tools=False,
-        supports_streaming=True,
-        input_modalities=["TEXT"],
-        output_modalities=["TEXT"],
-        max_tokens=4096,
-        context_window=4000,
-        recommended_mode="json",
-    ),
-}
-
-
-# Cohere Models - Command R series
-COHERE_MODELS: Dict[str, ModelConfig] = {
-    # Command R+
-    "cohere.command-r-plus-v1:0": ModelConfig(
-        model_id="cohere.command-r-plus-v1:0",
-        model_name="Command R+",
-        provider="Cohere",
-        regions=["eu-central-1", "eu-west-1", "eu-north-1"],
-        supports_tools=True,
-        supports_streaming=True,
-        input_modalities=["TEXT"],
-        output_modalities=["TEXT"],
-        max_tokens=4096,
         context_window=128000,
         recommended_mode="tools",
     ),
-    # Command R
-    "cohere.command-r-v1:0": ModelConfig(
-        model_id="cohere.command-r-v1:0",
-        model_name="Command R",
-        provider="Cohere",
+    # Qwen3 235B A22B 2507
+    "qwen.qwen3-235b-a22b-2507-v1:0": ModelConfig(
+        model_id="qwen.qwen3-235b-a22b-2507-v1:0",
+        model_name="Qwen3 235B A22B 2507",
+        provider="Qwen",
+        regions=["eu-central-1", "eu-north-1"],
+        supports_tools=True,
+        supports_streaming=True,
+        input_modalities=["TEXT"],
+        output_modalities=["TEXT"],
+        max_tokens=8192,
+        context_window=128000,
+        recommended_mode="tools",
+    ),
+    # Qwen3 Coder 30B A3B
+    "qwen.qwen3-coder-30b-a3b-v1:0": ModelConfig(
+        model_id="qwen.qwen3-coder-30b-a3b-v1:0",
+        model_name="Qwen3 Coder 30B A3B",
+        provider="Qwen",
         regions=["eu-central-1", "eu-west-1", "eu-north-1"],
         supports_tools=True,
         supports_streaming=True,
         input_modalities=["TEXT"],
         output_modalities=["TEXT"],
-        max_tokens=4096,
+        max_tokens=8192,
+        context_window=128000,
+        recommended_mode="tools",
+    ),
+    # Qwen3 Coder 480B A35B
+    "qwen.qwen3-coder-480b-a35b-v1:0": ModelConfig(
+        model_id="qwen.qwen3-coder-480b-a35b-v1:0",
+        model_name="Qwen3 Coder 480B A35B",
+        provider="Qwen",
+        regions=["eu-north-1"],
+        supports_tools=True,
+        supports_streaming=True,
+        input_modalities=["TEXT"],
+        output_modalities=["TEXT"],
+        max_tokens=8192,
+        context_window=128000,
+        recommended_mode="tools",
+    ),
+    # Qwen3 Next 80B A3B
+    "qwen.qwen3-next-80b-a3b": ModelConfig(
+        model_id="qwen.qwen3-next-80b-a3b",
+        model_name="Qwen3 Next 80B A3B",
+        provider="Qwen",
+        regions=["eu-west-1"],
+        supports_tools=True,
+        supports_streaming=True,
+        input_modalities=["TEXT"],
+        output_modalities=["TEXT"],
+        max_tokens=8192,
+        context_window=128000,
+        recommended_mode="tools",
+    ),
+    # Qwen3 VL 235B A22B - Vision Language
+    "qwen.qwen3-vl-235b-a22b": ModelConfig(
+        model_id="qwen.qwen3-vl-235b-a22b",
+        model_name="Qwen3 VL 235B A22B",
+        provider="Qwen",
+        regions=["eu-west-1"],
+        supports_tools=True,
+        supports_streaming=True,
+        input_modalities=["TEXT", "IMAGE"],
+        output_modalities=["TEXT"],
+        max_tokens=8192,
         context_window=128000,
         recommended_mode="tools",
     ),
 }
 
 
-# AI21 Labs Models - Jamba and Jurassic series
-AI21_MODELS: Dict[str, ModelConfig] = {
-    # Jamba 1.5 Large
-    "ai21.jamba-1-5-large-v1:0": ModelConfig(
-        model_id="ai21.jamba-1-5-large-v1:0",
-        model_name="Jamba 1.5 Large",
-        provider="AI21 Labs",
-        regions=["eu-central-1", "eu-west-1"],
+# =============================================================================
+# OPENAI MODELS (Open source versions on Bedrock)
+# =============================================================================
+OPENAI_MODELS: Dict[str, ModelConfig] = {
+    # GPT OSS 120B
+    "openai.gpt-oss-120b-1:0": ModelConfig(
+        model_id="openai.gpt-oss-120b-1:0",
+        model_name="GPT OSS 120B",
+        provider="OpenAI",
+        regions=["eu-central-1", "eu-west-1", "eu-north-1"],
         supports_tools=True,
         supports_streaming=True,
         input_modalities=["TEXT"],
         output_modalities=["TEXT"],
-        max_tokens=4096,
-        context_window=256000,
+        max_tokens=8192,
+        context_window=128000,
         recommended_mode="tools",
     ),
-    # Jamba 1.5 Mini
-    "ai21.jamba-1-5-mini-v1:0": ModelConfig(
-        model_id="ai21.jamba-1-5-mini-v1:0",
-        model_name="Jamba 1.5 Mini",
-        provider="AI21 Labs",
-        regions=["eu-central-1", "eu-west-1"],
+    # GPT OSS 20B
+    "openai.gpt-oss-20b-1:0": ModelConfig(
+        model_id="openai.gpt-oss-20b-1:0",
+        model_name="GPT OSS 20B",
+        provider="OpenAI",
+        regions=["eu-central-1", "eu-west-1", "eu-north-1"],
         supports_tools=True,
         supports_streaming=True,
         input_modalities=["TEXT"],
         output_modalities=["TEXT"],
-        max_tokens=4096,
-        context_window=256000,
+        max_tokens=8192,
+        context_window=128000,
         recommended_mode="tools",
     ),
-    # Jurassic-2 Ultra
-    "ai21.j2-ultra-v1": ModelConfig(
-        model_id="ai21.j2-ultra-v1",
-        model_name="Jurassic-2 Ultra",
-        provider="AI21 Labs",
-        regions=["eu-central-1", "eu-west-1"],
-        supports_tools=False,
+    # GPT OSS Safeguard 120B
+    "openai.gpt-oss-safeguard-120b": ModelConfig(
+        model_id="openai.gpt-oss-safeguard-120b",
+        model_name="GPT OSS Safeguard 120B",
+        provider="OpenAI",
+        regions=["eu-west-1"],
+        supports_tools=True,
         supports_streaming=True,
         input_modalities=["TEXT"],
         output_modalities=["TEXT"],
-        max_tokens=8191,
-        context_window=8192,
-        recommended_mode="json",
+        max_tokens=8192,
+        context_window=128000,
+        recommended_mode="tools",
     ),
-    # Jurassic-2 Mid
-    "ai21.j2-mid-v1": ModelConfig(
-        model_id="ai21.j2-mid-v1",
-        model_name="Jurassic-2 Mid",
-        provider="AI21 Labs",
-        regions=["eu-central-1", "eu-west-1"],
-        supports_tools=False,
+    # GPT OSS Safeguard 20B
+    "openai.gpt-oss-safeguard-20b": ModelConfig(
+        model_id="openai.gpt-oss-safeguard-20b",
+        model_name="GPT OSS Safeguard 20B",
+        provider="OpenAI",
+        regions=["eu-west-1"],
+        supports_tools=True,
         supports_streaming=True,
         input_modalities=["TEXT"],
         output_modalities=["TEXT"],
-        max_tokens=8191,
-        context_window=8192,
-        recommended_mode="json",
+        max_tokens=8192,
+        context_window=128000,
+        recommended_mode="tools",
     ),
 }
 
 
-# All LLM models combined
+# =============================================================================
+# DEEPSEEK MODELS
+# =============================================================================
+DEEPSEEK_MODELS: Dict[str, ModelConfig] = {
+    # DeepSeek-V3.1
+    "deepseek.v3-v1:0": ModelConfig(
+        model_id="deepseek.v3-v1:0",
+        model_name="DeepSeek-V3.1",
+        provider="DeepSeek",
+        regions=["eu-north-1"],
+        supports_tools=True,
+        supports_streaming=True,
+        input_modalities=["TEXT"],
+        output_modalities=["TEXT"],
+        max_tokens=8192,
+        context_window=128000,
+        recommended_mode="tools",
+    ),
+}
+
+
+# =============================================================================
+# GOOGLE GEMMA MODELS
+# =============================================================================
+GOOGLE_MODELS: Dict[str, ModelConfig] = {
+    # Gemma 3 27B IT
+    "google.gemma-3-27b-it": ModelConfig(
+        model_id="google.gemma-3-27b-it",
+        model_name="Gemma 3 27B IT",
+        provider="Google",
+        regions=["eu-west-1"],
+        supports_tools=True,
+        supports_streaming=True,
+        input_modalities=["TEXT", "IMAGE"],
+        output_modalities=["TEXT"],
+        max_tokens=8192,
+        context_window=128000,
+        recommended_mode="tools",
+    ),
+    # Gemma 3 12B IT
+    "google.gemma-3-12b-it": ModelConfig(
+        model_id="google.gemma-3-12b-it",
+        model_name="Gemma 3 12B IT",
+        provider="Google",
+        regions=["eu-west-1"],
+        supports_tools=True,
+        supports_streaming=True,
+        input_modalities=["TEXT", "IMAGE"],
+        output_modalities=["TEXT"],
+        max_tokens=8192,
+        context_window=128000,
+        recommended_mode="tools",
+    ),
+    # Gemma 3 4B IT
+    "google.gemma-3-4b-it": ModelConfig(
+        model_id="google.gemma-3-4b-it",
+        model_name="Gemma 3 4B IT",
+        provider="Google",
+        regions=["eu-west-1"],
+        supports_tools=True,
+        supports_streaming=True,
+        input_modalities=["TEXT", "IMAGE"],
+        output_modalities=["TEXT"],
+        max_tokens=8192,
+        context_window=128000,
+        recommended_mode="tools",
+    ),
+}
+
+
+# =============================================================================
+# NVIDIA MODELS
+# =============================================================================
+NVIDIA_MODELS: Dict[str, ModelConfig] = {
+    # Nemotron Nano 12B v2 VL
+    "nvidia.nemotron-nano-12b-v2": ModelConfig(
+        model_id="nvidia.nemotron-nano-12b-v2",
+        model_name="NVIDIA Nemotron Nano 12B v2 VL",
+        provider="NVIDIA",
+        regions=["eu-west-1"],
+        supports_tools=True,
+        supports_streaming=True,
+        input_modalities=["TEXT", "IMAGE"],
+        output_modalities=["TEXT"],
+        max_tokens=8192,
+        context_window=128000,
+        recommended_mode="tools",
+    ),
+    # Nemotron Nano 9B v2
+    "nvidia.nemotron-nano-9b-v2": ModelConfig(
+        model_id="nvidia.nemotron-nano-9b-v2",
+        model_name="NVIDIA Nemotron Nano 9B v2",
+        provider="NVIDIA",
+        regions=["eu-west-1"],
+        supports_tools=True,
+        supports_streaming=True,
+        input_modalities=["TEXT"],
+        output_modalities=["TEXT"],
+        max_tokens=8192,
+        context_window=128000,
+        recommended_mode="tools",
+    ),
+}
+
+
+# =============================================================================
+# MINIMAX MODELS
+# =============================================================================
+MINIMAX_MODELS: Dict[str, ModelConfig] = {
+    # MiniMax M2
+    "minimax.minimax-m2": ModelConfig(
+        model_id="minimax.minimax-m2",
+        model_name="MiniMax M2",
+        provider="MiniMax",
+        regions=["eu-west-1"],
+        supports_tools=True,
+        supports_streaming=True,
+        input_modalities=["TEXT"],
+        output_modalities=["TEXT"],
+        max_tokens=8192,
+        context_window=128000,
+        recommended_mode="tools",
+    ),
+}
+
+
+# =============================================================================
+# TWELVELABS MODELS (Video Understanding)
+# =============================================================================
+TWELVELABS_MODELS: Dict[str, ModelConfig] = {
+    # Pegasus v1.2
+    "twelvelabs.pegasus-1-2-v1:0": ModelConfig(
+        model_id="twelvelabs.pegasus-1-2-v1:0",
+        model_name="Pegasus v1.2",
+        provider="TwelveLabs",
+        regions=["eu-central-1", "eu-west-1", "eu-north-1"],
+        supports_tools=True,
+        supports_streaming=True,
+        input_modalities=["TEXT", "VIDEO"],
+        output_modalities=["TEXT"],
+        max_tokens=4096,
+        context_window=64000,
+        recommended_mode="tools",
+    ),
+}
+
+
+# =============================================================================
+# AMAZON TITAN TEXT MODELS (Legacy - removed from EU regions)
+# =============================================================================
+AMAZON_TITAN_MODELS: Dict[str, ModelConfig] = {}
+
+
+# =============================================================================
+# COHERE MODELS (LLM - removed from single-region EU)
+# =============================================================================
+COHERE_MODELS: Dict[str, ModelConfig] = {}
+
+
+# =============================================================================
+# AI21 MODELS (removed from EU regions)
+# =============================================================================
+AI21_MODELS: Dict[str, ModelConfig] = {}
+
+
+# =============================================================================
+# ALL LLM MODELS COMBINED
+# =============================================================================
 ALL_MODELS: Dict[str, ModelConfig] = {
     **CLAUDE_MODELS,
     **AMAZON_NOVA_MODELS,
     **META_LLAMA_MODELS,
     **MISTRAL_MODELS,
+    **QWEN_MODELS,
+    **OPENAI_MODELS,
+    **DEEPSEEK_MODELS,
+    **GOOGLE_MODELS,
+    **NVIDIA_MODELS,
+    **MINIMAX_MODELS,
+    **TWELVELABS_MODELS,
     **AMAZON_TITAN_MODELS,
     **COHERE_MODELS,
     **AI21_MODELS,
 }
 
 
-# Embedding Models
+# =============================================================================
+# EMBEDDING MODELS
+# =============================================================================
 EMBEDDING_MODELS: Dict[str, EmbeddingModelConfig] = {
     # Amazon Titan Text Embeddings V2
     "amazon.titan-embed-text-v2:0": EmbeddingModelConfig(
@@ -509,12 +723,12 @@ EMBEDDING_MODELS: Dict[str, EmbeddingModelConfig] = {
         input_modalities=["TEXT"],
         languages=["100+ languages", "optimized for English"],
     ),
-    # Amazon Titan Text Embeddings V1
+    # Amazon Titan Embeddings G1 - Text
     "amazon.titan-embed-text-v1": EmbeddingModelConfig(
         model_id="amazon.titan-embed-text-v1",
-        model_name="Amazon Titan Text Embeddings V1",
+        model_name="Amazon Titan Embeddings G1 - Text",
         provider="Amazon",
-        regions=["eu-central-1", "eu-west-1", "eu-north-1"],
+        regions=["eu-central-1"],
         dimensions=[1536],
         default_dimensions=1536,
         max_input_tokens=8192,
@@ -526,19 +740,31 @@ EMBEDDING_MODELS: Dict[str, EmbeddingModelConfig] = {
         model_id="amazon.titan-embed-image-v1",
         model_name="Amazon Titan Multimodal Embeddings G1",
         provider="Amazon",
-        regions=["eu-central-1", "eu-west-1", "eu-north-1"],
+        regions=["eu-central-1", "eu-west-1"],
         dimensions=[256, 384, 1024],
         default_dimensions=1024,
         max_input_tokens=256,
         input_modalities=["TEXT", "IMAGE"],
         languages=["English"],
     ),
+    # Cohere Embed v4 - Latest multimodal (Dec 2025)
+    "cohere.embed-v4:0": EmbeddingModelConfig(
+        model_id="cohere.embed-v4:0",
+        model_name="Cohere Embed v4",
+        provider="Cohere",
+        regions=["eu-central-1", "eu-west-1", "eu-north-1"],
+        dimensions=[256, 512, 1024, 1536],
+        default_dimensions=1024,
+        max_input_tokens=512,
+        input_modalities=["TEXT", "IMAGE"],
+        languages=["100+ languages"],
+    ),
     # Cohere Embed English v3
     "cohere.embed-english-v3": EmbeddingModelConfig(
         model_id="cohere.embed-english-v3",
         model_name="Cohere Embed English v3",
         provider="Cohere",
-        regions=["eu-central-1", "eu-west-1", "eu-north-1"],
+        regions=["eu-central-1", "eu-west-1"],
         dimensions=[1024],
         default_dimensions=1024,
         max_input_tokens=512,
@@ -550,40 +776,105 @@ EMBEDDING_MODELS: Dict[str, EmbeddingModelConfig] = {
         model_id="cohere.embed-multilingual-v3",
         model_name="Cohere Embed Multilingual v3",
         provider="Cohere",
-        regions=["eu-central-1", "eu-west-1", "eu-north-1"],
+        regions=["eu-central-1", "eu-west-1"],
         dimensions=[1024],
         default_dimensions=1024,
         max_input_tokens=512,
         input_modalities=["TEXT"],
         languages=["100+ languages"],
     ),
+    # TwelveLabs Marengo Embed 3.0 - Video/Audio embedding
+    "twelvelabs.marengo-embed-3-0-v1:0": EmbeddingModelConfig(
+        model_id="twelvelabs.marengo-embed-3-0-v1:0",
+        model_name="Marengo Embed 3.0",
+        provider="TwelveLabs",
+        regions=["eu-west-1"],
+        dimensions=[1024],
+        default_dimensions=1024,
+        max_input_tokens=512,
+        input_modalities=["TEXT", "IMAGE", "SPEECH", "VIDEO"],
+        languages=["100+ languages"],
+    ),
+    # TwelveLabs Marengo Embed v2.7
+    "twelvelabs.marengo-embed-2-7-v1:0": EmbeddingModelConfig(
+        model_id="twelvelabs.marengo-embed-2-7-v1:0",
+        model_name="Marengo Embed v2.7",
+        provider="TwelveLabs",
+        regions=["eu-west-1"],
+        dimensions=[1024],
+        default_dimensions=1024,
+        max_input_tokens=512,
+        input_modalities=["TEXT", "IMAGE", "SPEECH", "VIDEO"],
+        languages=["100+ languages"],
+    ),
+    # Amazon Rerank 1.0
+    "amazon.rerank-v1:0": EmbeddingModelConfig(
+        model_id="amazon.rerank-v1:0",
+        model_name="Amazon Rerank 1.0",
+        provider="Amazon",
+        regions=["eu-central-1"],
+        dimensions=[1],  # Reranking returns scores, not embeddings
+        default_dimensions=1,
+        max_input_tokens=8192,
+        input_modalities=["TEXT"],
+        languages=["English"],
+    ),
+    # Cohere Rerank 3.5
+    "cohere.rerank-v3-5:0": EmbeddingModelConfig(
+        model_id="cohere.rerank-v3-5:0",
+        model_name="Cohere Rerank 3.5",
+        provider="Cohere",
+        regions=["eu-central-1"],
+        dimensions=[1],  # Reranking returns scores, not embeddings
+        default_dimensions=1,
+        max_input_tokens=4096,
+        input_modalities=["TEXT"],
+        languages=["100+ languages"],
+    ),
 }
 
 
-# Cross-region inference profiles for EU
+# =============================================================================
+# CROSS-REGION INFERENCE PROFILES FOR EU
+# =============================================================================
 EU_CROSS_REGION_PROFILES: Dict[str, str] = {
-    # Claude models
-    "eu.anthropic.claude-3-5-sonnet-20241022-v2:0": "anthropic.claude-3-5-sonnet-20241022-v2:0",
-    "eu.anthropic.claude-3-5-sonnet-20240620-v1:0": "anthropic.claude-3-5-sonnet-20240620-v1:0",
+    # Claude models - Latest 4.x series
+    "eu.anthropic.claude-sonnet-4-5-20250929-v1:0": "anthropic.claude-sonnet-4-5-20250929-v1:0",
+    "eu.anthropic.claude-sonnet-4-20250514-v1:0": "anthropic.claude-sonnet-4-20250514-v1:0",
+    "eu.anthropic.claude-opus-4-5-20251101-v1:0": "anthropic.claude-opus-4-5-20251101-v1:0",
+    "eu.anthropic.claude-haiku-4-5-20251001-v1:0": "anthropic.claude-haiku-4-5-20251001-v1:0",
+    "eu.anthropic.claude-3-7-sonnet-20250219-v1:0": "anthropic.claude-3-7-sonnet-20250219-v1:0",
     "eu.anthropic.claude-3-5-haiku-20241022-v1:0": "anthropic.claude-3-5-haiku-20241022-v1:0",
-    "eu.anthropic.claude-3-sonnet-20240229-v1:0": "anthropic.claude-3-sonnet-20240229-v1:0",
     "eu.anthropic.claude-3-haiku-20240307-v1:0": "anthropic.claude-3-haiku-20240307-v1:0",
     # Amazon Nova models
+    "eu.amazon.nova-2-lite-v1:0": "amazon.nova-2-lite-v1:0",
     "eu.amazon.nova-pro-v1:0": "amazon.nova-pro-v1:0",
     "eu.amazon.nova-lite-v1:0": "amazon.nova-lite-v1:0",
     "eu.amazon.nova-micro-v1:0": "amazon.nova-micro-v1:0",
-    # Cohere models
-    "eu.cohere.command-r-plus-v1:0": "cohere.command-r-plus-v1:0",
-    "eu.cohere.command-r-v1:0": "cohere.command-r-v1:0",
+    # Meta Llama models
+    "eu.meta.llama3-2-3b-instruct-v1:0": "meta.llama3-2-3b-instruct-v1:0",
+    "eu.meta.llama3-2-1b-instruct-v1:0": "meta.llama3-2-1b-instruct-v1:0",
+    # Mistral models
+    "eu.mistral.pixtral-large-2502-v1:0": "mistral.pixtral-large-2502-v1:0",
+    # Cohere Embed v4
+    "eu.cohere.embed-v4:0": "cohere.embed-v4:0",
+    # TwelveLabs Pegasus
+    "eu.twelvelabs.pegasus-1-2-v1:0": "twelvelabs.pegasus-1-2-v1:0",
+    # TwelveLabs Marengo
+    "eu.twelvelabs.marengo-embed-2-7-v1:0": "twelvelabs.marengo-embed-2-7-v1:0",
 }
 
+
+# =============================================================================
+# HELPER FUNCTIONS
+# =============================================================================
 
 def get_model_config(model_id: str) -> ModelConfig:
     """
     Get configuration for a specific model.
 
     Args:
-        model_id: The model identifier (e.g., 'anthropic.claude-3-5-sonnet-20241022-v2:0')
+        model_id: The model identifier (e.g., 'anthropic.claude-sonnet-4-5-20250929-v1:0')
 
     Returns:
         ModelConfig for the specified model
@@ -604,7 +895,7 @@ def get_model_config(model_id: str) -> ModelConfig:
     if model_id not in ALL_MODELS:
         raise ValueError(
             f"Model '{model_id}' not found in configuration. "
-            f"Available models: {', '.join(ALL_MODELS.keys())}"
+            f"Available models: {', '.join(sorted(ALL_MODELS.keys()))}"
         )
 
     return ALL_MODELS[model_id]
@@ -666,7 +957,7 @@ def get_embedding_model_config(model_id: str) -> EmbeddingModelConfig:
     if model_id not in EMBEDDING_MODELS:
         raise ValueError(
             f"Embedding model '{model_id}' not found in configuration. "
-            f"Available models: {', '.join(EMBEDDING_MODELS.keys())}"
+            f"Available models: {', '.join(sorted(EMBEDDING_MODELS.keys()))}"
         )
 
     return EMBEDDING_MODELS[model_id]
@@ -684,3 +975,13 @@ def get_embedding_models_by_region(region: str) -> Dict[str, EmbeddingModelConfi
 def get_all_embedding_models() -> Dict[str, EmbeddingModelConfig]:
     """Get all available embedding models."""
     return EMBEDDING_MODELS.copy()
+
+
+def list_all_providers() -> List[str]:
+    """Get a list of all model providers."""
+    providers = set()
+    for config in ALL_MODELS.values():
+        providers.add(config.provider)
+    for config in EMBEDDING_MODELS.values():
+        providers.add(config.provider)
+    return sorted(providers)

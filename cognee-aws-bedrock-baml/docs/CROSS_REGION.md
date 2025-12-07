@@ -1,126 +1,73 @@
 # Cross-Region Inference Profiles
 
-AWS Bedrock supports cross-region inference profiles for automatic load distribution.
+Cross-region inference profiles allow routing requests across multiple AWS regions for improved availability and latency.
 
-## What are Cross-Region Profiles?
+**Last Updated: December 2025**
 
-Cross-region inference profiles allow you to:
-- Automatically distribute load across multiple regions
-- Improve availability and resilience
-- Use a single endpoint that routes to available regions
+## Available Cross-Region Profiles
 
-## EU Cross-Region Prefix
+### Claude Models
 
-Use the `eu.` prefix to enable cross-region inference:
-
-```
-eu.<provider>.<model-id>
-```
-
-## Available EU Cross-Region Profiles
-
-### Anthropic Claude
-
-| Cross-Region Profile | Base Model |
-|---------------------|------------|
-| `eu.anthropic.claude-3-5-sonnet-20241022-v2:0` | Claude 3.5 Sonnet v2 |
-| `eu.anthropic.claude-3-5-sonnet-20240620-v1:0` | Claude 3.5 Sonnet v1 |
+| Profile ID | Base Model |
+|------------|------------|
+| `eu.anthropic.claude-sonnet-4-5-20250929-v1:0` | Claude Sonnet 4.5 |
+| `eu.anthropic.claude-sonnet-4-20250514-v1:0` | Claude Sonnet 4 |
+| `eu.anthropic.claude-opus-4-5-20251101-v1:0` | Claude Opus 4.5 |
+| `eu.anthropic.claude-haiku-4-5-20251001-v1:0` | Claude Haiku 4.5 |
+| `eu.anthropic.claude-3-7-sonnet-20250219-v1:0` | Claude 3.7 Sonnet |
 | `eu.anthropic.claude-3-5-haiku-20241022-v1:0` | Claude 3.5 Haiku |
-| `eu.anthropic.claude-3-sonnet-20240229-v1:0` | Claude 3 Sonnet |
 | `eu.anthropic.claude-3-haiku-20240307-v1:0` | Claude 3 Haiku |
 
-### Amazon Nova
+### Amazon Nova Models
 
-| Cross-Region Profile | Base Model |
-|---------------------|------------|
+| Profile ID | Base Model |
+|------------|------------|
+| `eu.amazon.nova-2-lite-v1:0` | Nova 2 Lite |
 | `eu.amazon.nova-pro-v1:0` | Nova Pro |
 | `eu.amazon.nova-lite-v1:0` | Nova Lite |
 | `eu.amazon.nova-micro-v1:0` | Nova Micro |
 
-### Cohere
+### Meta Llama Models
 
-| Cross-Region Profile | Base Model |
-|---------------------|------------|
-| `eu.cohere.command-r-plus-v1:0` | Command R+ |
-| `eu.cohere.command-r-v1:0` | Command R |
+| Profile ID | Base Model |
+|------------|------------|
+| `eu.meta.llama3-2-3b-instruct-v1:0` | Llama 3.2 3B |
+| `eu.meta.llama3-2-1b-instruct-v1:0` | Llama 3.2 1B |
 
-## BAML Configuration Examples
+### Mistral Models
 
-### Claude with Cross-Region
+| Profile ID | Base Model |
+|------------|------------|
+| `eu.mistral.pixtral-large-2502-v1:0` | Pixtral Large |
 
-```baml
-client<llm> EUClaudeSonnet {
-  provider aws-bedrock
-  options {
-    model "eu.anthropic.claude-3-5-sonnet-20241022-v2:0"
-    inference_configuration {
-      max_tokens 8192
-      temperature 0.7
-    }
-  }
-}
-```
+### Cohere Embeddings
 
-### Nova with Cross-Region
+| Profile ID | Base Model |
+|------------|------------|
+| `eu.cohere.embed-v4:0` | Embed v4 |
 
-```baml
-client<llm> EUNovaPro {
-  provider aws-bedrock
-  options {
-    model "eu.amazon.nova-pro-v1:0"
-    inference_configuration {
-      max_tokens 5120
-      temperature 0.7
-    }
-  }
-}
-```
+### TwelveLabs Models
 
-### Cohere with Cross-Region
+| Profile ID | Base Model |
+|------------|------------|
+| `eu.twelvelabs.pegasus-1-2-v1:0` | Pegasus v1.2 |
+| `eu.twelvelabs.marengo-embed-2-7-v1:0` | Marengo Embed v2.7 |
 
-```baml
-client<llm> EUCommandRPlus {
-  provider aws-bedrock
-  options {
-    model "eu.cohere.command-r-plus-v1:0"
-    inference_configuration {
-      max_tokens 4096
-      temperature 0.7
-    }
-  }
-}
-```
-
-## Python Usage
+## Usage Example
 
 ```python
-import cognee
+from cognee_aws_bedrock_baml import BamlBedrockLLMAdapter
 
-# Using cross-region profile
-cognee.config.llm_model = "bedrock/eu.anthropic.claude-3-5-sonnet-20241022-v2:0"
+# Use cross-region profile for better availability
+adapter = BamlBedrockLLMAdapter(
+    model_id="eu.anthropic.claude-sonnet-4-5-20250929-v1:0",
+    region_name="eu-central-1"
+)
 ```
 
 ## Benefits
 
-1. **High Availability**: Automatic failover if one region is unavailable
-2. **Load Distribution**: Requests are distributed across regions
-3. **Reduced Latency**: Routes to nearest available region
-4. **Simple Configuration**: Single model ID for multiple regions
-
-## Limitations
-
-- Not all models have cross-region profiles
-- Some newer models may only be in specific regions
-- Pricing may vary by region
-
-## When to Use
-
-✅ **Use cross-region profiles when:**
-- You need high availability
-- Your users are across Europe
-- You want automatic load balancing
-
-❌ **Use specific regions when:**
-- You need data residency compliance
-- You want predictable latency
-- You need specific regional features
+1. **Higher Availability**: Requests can be routed to multiple regions
+2. **Lower Latency**: AWS routes to the nearest available region
+3. **Automatic Failover**: If one region is unavailable, requests go to another
+4. **Same API**: Use the same model ID with `eu.` prefix
