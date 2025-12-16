@@ -22,6 +22,7 @@ from cognee.infrastructure.llm.structured_output_framework.litellm_instructor.ll
 from cognee.infrastructure.llm.exceptions import (
     ContentPolicyFilterError,
 )
+from cognee.shared.rate_limiting import llm_rate_limiter_context_manager
 from cognee.infrastructure.files.utils.open_data_file import open_data_file
 from cognee.modules.observability.get_observe import get_observe
 from cognee.shared.logging_utils import get_logger
@@ -105,13 +106,13 @@ class OpenAIAdapter(LLMInterface):
     @observe(as_type="generation")
     @retry(
         stop=stop_after_delay(128),
-        wait=wait_exponential_jitter(2, 128),
+        wait=wait_exponential_jitter(8, 128),
         retry=retry_if_not_exception_type(litellm.exceptions.NotFoundError),
         before_sleep=before_sleep_log(logger, logging.DEBUG),
         reraise=True,
     )
     async def acreate_structured_output(
-        self, text_input: str, system_prompt: str, response_model: Type[BaseModel]
+        self, text_input: str, system_prompt: str, response_model: Type[BaseModel], **kwargs
     ) -> BaseModel:
         """
         Generate a response from a user query.
@@ -135,34 +136,9 @@ class OpenAIAdapter(LLMInterface):
         """
 
         try:
-            return await self.aclient.chat.completions.create(
-                model=self.model,
-                messages=[
-                    {
-                        "role": "user",
-                        "content": f"""{text_input}""",
-                    },
-                    {
-                        "role": "system",
-                        "content": system_prompt,
-                    },
-                ],
-                api_key=self.api_key,
-                api_base=self.endpoint,
-                api_version=self.api_version,
-                response_model=response_model,
-                max_retries=self.MAX_RETRIES,
-            )
-        except (
-            ContentFilterFinishReasonError,
-            ContentPolicyViolationError,
-            InstructorRetryException,
-        ) as e:
-            if not (self.fallback_model and self.fallback_api_key):
-                raise e
-            try:
+            async with llm_rate_limiter_context_manager():
                 return await self.aclient.chat.completions.create(
-                    model=self.fallback_model,
+                    model=self.model,
                     messages=[
                         {
                             "role": "user",
@@ -173,11 +149,40 @@ class OpenAIAdapter(LLMInterface):
                             "content": system_prompt,
                         },
                     ],
-                    api_key=self.fallback_api_key,
-                    # api_base=self.fallback_endpoint,
+                    api_key=self.api_key,
+                    api_base=self.endpoint,
+                    api_version=self.api_version,
                     response_model=response_model,
                     max_retries=self.MAX_RETRIES,
+                    **kwargs,
                 )
+        except (
+            ContentFilterFinishReasonError,
+            ContentPolicyViolationError,
+            InstructorRetryException,
+        ) as e:
+            if not (self.fallback_model and self.fallback_api_key):
+                raise e
+            try:
+                async with llm_rate_limiter_context_manager():
+                    return await self.aclient.chat.completions.create(
+                        model=self.fallback_model,
+                        messages=[
+                            {
+                                "role": "user",
+                                "content": f"""{text_input}""",
+                            },
+                            {
+                                "role": "system",
+                                "content": system_prompt,
+                            },
+                        ],
+                        api_key=self.fallback_api_key,
+                        # api_base=self.fallback_endpoint,
+                        response_model=response_model,
+                        max_retries=self.MAX_RETRIES,
+                        **kwargs,
+                    )
             except (
                 ContentFilterFinishReasonError,
                 ContentPolicyViolationError,
@@ -202,7 +207,7 @@ class OpenAIAdapter(LLMInterface):
         reraise=True,
     )
     def create_structured_output(
-        self, text_input: str, system_prompt: str, response_model: Type[BaseModel]
+        self, text_input: str, system_prompt: str, response_model: Type[BaseModel], **kwargs
     ) -> BaseModel:
         """
         Generate a response from a user query.
@@ -242,6 +247,7 @@ class OpenAIAdapter(LLMInterface):
             api_version=self.api_version,
             response_model=response_model,
             max_retries=self.MAX_RETRIES,
+            **kwargs,
         )
 
     @retry(
@@ -251,7 +257,7 @@ class OpenAIAdapter(LLMInterface):
         before_sleep=before_sleep_log(logger, logging.DEBUG),
         reraise=True,
     )
-    async def create_transcript(self, input):
+    async def create_transcript(self, input, **kwargs):
         """
         Generate an audio transcript from a user query.
 
@@ -278,6 +284,7 @@ class OpenAIAdapter(LLMInterface):
                 api_base=self.endpoint,
                 api_version=self.api_version,
                 max_retries=self.MAX_RETRIES,
+                **kwargs,
             )
 
         return transcription
@@ -289,7 +296,7 @@ class OpenAIAdapter(LLMInterface):
         before_sleep=before_sleep_log(logger, logging.DEBUG),
         reraise=True,
     )
-    async def transcribe_image(self, input) -> BaseModel:
+    async def transcribe_image(self, input, **kwargs) -> BaseModel:
         """
         Generate a transcription of an image from a user query.
 
@@ -334,4 +341,5 @@ class OpenAIAdapter(LLMInterface):
             api_version=self.api_version,
             max_completion_tokens=300,
             max_retries=self.MAX_RETRIES,
+            **kwargs,
         )

@@ -1,7 +1,7 @@
 [project]
 name = "cognee"
 
-version = "0.5.0.dev0"
+version = "0.5.0.dev1"
 description = "Cognee - is a library for enriching LLM context with a semantic layer for better understanding and reasoning."
 authors = [
     { name = "Vasilije Markovic" },
@@ -59,6 +59,7 @@ dependencies = [
     "tenacity>=9.0.0",
     "fakeredis[lua]>=2.32.0",
     "diskcache>=5.6.3",
+    "aiolimiter>=1.2.1",
 ]
 
 [project.optional-dependencies]
