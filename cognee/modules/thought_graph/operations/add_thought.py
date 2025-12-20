@@ -30,7 +30,7 @@ async def add_thought(
     where ideas need to be captured quickly without breaking flow.
     
     Args:
-        content: The main thought/idea content (required)
+        content: The main thought/idea content (required, cannot be empty)
         title: Optional short title for the thought
         tags: Optional list of tags for categorization
         context: Optional context about when/why this thought emerged
@@ -43,6 +43,9 @@ async def add_thought(
     Returns:
         The created ThoughtNode with ID assigned
         
+    Raises:
+        ValueError: If input validation fails (invalid ranges, empty content, etc.)
+        
     Example:
         >>> thought = await add_thought(
         ...     content="Build a graph database for managing ADHD thoughts",
@@ -52,6 +55,19 @@ async def add_thought(
         ... )
         >>> print(f"Added thought: {thought.id}")
     """
+    # Input validation
+    if not content or not content.strip():
+        raise ValueError("Content cannot be empty")
+    
+    if energy_level is not None and not (1 <= energy_level <= 10):
+        raise ValueError(f"Energy level must be between 1 and 10, got {energy_level}")
+    
+    if importance_score is not None and not (1 <= importance_score <= 10):
+        raise ValueError(f"Importance score must be between 1 and 10, got {importance_score}")
+    
+    if not (0.0 <= similarity_threshold <= 1.0):
+        raise ValueError(f"Similarity threshold must be between 0.0 and 1.0, got {similarity_threshold}")
+    
     # Create thought node
     thought = ThoughtNode(
         id=uuid4(),

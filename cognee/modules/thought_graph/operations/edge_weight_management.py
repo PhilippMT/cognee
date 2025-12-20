@@ -1,4 +1,14 @@
-"""Edge weight decay and connection strength management."""
+"""Edge weight decay and connection strength management.
+
+IMPLEMENTATION STATUS:
+- ✅ Weight decay calculation - COMPLETE
+- ✅ Time-based decay logic - COMPLETE
+- ✅ Potential connection discovery - COMPLETE
+- ⚠️  Graph persistence of weight updates - PENDING (requires edge property update support)
+
+Current behavior: Calculates weight changes and reports results, but doesn't persist
+to graph. Full persistence will be added when graph backend supports edge property updates.
+"""
 
 from typing import List, Dict, Any, Optional, Tuple
 from uuid import UUID
@@ -23,18 +33,24 @@ async def decay_edge_weights(
     removing edges that fall below the minimum weight threshold. This
     helps the graph evolve and adapt to changing relevance.
     
+    NOTE: Currently calculates weight changes but doesn't persist them to the graph.
+    Requires graph backend edge property update support for full functionality.
+    
     Args:
         decay_rate: Amount to reduce weight by (0.0-1.0)
-        min_weight: Minimum weight before edge is removed
+        min_weight: Minimum weight before edge is removed (0.0-1.0)
         time_based: Apply decay based on edge age
-        days_threshold: Days since creation to apply full decay
+        days_threshold: Days since creation to apply full decay (must be > 0)
         
     Returns:
         Dictionary with decay results:
-        - edges_decayed: Number of edges with reduced weight
-        - edges_removed: Number of edges removed
+        - edges_decayed: Number of edges with reduced weight (calculated)
+        - edges_removed: Number of edges below threshold (calculated)
         - avg_weight_before: Average weight before decay
         - avg_weight_after: Average weight after decay
+        
+    Raises:
+        ValueError: If parameters are out of valid ranges
         
     Example:
         >>> results = await decay_edge_weights(
@@ -43,9 +59,19 @@ async def decay_edge_weights(
         ...     time_based=True,
         ...     days_threshold=30
         ... )
-        >>> print(f"Removed {results['edges_removed']} weak connections")
+        >>> print(f"Would remove {results['edges_removed']} weak connections")
     """
-    logger.info(f"Applying edge weight decay (rate={decay_rate}, min={min_weight})")
+    # Input validation
+    if not (0.0 <= decay_rate <= 1.0):
+        raise ValueError(f"Decay rate must be between 0.0 and 1.0, got {decay_rate}")
+    
+    if not (0.0 <= min_weight <= 1.0):
+        raise ValueError(f"Min weight must be between 0.0 and 1.0, got {min_weight}")
+    
+    if days_threshold <= 0:
+        raise ValueError(f"Days threshold must be positive, got {days_threshold}")
+    
+    logger.info(f"Calculating edge weight decay (rate={decay_rate}, min={min_weight})")
     
     try:
         graph_engine = await get_graph_engine()
@@ -116,10 +142,12 @@ async def decay_edge_weights(
                 total_weight_after += current_weight
         
         # Apply updates
-        # Note: Actual graph update would happen here
-        # For now, just log the intended changes
+        # TODO: Persist edge weight updates to graph database
+        # Requires graph backend support for edge property updates
+        # For now, report what would be changed
         
-        logger.info(f"Decay complete: {edges_decayed} edges decayed, {edges_removed} edges removed")
+        logger.info(f"Decay calculation complete: {edges_decayed} edges would be decayed, {edges_removed} edges would be removed")
+        logger.info("Note: Changes calculated but not persisted (requires edge property update support)")
         
         avg_weight_before = total_weight_before / len(edges) if edges else 0.0
         remaining_edges = len(edges) - edges_removed
@@ -154,29 +182,41 @@ async def reinforce_edge(
     Increases the weight of an edge when it's actively used or confirmed
     as valuable, helping important connections persist.
     
+    NOTE: Currently a placeholder. Requires graph backend edge property update support.
+    
     Args:
         source_id: Source thought ID
         target_id: Target thought ID
-        reinforcement_amount: Amount to increase weight
-        max_weight: Maximum weight cap
+        reinforcement_amount: Amount to increase weight (0.0-1.0)
+        max_weight: Maximum weight cap (0.0-1.0)
         
     Returns:
-        True if edge was reinforced, False otherwise
+        True if edge would be reinforced, False otherwise
+        
+    Raises:
+        ValueError: If parameters are out of valid ranges
     """
-    logger.info(f"Reinforcing edge {source_id} -> {target_id}")
+    # Input validation
+    if not (0.0 <= reinforcement_amount <= 1.0):
+        raise ValueError(f"Reinforcement amount must be between 0.0 and 1.0, got {reinforcement_amount}")
+    
+    if not (0.0 <= max_weight <= 1.0):
+        raise ValueError(f"Max weight must be between 0.0 and 1.0, got {max_weight}")
+    
+    logger.info(f"Would reinforce edge {source_id} -> {target_id} by {reinforcement_amount}")
     
     try:
         graph_engine = await get_graph_engine()
         
-        # Get current edge data
-        # Note: This is simplified - actual implementation would query edge
-        # For now, return success
+        # TODO: Get current edge data and update weight
+        # Requires graph backend edge property query and update support
+        # For now, return success to indicate operation would complete
         
-        logger.debug(f"Edge reinforced by {reinforcement_amount}")
+        logger.info(f"Edge would be reinforced by {reinforcement_amount} (not persisted)")
         return True
         
     except Exception as e:
-        logger.error(f"Error reinforcing edge: {e}")
+        logger.error(f"Error in edge reinforcement: {e}")
         return False
 
 

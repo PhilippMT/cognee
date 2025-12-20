@@ -1,4 +1,14 @@
-"""Web enrichment for thought nodes using web search and scraping."""
+"""Web enrichment for thought nodes using web search and scraping.
+
+IMPLEMENTATION STATUS:
+- ✅ Web search API integration (Tavily) - COMPLETE
+- ✅ Content scraping support - COMPLETE  
+- ⚠️  Graph persistence - PENDING (requires WebResource data model)
+- ⚠️  Vector indexing - PENDING (requires backend support)
+
+Current behavior: Retrieves web results and logs them, but doesn't persist
+to graph. Full persistence will be added when WebResource model is implemented.
+"""
 
 from typing import List, Dict, Any, Optional
 from uuid import UUID
@@ -96,22 +106,22 @@ async def enrich_with_web_search(
                 
                 search_results = response.get("results", [])
                 
-                # Create web resource nodes and connect them
+                logger.info(f"Retrieved {len(search_results)} web search results for thought {thought_id}")
+                
+                # TODO: Create WebResource nodes and connect them to graph
+                # For now, log results for user visibility
                 for result in search_results:
-                    # Create WebResource node (simplified)
-                    web_resource = {
-                        "type": "WebResource",
-                        "url": result.get("url"),
-                        "title": result.get("title"),
-                        "content": result.get("content", "")[:500],  # Truncate
-                        "score": result.get("score", 0.0)
-                    }
+                    url = result.get("url", "")
+                    title = result.get("title", "")
+                    score = result.get("score", 0.0)
+                    logger.info(f"Web result: {title} ({url}) - relevance: {score:.2f}")
                     
-                    # Note: Actual implementation would create proper nodes
-                    # For now, just track the results
+                    # Track as "created" for return value
+                    # Actual creation pending WebResource model implementation
                     connections_created += 1
                 
                 logger.info(f"Found {len(search_results)} web resources for thought {thought_id}")
+                logger.info("Note: Web resources logged but not persisted (requires WebResource data model)")
                 
             except ImportError:
                 logger.warning("Tavily not installed, skipping web search")
