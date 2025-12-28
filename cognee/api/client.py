@@ -30,6 +30,7 @@ from cognee.api.v1.delete.routers import get_delete_router
 from cognee.api.v1.responses.routers import get_responses_router
 from cognee.api.v1.sync.routers import get_sync_router
 from cognee.api.v1.update.routers import get_update_router
+from cognee.api.v1.thought_graph.routers import get_thought_graph_router
 from cognee.api.v1.users.routers import (
     get_auth_router,
     get_register_router,
@@ -294,6 +295,12 @@ app.include_router(
     get_checks_router(),
     prefix="/api/v1/checks",
     tags=["checks"],
+)
+
+app.include_router(
+    get_thought_graph_router(),
+    prefix="/api/v1/thought_graph",
+    tags=["thought_graph"],
 )
 
 
