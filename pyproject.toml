@@ -135,9 +135,9 @@ evals = [
 graphiti = ["graphiti-core>=0.7.0,<0.8"]
 # Note: New s3fs and boto3 versions don't work well together
 # Always use comaptible fixed versions of these two dependencies
-aws = ["s3fs[boto3]==2025.3.2"]
+aws = ["s3fs[boto3]==2025.12.0"]
 dlt = ["dlt[sqlalchemy]>=1.9.0,<2"]
-baml = ["baml-py (==0.206.0)"]
+baml = ["baml-py (==0.206.0)","boto3"]
 dev = [
     "pytest>=7.4.0,<8",
     "pytest-cov>=6.1.1,<7.0.0",

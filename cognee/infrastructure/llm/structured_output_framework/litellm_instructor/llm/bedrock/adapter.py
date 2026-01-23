@@ -104,7 +104,7 @@ class BedrockAdapter(LLMInterface):
     @sleep_and_retry_async()
     @rate_limit_async
     async def acreate_structured_output(
-        self, text_input: str, system_prompt: str, response_model: Type[BaseModel]
+        self, text_input: str, system_prompt: str, response_model: Type[BaseModel], **kwargs
     ) -> BaseModel:
         """Generate structured output from AWS Bedrock API."""
 
@@ -130,7 +130,7 @@ class BedrockAdapter(LLMInterface):
     @sleep_and_retry_sync()
     @rate_limit_sync
     def create_structured_output(
-        self, text_input: str, system_prompt: str, response_model: Type[BaseModel]
+        self, text_input: str, system_prompt: str, response_model: Type[BaseModel], **kwargs
     ) -> BaseModel:
         """Generate structured output from AWS Bedrock API (synchronous)."""
 

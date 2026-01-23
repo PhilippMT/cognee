@@ -83,6 +83,16 @@ def run_migrations_online() -> None:
     asyncio.run(run_async_migrations())
 
 
+from cognee.infrastructure.databases.relational.config import get_relational_config
+
+relational_config = get_relational_config()
+print(f"DEBUG: db_provider={relational_config.db_provider}")
+print(f"DEBUG: db_host={relational_config.db_host}")
+print(f"DEBUG: db_port={relational_config.db_port}")
+print(f"DEBUG: db_username={relational_config.db_username}")
+print(f"DEBUG: db_password={relational_config.db_password}")
+print(f"DEBUG: db_name={relational_config.db_name}")
+
 db_engine = get_relational_engine()
 
 print("Using database:", db_engine.db_uri)

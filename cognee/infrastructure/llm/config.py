@@ -120,21 +120,34 @@ class LLMConfig(BaseSettings):
         elif self.structured_output_framework.lower() == "baml" and ClientRegistry is not None:
             self.baml_registry = ClientRegistry()
 
-            raw_options = {
-                "model": self.baml_llm_model,
-                "temperature": self.baml_llm_temperature,
-                "api_key": self.baml_llm_api_key,
-                "base_url": self.baml_llm_endpoint,
-                "api_version": self.baml_llm_api_version,
-            }
+            # Normalize provider name for BAML (aws_bedrock -> aws-bedrock)
+            baml_provider = self.baml_llm_provider
+            if baml_provider == "aws_bedrock":
+                baml_provider = "aws-bedrock"
+
+            # Build options based on provider type
+            # AWS Bedrock uses 'region' instead of 'base_url' and doesn't support 'temperature'
+            if baml_provider == "aws-bedrock":
+                raw_options = {
+                    "model": self.baml_llm_model,
+                    "region": self.baml_llm_endpoint,  # endpoint is used as region for Bedrock
+                }
+            else:
+                raw_options = {
+                    "model": self.baml_llm_model,
+                    "temperature": self.baml_llm_temperature,
+                    "api_key": self.baml_llm_api_key,
+                    "base_url": self.baml_llm_endpoint,
+                    "api_version": self.baml_llm_api_version,
+                }
 
             # Note: keep the item only when the value is not None or an empty string (they would override baml default values)
             options = {k: v for k, v in raw_options.items() if v not in (None, "")}
             self.baml_registry.add_llm_client(
-                name=self.baml_llm_provider, provider=self.baml_llm_provider, options=options
+                name=baml_provider, provider=baml_provider, options=options
             )
             # Sets the primary client
-            self.baml_registry.set_primary(self.baml_llm_provider)
+            self.baml_registry.set_primary(baml_provider)
 
     @model_validator(mode="after")
     def ensure_env_vars_for_ollama(self) -> "LLMConfig":

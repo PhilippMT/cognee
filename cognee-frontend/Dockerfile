@@ -4,11 +4,11 @@ FROM node:22-alpine
 # Set the working directory to /app
 WORKDIR /app
 
-# Copy package.json and package-lock.json to the working directory
-COPY package.json package-lock.json ./
+# Copy package.json to the working directory
+COPY package.json ./
 
 # Install any needed packages specified in package.json
-RUN npm ci
+RUN npm install
 RUN npm rebuild lightningcss
 
 # Copy the rest of the application code to the working directory

@@ -1,23 +1,38 @@
 ## Repository Guidelines
 
-This document summarizes how to work with the cognee repository: how it’s organized, how to build, test, lint, and contribute. It mirrors our actual tooling and CI while providing quick commands for local development.
+This document summarizes how to work with the cognee repository: how it's organized, how to build, test, lint, and contribute. It mirrors our actual tooling and CI while providing quick commands for local development.
 
 ## Project Structure & Module Organization
 
 - `cognee/`: Core Python library and API.
-  - `api/`: FastAPI application and versioned routers (add, cognify, memify, search, delete, users, datasets, responses, visualize, settings, sync, update, checks).
+  - `api/`: FastAPI application and versioned routers.
+    - `v1/`: 21 routers including add, cognify, memify, search, delete, users, datasets, responses, visualize, settings, sync, update, checks, cloud, notebooks, ontologies, permissions, thought_graph, prune, config, ui.
   - `cli/`: CLI entry points and subcommands invoked via `cognee` / `cognee-cli`.
+    - Commands: add, search, cognify, delete, config
+    - Flags: `--debug` (enable debug mode), `-ui` (launch UI + API + MCP)
   - `infrastructure/`: Databases, LLM providers, embeddings, loaders, and storage adapters.
-  - `modules/`: Domain logic (graph, retrieval, ontology, users, processing, observability, etc.).
-  - `tasks/`: Reusable tasks (e.g., code graph, web scraping, storage). Extend with new tasks here.
+    - `databases/`: Relational, vector, graph, hybrid, and dataset database handlers
+    - `llm/`: LLM gateway, extraction, prompts, structured output frameworks
+    - `loaders/`: Core (Text, Audio, Image, CSV) and external (PDF, Unstructured, BeautifulSoup)
+  - `modules/`: Domain logic organized by feature.
+    - Core: graph, retrieval, ontology, users, processing, observability
+    - New: cloud, thought_graph, metrics, notebooks, memify, visualization
+  - `tasks/`: Reusable tasks (17 categories).
+    - Core: chunks, documents, graph, ingestion, storage, summarization
+    - New: codingagents, feedback, temporal_awareness, temporal_graph, web_scraper
   - `eval_framework/`: Evaluation utilities and adapters.
   - `shared/`: Cross-cutting helpers (logging, settings, utils).
+  - `memify_pipelines/`: Specialized memify pipeline implementations.
   - `tests/`: Unit, integration, CLI, and end-to-end tests organized by feature.
   - `__main__.py`: Entrypoint to route to CLI.
-- `cognee-mcp/`: Model Context Protocol server exposing cognee as MCP tools (SSE/HTTP/stdio). Contains its own README and Dockerfile.
-- `cognee-frontend/`: Next.js UI for local development and demos.
+- `cognee-mcp/`: Model Context Protocol server exposing cognee as MCP tools.
+  - Transports: stdio (default), SSE, HTTP
+  - Modes: Direct (uses cognee library) or API (connects to running Cognee server)
+  - Contains its own README and Dockerfile.
+- `cognee-frontend/`: Next.js 16 UI with React 19 for local development and demos.
+- `cognee-aws-bedrock/`: AWS Bedrock integration package.
 - `distributed/`: Utilities for distributed execution (Modal, workers, queues).
-- `examples/`: Example scripts demonstrating the public APIs and features (graph, code graph, multimodal, permissions, etc.).
+- `examples/`: Example scripts demonstrating the public APIs and features.
 - `notebooks/`: Jupyter notebooks for demos and tutorials.
 - `alembic/`: Database migrations for relational backends.
 
@@ -40,6 +55,7 @@ uv run cognee-cli add "Cognee turns documents into AI memory."
 uv run cognee-cli cognify
 uv run cognee-cli search "What does cognee do?"
 uv run cognee-cli -ui   # Launches UI, backend API, and MCP server together
+uv run cognee-cli --debug add "text"  # Enable debug mode with full stack traces
 ```
 
 - Start the FastAPI server directly:

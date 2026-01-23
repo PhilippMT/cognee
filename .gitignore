@@ -1,5 +1,5 @@
 .data
-.env
+!.env
 .local.env
 .prod.env
 cognee/.data/
@@ -142,7 +142,7 @@ celerybeat.pid
 *.sage.py
 
 # Environments
-.env
+!.env
 .env.local
 .venv
 env/
