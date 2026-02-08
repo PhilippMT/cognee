@@ -1,4 +1,3 @@
-import pickle
 from uuid import UUID, uuid4
 from pydantic import BaseModel, Field, ConfigDict
 from datetime import datetime, timezone
@@ -28,8 +27,6 @@ class DataPoint(BaseModel):
     - update_version
     - to_json
     - from_json
-    - to_pickle
-    - from_pickle
     - to_dict
     - from_dict
     """
@@ -49,6 +46,10 @@ class DataPoint(BaseModel):
     metadata: Optional[MetaData] = {"index_fields": []}
     type: str = Field(default_factory=lambda: DataPoint.__name__)
     belongs_to_set: Optional[List["DataPoint"]] = None
+    source_pipeline: Optional[str] = None
+    source_task: Optional[str] = None
+    source_note_set: Optional[str] = None
+    source_user: Optional[str] = None
 
     def __init__(self, **data):
         super().__init__(**data)
