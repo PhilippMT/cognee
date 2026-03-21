@@ -1,5 +1,5 @@
 import asyncio
-from typing import Any, Optional, Type, List, Union
+from typing import Any, Dict, List, Optional, Type, Union
 
 from cognee.infrastructure.engine import DataPoint
 from cognee.modules.graph.cognee_graph.CogneeGraphElements import Edge
@@ -8,13 +8,17 @@ from cognee.modules.graph.utils import resolve_edges_to_text
 from cognee.modules.graph.utils.convert_node_to_data_point import get_all_subclasses
 from cognee.modules.retrieval.base_retriever import BaseRetriever
 from cognee.modules.retrieval.utils.brute_force_triplet_search import brute_force_triplet_search
+from cognee.modules.retrieval.utils.used_graph_elements import (
+    is_edge_list,
+    extract_from_edges,
+)
 from cognee.modules.retrieval.utils.completion import (
     generate_completion,
     generate_completion_batch,
 )
 from cognee.infrastructure.session.get_session_manager import get_session_manager
 from cognee.shared.logging_utils import get_logger
-from cognee.infrastructure.databases.graph import get_graph_engine
+from cognee.infrastructure.databases.unified import get_unified_engine
 from cognee.context_global_variables import session_user
 from cognee.infrastructure.databases.cache.config import CacheConfig
 
@@ -38,8 +42,10 @@ class GraphCompletionRetriever(BaseRetriever):
         top_k: Optional[int] = 5,
         node_type: Optional[Type] = None,
         node_name: Optional[List[str]] = None,
+        node_name_filter_operator: str = "OR",
         wide_search_top_k: Optional[int] = 100,
         triplet_distance_penalty: Optional[float] = 3.5,
+        feedback_influence: float = 0.0,
         session_id: Optional[str] = None,
         response_model: Type = str,
     ):
@@ -51,7 +57,9 @@ class GraphCompletionRetriever(BaseRetriever):
         self.wide_search_top_k = wide_search_top_k
         self.node_type = node_type
         self.node_name = node_name
+        self.node_name_filter_operator = node_name_filter_operator
         self.triplet_distance_penalty = triplet_distance_penalty
+        self.feedback_influence = feedback_influence
         # session_id (Optional[str]): Identifier for managing conversation history.
         self.session_id = session_id
         # response_model (Type): The Pydantic model or type for the expected response.
@@ -94,8 +102,8 @@ class GraphCompletionRetriever(BaseRetriever):
 
         validate_retriever_input(query, query_batch, self._use_session_cache())
 
-        graph_engine = await get_graph_engine()
-        is_empty = await graph_engine.is_empty()
+        self._unified_engine = await get_unified_engine()
+        is_empty = await self._unified_engine.graph.is_empty()
 
         if is_empty:
             logger.warning("Search attempt on an empty knowledge graph")
@@ -149,6 +157,7 @@ class GraphCompletionRetriever(BaseRetriever):
             - list: A list of found triplets that match the query.
         """
         collections = self._get_vector_index_collections()
+        unified_engine = getattr(self, "_unified_engine", None)
         return await brute_force_triplet_search(
             query,
             query_batch,
@@ -156,8 +165,11 @@ class GraphCompletionRetriever(BaseRetriever):
             collections=collections or None,
             node_type=self.node_type,
             node_name=self.node_name,
+            node_name_filter_operator=self.node_name_filter_operator,
             wide_search_top_k=self.wide_search_top_k,
             triplet_distance_penalty=self.triplet_distance_penalty,
+            feedback_influence=self.feedback_influence,
+            unified_engine=unified_engine,
         )
 
     async def get_context_from_objects(
@@ -200,6 +212,14 @@ class GraphCompletionRetriever(BaseRetriever):
             return ""
 
         return await self.resolve_edges_to_text(triplets)
+
+    def _extract_context_object_ids(self, retrieved_objects: Any) -> Optional[Dict[str, List[str]]]:
+        """Extract node_ids and edge_ids from list of Edge. Only used for single-query session path."""
+        if not isinstance(retrieved_objects, list) or not retrieved_objects:
+            return None
+        if not is_edge_list(retrieved_objects):
+            return None
+        return extract_from_edges(retrieved_objects)
 
     def _completion_kwargs(self, context: str) -> dict:
         """Common kwargs for completion calls (no session)."""
@@ -252,6 +272,7 @@ class GraphCompletionRetriever(BaseRetriever):
         use_session = self._use_session_cache() and not query_batch
         if use_session:
             sm = get_session_manager()
+            used_graph_element_ids = self._extract_context_object_ids(retrieved_objects)
             completion = await sm.generate_completion_with_session(
                 session_id=self.session_id,
                 query=query,
@@ -261,6 +282,7 @@ class GraphCompletionRetriever(BaseRetriever):
                 system_prompt=self.system_prompt,
                 response_model=self.response_model,
                 summarize_context=False,
+                used_graph_element_ids=used_graph_element_ids,
             )
             return [completion]
         return await self._generate_completion_without_session(query, query_batch, context)
