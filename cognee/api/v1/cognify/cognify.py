@@ -4,6 +4,7 @@ from typing import Union, Optional
 from uuid import UUID
 
 from cognee.modules.cognify.config import get_cognify_config
+from cognee.modules.cognify.rollback import cognify_rollback_handler
 from cognee.modules.ontology.ontology_env_config import get_ontology_env_config
 from cognee.shared.logging_utils import get_logger
 from cognee.shared.data_models import KnowledgeGraph
@@ -11,6 +12,8 @@ from cognee.infrastructure.llm import get_max_chunk_tokens
 
 from cognee.modules.pipelines import run_pipeline
 from cognee.modules.pipelines.tasks.task import Task
+from cognee.infrastructure.databases.vector.embeddings.config import EmbeddingConfig
+from cognee.infrastructure.llm.config import LLMConfig
 from cognee.modules.chunking.TextChunker import TextChunker
 from cognee.modules.ontology.ontology_config import Config
 from cognee.modules.ontology.get_default_ontology_resolver import (
@@ -37,9 +40,6 @@ from cognee.modules.observability import new_span, COGNEE_PIPELINE_NAME, COGNEE_
 logger = get_logger("cognify")
 
 
-update_status_lock = asyncio.Lock()
-
-
 async def cognify(
     datasets: Union[str, list[str], list[UUID]] = None,
     user: User = None,
@@ -55,6 +55,8 @@ async def cognify(
     custom_prompt: Optional[str] = None,
     temporal_cognify: bool = False,
     data_per_batch: int = 20,
+    llm_config: Optional[LLMConfig] = None,
+    embedding_config: Optional[EmbeddingConfig] = None,
     **kwargs,
 ):
     """
@@ -85,7 +87,7 @@ async def cognify(
         3. **Entity Extraction**: Identifies key concepts, people, places, organizations
         4. **Relationship Detection**: Discovers connections between entities
         5. **Graph Construction**: Builds semantic knowledge graph with embeddings
-        6. **Content Summarization**: Creates hierarchical summaries for navigation
+        6. **Content Summarization**: Creates text summaries for navigation
 
     Graph Model Customization:
         The `graph_model` parameter allows custom knowledge structures:
@@ -201,12 +203,22 @@ async def cognify(
 
     client = get_remote_client()
     if client is not None:
-        return await client.cognify(datasets)
+        return await client.cognify(
+            datasets,
+            chunk_size=chunk_size,
+            chunks_per_batch=chunks_per_batch,
+            custom_prompt=custom_prompt,
+            run_in_background=run_in_background,
+        )
 
     with new_span("cognee.api.cognify") as span:
         span.set_attribute(COGNEE_PIPELINE_NAME, "cognify")
         if datasets is not None:
             span.set_attribute("cognee.cognify.datasets", str(datasets))
+
+        from cognee.modules.migrations.startup import run_migrations_and_block
+
+        await run_migrations_and_block(datasets, user)
 
         if config is None:
             ontology_config = get_ontology_env_config()
@@ -261,6 +273,9 @@ async def cognify(
             use_pipeline_cache=True,
             pipeline_name="cognify_pipeline",
             data_per_batch=data_per_batch,
+            rollback_handler=cognify_rollback_handler,
+            llm_config=llm_config,
+            embedding_config=embedding_config,
         )
 
         dataset_desc = str(datasets) if datasets else "all datasets"
@@ -317,7 +332,7 @@ async def get_default_tasks(  # TODO: Find out a better way to do this (Boris's 
             chunker=chunker,
         ),
         # COGNIFY: LLM-extract entities and relationships into a knowledge graph
-        # COGNIFY: LLM-summarize each chunk for hierarchical retrieval
+        # COGNIFY: LLM-summarize each chunk for retrieval
         Task(
             extract_graph_and_summarize,
             graph_model=graph_model,

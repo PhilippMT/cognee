@@ -12,6 +12,12 @@ logger = get_logger()
 
 
 async def main():
+    # Disable session-turn gating (auto_feedback). This script issues several searches against the
+    # same session; with gating on, the turn analysis can intercept a follow-up search with a
+    # clarifying acknowledgement instead of an answer. That layer has dedicated coverage
+    # (e.g. test_session_context_turn_flow.py); here we assert direct retrieval results.
+    os.environ["AUTO_FEEDBACK"] = "False"
+
     data_directory_path = str(
         pathlib.Path(
             os.path.join(pathlib.Path(__file__).parent, ".data_storage/test_library")
@@ -78,6 +84,30 @@ async def main():
 
     assert len(history) == 6, "Search history is not correct."
 
+    memory_text = (
+        "Grace Hopper designed one of the first compilers and popularized the term "
+        "debugging in computing."
+    )
+    remember_result = await cognee.remember(
+        memory_text,
+        dataset_name=dataset_name,
+        self_improvement=False,
+    )
+    assert remember_result.status == "completed", "Remember did not complete successfully."
+    assert remember_result.dataset_name == dataset_name, "Remember used the wrong dataset."
+
+    recall_results = await cognee.recall(
+        query_text="Grace Hopper compiler debugging",
+        query_type=SearchType.CHUNKS,
+        datasets=[dataset_name],
+        top_k=5,
+        auto_route=False,
+    )
+    assert len(recall_results) != 0, "Recall results list is empty."
+    recall_text = "\n".join(result.text for result in recall_results).lower()
+    assert "grace hopper" in recall_text, "Recall did not return remembered content."
+    assert "compiler" in recall_text, "Recall result is missing the remembered compiler detail."
+
     # Test updating of documents
     # Get Pipeline Run object
     pipeline_run_obj = list(cognify_run_info.values())[0]
@@ -134,11 +164,11 @@ async def main():
     from cognee.infrastructure.databases.graph import get_graph_config
 
     graph_config = get_graph_config()
-    # For Kuzu v0.11.0+, check if database file doesn't exist (single-file format with .kuzu extension)
+    # For Ladybug/Kuzu, check if database file doesn't exist.
     # For older versions or other providers, check if directory is empty
-    if graph_config.graph_database_provider.lower() == "kuzu":
+    if graph_config.graph_database_provider.lower() in ("ladybug", "kuzu"):
         assert not os.path.exists(graph_config.graph_file_path), (
-            "Kuzu graph database file still exists"
+            "Ladybug graph database file still exists"
         )
     else:
         assert not os.path.exists(graph_config.graph_file_path) or not os.listdir(

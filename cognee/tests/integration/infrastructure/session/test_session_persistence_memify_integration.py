@@ -118,12 +118,12 @@ async def session_persistence_env(event_loop):
         tempfile.TemporaryDirectory(prefix="cognee_session_persistence_system_") as system_path,
         tempfile.TemporaryDirectory(prefix="cognee_session_persistence_data_") as data_path,
     ):
-        pytest.importorskip("kuzu")
+        pytest.importorskip("ladybug")
         _reset_cache_backend_caches()
 
         vector_db_config.set(None)
         graph_db_config.set(None)
-        cognee.config.set_graph_database_provider("kuzu")
+        cognee.config.set_graph_database_provider("ladybug")
         cognee.config.set_vector_db_config(
             {
                 "vector_db_provider": "lancedb",
@@ -155,11 +155,11 @@ async def session_persistence_env(event_loop):
             _reset_cache_backend_caches()
 
 
-@pytest.fixture(params=["fs", "redis"])
+@pytest.fixture(params=["fs", "redis", "sqlite"])
 def session_manager_with_qa(request):
     """
-    SessionManager backed by either FsCache or in-memory Redis.
-    Tests run twice (once per backend).
+    SessionManager backed by FsCache, in-memory Redis, or SQL (aiosqlite).
+    Tests run once per backend.
     """
     backend = request.param
     if backend == "fs":
@@ -176,7 +176,7 @@ def session_manager_with_qa(request):
                 sm = SessionManager(cache_engine=adapter)
                 yield sm, adapter
                 adapter.cache.close()
-    else:
+    elif backend == "redis":
         store = _InMemoryRedisList()
         patch_mod = "cognee.infrastructure.databases.cache.redis.RedisAdapter"
         with (
@@ -190,6 +190,16 @@ def session_manager_with_qa(request):
             adapter = RedisAdapter(host="localhost", port=6379)
             sm = SessionManager(cache_engine=adapter)
             yield sm, adapter
+    else:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            from cognee.infrastructure.databases.cache.sql.SqlCacheAdapter import (
+                SqlCacheAdapter,
+            )
+
+            adapter = SqlCacheAdapter(f"sqlite+aiosqlite:///{tmpdir}/cache.db")
+            sm = SessionManager(cache_engine=adapter)
+            yield sm, adapter
+            asyncio.run(adapter.close())
 
 
 @pytest.mark.asyncio

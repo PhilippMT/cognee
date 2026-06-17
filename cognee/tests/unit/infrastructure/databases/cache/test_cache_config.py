@@ -8,8 +8,11 @@ def test_cache_config_defaults(monkeypatch):
     """Test that CacheConfig has the correct default values."""
     for env_var in (
         "CACHE_BACKEND",
+        "CACHE_DB_URL",
+        "CACHE_PURGE_INTERVAL_SECONDS",
         "CACHING",
         "AUTO_FEEDBACK",
+        "SHARED_LADYBUG_LOCK",
         "SHARED_KUZU_LOCK",
         "CACHE_HOST",
         "CACHE_PORT",
@@ -25,8 +28,12 @@ def test_cache_config_defaults(monkeypatch):
 
     config = CacheConfig(_env_file=None)
 
-    assert config.cache_backend == "fs"
+    assert config.cache_backend == "sqlite"
+    assert config.cache_db_url is None
+    assert config.cache_purge_interval_seconds == 900
     assert config.caching is True
+    assert config.auto_feedback is True
+    assert config.shared_ladybug_lock is False
     assert config.shared_kuzu_lock is False
     assert config.cache_host == "localhost"
     assert config.cache_port == 6379
@@ -40,7 +47,7 @@ def test_cache_config_custom_values():
     config = CacheConfig(
         cache_backend="redis",
         caching=True,
-        shared_kuzu_lock=True,
+        shared_ladybug_lock=True,
         cache_host="redis.example.com",
         cache_port=6380,
         agentic_lock_expire=120,
@@ -50,7 +57,7 @@ def test_cache_config_custom_values():
 
     assert config.cache_backend == "redis"
     assert config.caching is True
-    assert config.shared_kuzu_lock is True
+    assert config.shared_ladybug_lock is True
     assert config.cache_host == "redis.example.com"
     assert config.cache_port == 6380
     assert config.agentic_lock_expire == 120
@@ -63,7 +70,7 @@ def test_cache_config_to_dict():
     config = CacheConfig(
         cache_backend="fs",
         caching=True,
-        shared_kuzu_lock=True,
+        shared_ladybug_lock=True,
         cache_host="test-host",
         cache_port=7000,
         agentic_lock_expire=100,
@@ -75,9 +82,12 @@ def test_cache_config_to_dict():
 
     assert config_dict == {
         "cache_backend": "fs",
+        "cache_db_url": None,
+        "cache_purge_interval_seconds": 900,
         "caching": True,
-        "auto_feedback": False,
-        "shared_kuzu_lock": True,
+        "auto_feedback": True,
+        "shared_ladybug_lock": True,
+        "shared_kuzu_lock": False,
         "cache_host": "test-host",
         "cache_port": 7000,
         "cache_username": None,
@@ -124,10 +134,18 @@ def test_cache_config_extra_fields_allowed():
 
 def test_cache_config_boolean_type_validation():
     """Test that boolean fields accept various truthy/falsy values."""
-    config1 = CacheConfig(caching="true", shared_kuzu_lock="yes")
+    config1 = CacheConfig(caching="true", shared_ladybug_lock="yes")
     assert config1.caching is True
-    assert config1.shared_kuzu_lock is True
+    assert config1.shared_ladybug_lock is True
 
-    config2 = CacheConfig(caching="false", shared_kuzu_lock="no")
+    config2 = CacheConfig(caching="false", shared_ladybug_lock="no")
     assert config2.caching is False
-    assert config2.shared_kuzu_lock is False
+    assert config2.shared_ladybug_lock is False
+
+
+def test_cache_config_legacy_kuzu_lock_alias():
+    """Test that the legacy Kuzu lock setting still enables the Ladybug lock."""
+    config = CacheConfig(shared_kuzu_lock=True)
+
+    assert config.shared_kuzu_lock is True
+    assert config.shared_ladybug_lock is True

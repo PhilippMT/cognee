@@ -93,6 +93,7 @@ def _discover_commands() -> List[Type[SupportsCliCommand]]:
         ("cognee.cli.commands.delete_command", "DeleteCommand"),
         ("cognee.cli.commands.config_command", "ConfigCommand"),
         ("cognee.cli.commands.datasets_command", "DatasetsCommand"),
+        ("cognee.cli.commands.agents_command", "AgentsCommand"),
         ("cognee.cli.commands.sessions_command", "SessionsCommand"),
         ("cognee.cli.commands.feedback_command", "FeedbackCommand"),
         ("cognee.cli.commands.memify_command", "MemifyCommand"),
@@ -101,6 +102,12 @@ def _discover_commands() -> List[Type[SupportsCliCommand]]:
         ("cognee.cli.commands.improve_command", "ImproveCommand"),
         ("cognee.cli.commands.forget_command", "ForgetCommand"),
         ("cognee.cli.commands.serve_command", "ServeCommand"),
+        ("cognee.cli.commands.migrate_command", "UpgradeCommand"),
+        ("cognee.cli.commands.migrate_command", "DowngradeCommand"),
+        ("cognee.cli.commands.migrate_command", "HistoryCommand"),
+        ("cognee.cli.commands.migrate_command", "CurrentCommand"),
+        ("cognee.cli.commands.migrate_command", "StampCommand"),
+        ("cognee.cli.commands.push_command", "PushCommand"),
     ]
 
     for module_path, class_name in command_modules:
@@ -148,6 +155,17 @@ def _create_parser() -> tuple[argparse.ArgumentParser, Dict[str, SupportsCliComm
         default=None,
         help="Delegate commands to a running Cognee API server (e.g. http://localhost:8000). "
         "Required for multi-agent / concurrent usage with file-based databases.",
+    )
+    parser.add_argument(
+        "--api-key",
+        default=None,
+        help="API key sent as X-Api-Key when --api-url is set. Falls back to $COGNEE_API_KEY.",
+    )
+    parser.add_argument(
+        "--api-token",
+        default=None,
+        help="Bearer token sent as Authorization: Bearer <token> when --api-url is set. "
+        "Falls back to $COGNEE_API_TOKEN. Ignored if --api-key is also provided.",
     )
 
     subparsers = parser.add_subparsers(title="Available commands", dest="command")
@@ -333,7 +351,7 @@ def main() -> int:
 
     # When --api-url is set, delegate to the API server instead of running
     # in-process.  This is the correct mode for concurrent / multi-agent use
-    # with file-based databases (SQLite, KuzuDB, LanceDB).
+    # with file-based databases (SQLite, Ladybug, LanceDB).
     from cognee.cli.api_dispatch import can_dispatch, dispatch as api_dispatch
 
     if can_dispatch(args) and args.command:

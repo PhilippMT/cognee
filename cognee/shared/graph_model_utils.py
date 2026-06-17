@@ -1,22 +1,25 @@
+import asyncio
 import re
 import sys
 import types
-import asyncio
 from pprint import pprint
-from typing import Any, Union, get_args, get_origin
+from typing import Any, Union, cast, get_args, get_origin
+
+from datamodel_code_generator import DataModelType, GenerateConfig, InputFileType, generate
 from pydantic import BaseModel, ConfigDict, Field, create_model
-from pydantic_core import PydanticUndefined
+from pydantic._internal._core_utils import CoreSchemaOrField, is_core_schema
 from pydantic.json_schema import GenerateJsonSchema
-from pydantic._internal._core_utils import is_core_schema, CoreSchemaOrField
-from datamodel_code_generator import InputFileType, generate, GenerateConfig, DataModelType
+from pydantic_core import PydanticUndefined
 
 import cognee
-from cognee.shared.logging_utils import setup_logging, ERROR
 from cognee.api.v1.search import SearchType
 from cognee.infrastructure.engine import DataPoint
+from cognee.shared.logging_utils import ERROR, setup_logging
 
 
-def datapoint_model_to_basemodel(model: type[BaseModel]) -> type[BaseModel]:
+def datapoint_model_to_basemodel(
+    model: type[BaseModel], *, strip_metadata: bool = False
+) -> type[BaseModel]:
     """
     Convert a DataPoint-derived model into a plain BaseModel-derived model at runtime.
 
@@ -45,8 +48,8 @@ def datapoint_model_to_basemodel(model: type[BaseModel]) -> type[BaseModel]:
 
         if origin is tuple:
             if len(args) == 2 and args[1] is Ellipsis:
-                return tuple[_replace_datapoint_types(args[0], cache), ...]
-            return tuple[tuple(_replace_datapoint_types(arg, cache) for arg in args)]
+                return tuple[_replace_datapoint_types(args[0], cache), ...]  # ty:ignore[invalid-type-form]
+            return tuple[tuple(_replace_datapoint_types(arg, cache) for arg in args)]  # ty:ignore[invalid-type-form]
 
         if origin is dict:
             key_type = _replace_datapoint_types(args[0], cache)
@@ -77,6 +80,9 @@ def datapoint_model_to_basemodel(model: type[BaseModel]) -> type[BaseModel]:
             field_names = [name for name in own_annotations if name in model_fields]
         else:
             field_names = list(model_fields.keys())
+
+        if strip_metadata:
+            field_names = [name for name in field_names if name != "metadata"]
 
         converted_fields = {}
         for field_name in field_names:
@@ -118,7 +124,8 @@ def graph_schema_to_graph_model(pydantic_json_schema: dict) -> BaseModel:
         type_overrides={"DataPoint": "cognee.infrastructure.engine.DataPoint"},
     )
     # Override title to ensure a valid and secure Python class name for the generated model
-    result = generate(pydantic_json_schema, config=config)
+    # 'config' has 'output=None', 'generate' is supposed to return a string
+    result = cast(str, generate(pydantic_json_schema, config=config))
 
     # Replace the generated DataPointModel class definition made by datamodel_code_generator with
     # the existing Cognee DataPoint class

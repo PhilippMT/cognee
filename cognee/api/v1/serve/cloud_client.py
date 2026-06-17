@@ -1,6 +1,7 @@
 """Remote HTTP client that proxies V2 operations to a Cognee Cloud instance."""
 
 import io
+from pathlib import Path
 from typing import Any, Optional
 from uuid import UUID
 
@@ -23,10 +24,19 @@ class CloudClient:
         self.api_key = api_key
         self._session: Optional[aiohttp.ClientSession] = None
 
+    # Default for ordinary API calls: aiohttp's standard 5-minute total,
+    # with connect failures surfacing quickly.
+    DEFAULT_TIMEOUT = aiohttp.ClientTimeout(total=300, sock_connect=30)
+    # Archive uploads (cognee.push) plus the synchronous server-side import
+    # can legitimately exceed any fixed total; per-read inactivity stays
+    # bounded instead. Applied per-request, only to archive uploads.
+    UPLOAD_TIMEOUT = aiohttp.ClientTimeout(total=None, sock_connect=30, sock_read=300)
+
     async def _get_session(self) -> aiohttp.ClientSession:
         if self._session is None or self._session.closed:
             self._session = aiohttp.ClientSession(
                 headers={"X-Api-Key": self.api_key},
+                timeout=self.DEFAULT_TIMEOUT,
             )
         return self._session
 
@@ -59,9 +69,39 @@ class CloudClient:
             form.add_field("run_in_background", "true")
         if kwargs.get("custom_prompt"):
             form.add_field("custom_prompt", kwargs["custom_prompt"])
+        if kwargs.get("chunk_size") is not None:
+            form.add_field("chunk_size", str(kwargs["chunk_size"]))
+        if kwargs.get("chunks_per_batch") is not None:
+            form.add_field("chunks_per_batch", str(kwargs["chunks_per_batch"]))
+        content_type_kw = kwargs.get("content_type")
+        if content_type_kw is not None:
+            form.add_field("content_type", str(content_type_kw))
+        if kwargs.get("import_mode") is not None:
+            form.add_field("import_mode", str(kwargs["import_mode"]))
 
+        # Skills are local SKILL.md files. The server's add_skills() reads
+        # paths from its own filesystem — sending the path string verbatim
+        # would have the server look for that path on the POD, not the
+        # caller. For content_type="skills", read each SKILL.md and upload
+        # its bytes so the server can write them to a tempdir.
+        if content_type_kw == "skills" and isinstance(data, (str, Path)):
+            source = Path(data).expanduser()
+            if source.is_file():
+                skill_files = [source] if source.name == "SKILL.md" else []
+            elif source.is_dir():
+                skill_files = sorted(source.rglob("SKILL.md"))
+            else:
+                raise FileNotFoundError(f"Skills source not found: {data}")
+            if not skill_files:
+                raise ValueError(f"No SKILL.md files under {data}")
+            base = source if source.is_dir() else source.parent
+            for skill_path in skill_files:
+                # Preserve relative structure so the server can reconstruct
+                # the SKILL.md layout when writing to its tempdir.
+                rel = skill_path.relative_to(base).as_posix()
+                form.add_field("data", skill_path.open("rb"), filename=rel)
         # Handle data — string or file-like objects
-        if isinstance(data, str):
+        elif isinstance(data, str):
             form.add_field(
                 "data",
                 io.BytesIO(data.encode("utf-8")),
@@ -84,7 +124,14 @@ class CloudClient:
             name = getattr(data, "name", "upload")
             form.add_field("data", data, filename=name)
 
-        async with session.post(f"{self.service_url}/api/v1/remember", data=form) as resp:
+        timeout = (
+            self.UPLOAD_TIMEOUT
+            if kwargs.get("content_type") == "cogx-archive"
+            else self.DEFAULT_TIMEOUT
+        )
+        async with session.post(
+            f"{self.service_url}/api/v1/remember", data=form, timeout=timeout
+        ) as resp:
             if resp.status >= 400:
                 body = await resp.text()
                 raise RuntimeError(f"Remote remember failed ({resp.status}): {body}")
@@ -95,14 +142,12 @@ class CloudClient:
         entry,
         dataset_name: str = "main_dataset",
         session_id: Optional[str] = None,
+        skill_improvement: Optional[dict] = None,
     ) -> dict:
-        """POST /api/v1/remember/entry — store a typed MemoryEntry in session cache.
+        """POST /api/v1/remember/entry — store a typed MemoryEntry.
 
-        ``entry`` is a pydantic MemoryEntry (QAEntry / TraceEntry / FeedbackEntry).
+        ``entry`` is a pydantic MemoryEntry.
         """
-        if session_id is None:
-            raise ValueError("session_id is required for typed memory entries")
-
         session = await self._get_session()
 
         # Pydantic v2: model_dump preserves the discriminator field.
@@ -112,6 +157,7 @@ class CloudClient:
             "entry": entry_dump,
             "dataset_name": dataset_name,
             "session_id": session_id,
+            "skill_improvement": skill_improvement,
         }
 
         async with session.post(
@@ -130,16 +176,26 @@ class CloudClient:
         payload: dict = {"query": query_text}
         if query_type:
             payload["search_type"] = query_type if isinstance(query_type, str) else query_type.value
-        if kwargs.get("datasets"):
+        if kwargs.get("dataset_ids"):
+            payload["dataset_ids"] = [str(dataset_id) for dataset_id in kwargs["dataset_ids"]]
+        elif kwargs.get("datasets"):
             payload["datasets"] = kwargs["datasets"]
         if kwargs.get("top_k"):
             payload["top_k"] = kwargs["top_k"]
         if kwargs.get("system_prompt"):
             payload["system_prompt"] = kwargs["system_prompt"]
+        if kwargs.get("node_name"):
+            payload["node_name"] = kwargs["node_name"]
+        if kwargs.get("only_context"):
+            payload["only_context"] = kwargs["only_context"]
+        if kwargs.get("verbose"):
+            payload["verbose"] = kwargs["verbose"]
         if kwargs.get("session_id"):
             payload["session_id"] = kwargs["session_id"]
         if kwargs.get("scope") is not None:
             payload["scope"] = kwargs["scope"]
+        if kwargs.get("include_references") is not None:
+            payload["include_references"] = kwargs["include_references"]
 
         async with session.post(
             f"{self.service_url}/api/v1/recall",
@@ -220,6 +276,14 @@ class CloudClient:
             payload["datasets"] = (
                 [str(d) for d in datasets] if isinstance(datasets, list) else [str(datasets)]
             )
+        if kwargs.get("run_in_background"):
+            payload["run_in_background"] = True
+        if kwargs.get("custom_prompt"):
+            payload["custom_prompt"] = kwargs["custom_prompt"]
+        if kwargs.get("chunk_size") is not None:
+            payload["chunk_size"] = kwargs["chunk_size"]
+        if kwargs.get("chunks_per_batch") is not None:
+            payload["chunks_per_batch"] = kwargs["chunks_per_batch"]
 
         async with session.post(
             f"{self.service_url}/api/v1/cognify",
@@ -240,6 +304,31 @@ class CloudClient:
             payload["searchType"] = st if isinstance(st, str) else st.value
         if kwargs.get("datasets"):
             payload["datasets"] = kwargs["datasets"]
+        if kwargs.get("dataset_ids"):
+            dataset_ids = kwargs["dataset_ids"]
+            if isinstance(dataset_ids, UUID):
+                dataset_ids = [dataset_ids]
+            payload["datasetIds"] = [str(dataset_id) for dataset_id in dataset_ids]
+        if kwargs.get("top_k") is not None:
+            payload["topK"] = kwargs["top_k"]
+        if kwargs.get("system_prompt"):
+            payload["systemPrompt"] = kwargs["system_prompt"]
+        if kwargs.get("node_name"):
+            payload["nodeName"] = kwargs["node_name"]
+        if kwargs.get("only_context") is not None:
+            payload["onlyContext"] = kwargs["only_context"]
+        if kwargs.get("verbose") is not None:
+            payload["verbose"] = kwargs["verbose"]
+        if kwargs.get("skills") is not None:
+            payload["skills"] = [
+                skill.name if hasattr(skill, "name") else str(skill) for skill in kwargs["skills"]
+            ]
+        if kwargs.get("tools") is not None:
+            payload["tools"] = kwargs["tools"]
+        if kwargs.get("max_iter") is not None:
+            payload["maxIter"] = kwargs["max_iter"]
+        if kwargs.get("include_references") is not None:
+            payload["includeReferences"] = kwargs["include_references"]
 
         async with session.post(
             f"{self.service_url}/api/v1/search",
@@ -258,10 +347,13 @@ class CloudClient:
         if kwargs.get("everything"):
             payload["everything"] = True
         if kwargs.get("dataset"):
-            ds = kwargs["dataset"]
-            payload["dataset"] = str(ds)
+            payload["dataset"] = str(kwargs["dataset"])
+        if kwargs.get("dataset_id"):
+            payload["dataset_id"] = str(kwargs["dataset_id"])
         if kwargs.get("data_id"):
             payload["data_id"] = str(kwargs["data_id"])
+        if kwargs.get("memory_only") is not None:
+            payload["memory_only"] = bool(kwargs["memory_only"])
 
         async with session.post(
             f"{self.service_url}/api/v1/forget",

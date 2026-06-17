@@ -6,12 +6,13 @@ from collections import Counter
 from typing import List, Optional, Any, Dict, Tuple
 from uuid import UUID
 
+from cognee.modules.graph.models.EdgeType import EdgeType
 from cognee.infrastructure.databases.exceptions import MissingQueryParameterError
 from cognee.infrastructure.databases.exceptions import MutuallyExclusiveQueryParametersError
 from cognee.infrastructure.databases.graph.neptune_driver.adapter import NeptuneGraphDB
 from cognee.infrastructure.databases.vector.vector_db_interface import VectorDBInterface
 from cognee.infrastructure.engine import DataPoint
-from cognee.modules.engine.utils.generate_edge_id import generate_edge_id
+from cognee.modules.graph.utils.prepare_edges_for_storage import get_edge_retrieval_text
 from cognee.modules.storage.utils import JSONEncoder
 from cognee.shared.logging_utils import get_logger
 from cognee.infrastructure.databases.vector.embeddings.EmbeddingEngine import EmbeddingEngine
@@ -35,6 +36,14 @@ class IndexSchema(DataPoint):
 
     id: str
     text: str
+    # Optional reference scalars carried for the search "Evidence" feature.
+    # They stay None for non-chunk data points, so this schema remains
+    # compatible with every indexed DataPoint type.
+    document_id: Optional[str] = None
+    document_name: Optional[str] = None
+    chunk_index: Optional[int] = None
+    source_chunk_id: Optional[str] = None
+    importance_weight: Optional[float] = 0.5
     belongs_to_set: List[str] = []
     metadata: dict = {"index_fields": ["text"]}
 
@@ -229,7 +238,14 @@ class NeptuneAnalyticsAdapter(NeptuneGraphDB, VectorDBInterface):
 
         try:
             result = self._client.query(query_string, params)
-            return [self._get_scored_result(item) for item in result]
+            return [
+                ScoredResult(
+                    id=(item.get("payload") or {}).get("~id"),
+                    payload=(item.get("payload") or {}).get("~properties"),
+                    score=0,
+                )
+                for item in result
+            ]
         except Exception as e:
             self._na_exception_handler(e, query_string)
 
@@ -240,7 +256,7 @@ class NeptuneAnalyticsAdapter(NeptuneGraphDB, VectorDBInterface):
         query_vector: Optional[List[float]] = None,
         limit: Optional[int] = None,
         with_vector: bool = False,
-        include_payload: bool = False,  # TODO: Add support for this parameter
+        include_payload: bool = False,
         node_name: Optional[List[str]] = None,
         node_name_filter_operator: str = "OR",
     ):
@@ -258,6 +274,13 @@ class NeptuneAnalyticsAdapter(NeptuneGraphDB, VectorDBInterface):
             - limit (int): The maximum number of results to return from the search.
             - with_vector (bool): Whether to return the vector representations with search
               results, this is not supported for Neptune Analytics backend at the moment.
+            - include_payload (bool): When True, fetch full node properties and populate
+              ``ScoredResult.payload``. When False (default), only node IDs are returned and
+              ``payload`` is set to None, reducing data transfer.
+            - node_name (Optional[List[str]]): Optional list of set names to filter results
+              by ``belongs_to_set`` membership.
+            - node_name_filter_operator (str): ``"OR"`` (default) matches nodes belonging to
+              any of the ``node_name`` values; ``"AND"`` requires membership in all of them.
 
         Returns:
         --------
@@ -322,22 +345,30 @@ class NeptuneAnalyticsAdapter(NeptuneGraphDB, VectorDBInterface):
 
         if with_vector:
             query_string += """
-        WITH node, score, id(node) as node_id
+        WITH node, score
         MATCH (n)
         WHERE id(n) = id(node)
         CALL neptune.algo.vectors.get(n)
         YIELD embedding
-        RETURN node as payload, score, embedding
         """
 
-        else:
-            query_string += """
-        RETURN node as payload, score
-        """
+        payload_part = "node as payload" if include_payload else "id(node) as node_id"
+        embedding_part = ", embedding" if with_vector else ""
+        query_string += f"RETURN {payload_part}, score{embedding_part}"
 
         try:
             query_response = self._client.query(query_string, params)
-            return [self._get_scored_result(item=item, with_score=True) for item in query_response]
+            results = []
+            for item in query_response:
+                payload_obj = item.get("payload") or {}
+                results.append(
+                    ScoredResult(
+                        id=payload_obj.get("~id") if include_payload else item.get("node_id"),
+                        payload=payload_obj.get("~properties") if include_payload else None,
+                        score=item.get("score", 0),
+                    )
+                )
+            return results
         except Exception as e:
             self._na_exception_handler(e, query_string)
 
@@ -442,6 +473,14 @@ class NeptuneAnalyticsAdapter(NeptuneGraphDB, VectorDBInterface):
                 IndexSchema(
                     id=str(data_point.id),
                     text=getattr(data_point, data_point.metadata["index_fields"][0]),
+                    # Reference scalars for search "Evidence". Pulled via getattr
+                    # so non-chunk data points (which lack these fields) simply
+                    # fall back to None instead of raising.
+                    document_id=getattr(data_point, "document_id", None),
+                    document_name=getattr(data_point, "document_name", None),
+                    chunk_index=getattr(data_point, "chunk_index", None),
+                    source_chunk_id=getattr(data_point, "source_chunk_id", None),
+                    importance_weight=getattr(data_point, "importance_weight", None),
                 )
                 for data_point in data_points
             ],
@@ -463,20 +502,6 @@ class NeptuneAnalyticsAdapter(NeptuneGraphDB, VectorDBInterface):
         """
         query_result = self._client.query(query)
         return len(query_result) == 0
-
-    @staticmethod
-    def _get_scored_result(
-        item: dict, with_vector: bool = False, with_score: bool = False
-    ) -> ScoredResult:
-        """
-        Util method to simplify the object creation of ScoredResult base on incoming NX payload response.
-        """
-        return ScoredResult(
-            id=item.get("payload").get("~id"),
-            payload=item.get("payload").get("~properties"),
-            score=item.get("score") if with_score else 0,
-            vector=item.get("embedding") if with_vector else None,
-        )
 
     def _na_exception_handler(self, ex, query_string: str):
         """
@@ -530,6 +555,11 @@ class NeptuneAnalyticsAdapter(NeptuneGraphDB, VectorDBInterface):
                 IndexSchema(
                     id=str(dp.id),
                     text=getattr(dp, field_name),
+                    document_id=getattr(dp, "document_id", None),
+                    document_name=getattr(dp, "document_name", None),
+                    chunk_index=getattr(dp, "chunk_index", None),
+                    source_chunk_id=getattr(dp, "source_chunk_id", None),
+                    importance_weight=getattr(dp, "importance_weight", None),
                     belongs_to_set=dp.belongs_to_set or [],
                 )
                 for dp in points
@@ -560,8 +590,9 @@ class NeptuneAnalyticsAdapter(NeptuneGraphDB, VectorDBInterface):
         edge_texts = []
         for edge in edges:
             props = edge[3] if len(edge) > 3 and edge[3] else {}
-            edge_text = props.get("edge_text", edge[2])
-            edge_texts.append(edge_text)
+            edge_text = get_edge_retrieval_text(props.get("edge_text"), edge[2])
+            if edge_text:
+                edge_texts.append(edge_text)
 
         edge_type_counts = Counter(edge_texts)
         if not edge_type_counts:
@@ -570,7 +601,7 @@ class NeptuneAnalyticsAdapter(NeptuneGraphDB, VectorDBInterface):
         await self.create_vector_index("EdgeType", "relationship_name")
         index_schemas = [
             IndexSchema(
-                id=str(generate_edge_id(edge_id=text)),
+                id=str(EdgeType.id_for(text)),
                 text=text,
                 belongs_to_set=[],
             )

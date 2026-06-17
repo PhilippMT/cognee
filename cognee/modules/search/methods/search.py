@@ -1,35 +1,37 @@
-import json
 import asyncio
-from uuid import UUID
+import json
 from typing import Any, List, Optional, Tuple, Type, Union
+from uuid import UUID
 
-from cognee.infrastructure.databases.graph import get_graph_engine
-from cognee.shared.logging_utils import get_logger
-from cognee.shared.utils import send_telemetry
+from cognee import __version__ as cognee_version
 from cognee.context_global_variables import (
     backend_access_control_enabled,
     set_database_global_context_variables,
 )
-
+from cognee.infrastructure.databases.graph import get_graph_engine
+from cognee.infrastructure.databases.vector.embeddings.config import EmbeddingConfig
+from cognee.infrastructure.llm.config import LLMConfig
+from cognee.modules.data.methods.get_authorized_existing_datasets import (
+    get_authorized_existing_datasets,
+)
+from cognee.modules.data.models import Dataset
 from cognee.modules.engine.models.node_set import NodeSet
 from cognee.modules.graph.cognee_graph.CogneeGraphElements import Edge
+from cognee.modules.observability import (
+    COGNEE_SEARCH_QUERY,
+    COGNEE_SEARCH_TYPE,
+    new_span,
+)
+from cognee.modules.search.methods.get_retriever_output import get_retriever_output
+from cognee.modules.search.models.SearchResultPayload import SearchResultPayload
+from cognee.modules.search.operations import log_query, log_result
 from cognee.modules.search.types import (
     SearchResult,
     SearchType,
 )
-from cognee.modules.search.operations import log_query, log_result
 from cognee.modules.users.models import User
-from cognee.modules.data.models import Dataset
-from cognee.modules.data.methods.get_authorized_existing_datasets import (
-    get_authorized_existing_datasets,
-)
-from cognee import __version__ as cognee_version
-from cognee.modules.search.methods.get_retriever_output import get_retriever_output
-from cognee.modules.observability import (
-    new_span,
-    COGNEE_SEARCH_TYPE,
-    COGNEE_SEARCH_QUERY,
-)
+from cognee.shared.logging_utils import get_logger
+from cognee.shared.utils import send_telemetry
 
 logger = get_logger()
 
@@ -41,7 +43,7 @@ async def search(
     user: User,
     system_prompt_path="answer_simple_question.txt",
     system_prompt: Optional[str] = None,
-    top_k: int = 10,
+    top_k: int = 15,
     node_type: Optional[Type] = NodeSet,
     node_name: Optional[List[str]] = None,
     node_name_filter_operator: str = "OR",
@@ -54,6 +56,9 @@ async def search(
     retriever_specific_config: Optional[dict] = None,
     neighborhood_depth: Optional[int] = None,
     neighborhood_seed_top_k: Optional[int] = None,
+    include_references: bool = False,
+    llm_config: Optional[LLMConfig] = None,
+    embedding_config: Optional[EmbeddingConfig] = None,
 ) -> List[SearchResult]:
     """
 
@@ -77,6 +82,7 @@ async def search(
         additional_properties={
             "cognee_version": cognee_version,
             "tenant_id": str(user.tenant_id) if user.tenant_id else "Single User Tenant",
+            "include_references": include_references,
         },
     )
 
@@ -108,6 +114,9 @@ async def search(
             retriever_specific_config=retriever_specific_config,
             neighborhood_depth=neighborhood_depth,
             neighborhood_seed_top_k=neighborhood_seed_top_k,
+            include_references=include_references,
+            llm_config=llm_config,
+            embedding_config=embedding_config,
         )
 
         span.set_attribute("cognee.search.result_count", len(search_results))
@@ -147,7 +156,7 @@ async def authorized_search(
     dataset_ids: Optional[list[UUID]] = None,
     system_prompt_path: str = "answer_simple_question.txt",
     system_prompt: Optional[str] = None,
-    top_k: int = 10,
+    top_k: int = 15,
     node_type: Optional[Type] = NodeSet,
     node_name: Optional[List[str]] = None,
     node_name_filter_operator: str = "OR",
@@ -159,7 +168,10 @@ async def authorized_search(
     retriever_specific_config: Optional[dict] = None,
     neighborhood_depth: Optional[int] = None,
     neighborhood_seed_top_k: Optional[int] = None,
-) -> List[Tuple[Any, Union[List[Edge], str], List[Dataset]]]:
+    include_references: bool = False,
+    llm_config: Optional[LLMConfig] = None,
+    embedding_config: Optional[EmbeddingConfig] = None,
+) -> List[SearchResultPayload]:
     """
     Verifies access for provided datasets or uses all datasets user has read access for and performs search per dataset.
     Not to be used outside of active access control mode.
@@ -174,6 +186,7 @@ async def authorized_search(
         search_datasets=search_datasets,
         query_type=query_type,
         query_text=query_text,
+        user=user,
         system_prompt_path=system_prompt_path,
         system_prompt=system_prompt,
         top_k=top_k,
@@ -188,6 +201,9 @@ async def authorized_search(
         retriever_specific_config=retriever_specific_config,
         neighborhood_depth=neighborhood_depth,
         neighborhood_seed_top_k=neighborhood_seed_top_k,
+        include_references=include_references,
+        llm_config=llm_config,
+        embedding_config=embedding_config,
     )
 
     return search_results
@@ -197,9 +213,10 @@ async def search_in_datasets_context(
     search_datasets: list[Dataset],
     query_type: SearchType,
     query_text: str,
+    user: User,
     system_prompt_path: str = "answer_simple_question.txt",
     system_prompt: Optional[str] = None,
-    top_k: int = 10,
+    top_k: int = 15,
     node_type: Optional[Type] = NodeSet,
     node_name: Optional[List[str]] = None,
     node_name_filter_operator: str = "OR",
@@ -211,6 +228,9 @@ async def search_in_datasets_context(
     retriever_specific_config: Optional[dict] = None,
     neighborhood_depth: Optional[int] = None,
     neighborhood_seed_top_k: Optional[int] = None,
+    include_references: bool = False,
+    llm_config: Optional[LLMConfig] = None,
+    embedding_config: Optional[EmbeddingConfig] = None,
 ) -> List[Tuple[Any, Union[str, List[Edge]], List[Dataset]]]:
     """
     Searches all provided datasets and handles setting up of appropriate database context based on permissions.
@@ -223,7 +243,7 @@ async def search_in_datasets_context(
         query_text: str,
         system_prompt_path: str = "answer_simple_question.txt",
         system_prompt: Optional[str] = None,
-        top_k: int = 10,
+        top_k: int = 15,
         node_type: Optional[Type] = NodeSet,
         node_name: Optional[List[str]] = None,
         node_name_filter_operator: str = "OR",
@@ -235,12 +255,18 @@ async def search_in_datasets_context(
         retriever_specific_config: Optional[dict] = None,
         neighborhood_depth: Optional[int] = None,
         neighborhood_seed_top_k: Optional[int] = None,
-    ) -> Tuple[Any, Union[str, List[Edge]], List[Dataset]]:
+        include_references: bool = False,
+    ) -> SearchResultPayload:
         with new_span("cognee.search.dataset") as span:
             span.set_attribute("cognee.search.dataset_name", dataset.name or "")
             span.set_attribute("cognee.search.dataset_id", str(dataset.id))
 
-            async with set_database_global_context_variables(dataset.id, dataset.owner_id):
+            async with set_database_global_context_variables(
+                dataset.id,
+                dataset.owner_id,
+                llm_config=llm_config,
+                embedding_config=embedding_config,
+            ):
                 # Check if graph for dataset is empty and log warnings if necessary
                 graph_engine = await get_graph_engine()
                 is_empty = await graph_engine.is_empty()
@@ -266,6 +292,7 @@ async def search_in_datasets_context(
                 return await get_retriever_output(
                     query_type=query_type,
                     query_text=query_text,
+                    user=user,
                     dataset=dataset,
                     system_prompt_path=system_prompt_path,
                     system_prompt=system_prompt,
@@ -281,6 +308,7 @@ async def search_in_datasets_context(
                     retriever_specific_config=retriever_specific_config,
                     neighborhood_depth=neighborhood_depth,
                     neighborhood_seed_top_k=neighborhood_seed_top_k,
+                    include_references=include_references,
                 )
 
     # Search every dataset async based on query and appropriate database configuration
@@ -306,32 +334,51 @@ async def search_in_datasets_context(
                     retriever_specific_config=retriever_specific_config,
                     neighborhood_depth=neighborhood_depth,
                     neighborhood_seed_top_k=neighborhood_seed_top_k,
+                    include_references=include_references,
                 )
             )
     else:
         # Run search without setting database context in case access control is disabled
         # Needed for low level pipelines that need to run search without dataset context.
-        tasks.append(
-            get_retriever_output(
-                query_type=query_type,
-                query_text=query_text,
-                dataset=None,
-                system_prompt_path=system_prompt_path,
-                system_prompt=system_prompt,
-                top_k=top_k,
-                node_type=node_type,
-                node_name=node_name,
-                node_name_filter_operator=node_name_filter_operator,
-                only_context=only_context,
-                session_id=session_id,
-                wide_search_top_k=wide_search_top_k,
-                triplet_distance_penalty=triplet_distance_penalty,
-                feedback_influence=feedback_influence,
-                retriever_specific_config=retriever_specific_config,
-                neighborhood_depth=neighborhood_depth,
-                neighborhood_seed_top_k=neighborhood_seed_top_k,
-            )
+        dataset = search_datasets[0] if len(search_datasets) == 1 else None
+        retriever_kwargs = dict(
+            query_type=query_type,
+            query_text=query_text,
+            user=user,
+            dataset=dataset,
+            system_prompt_path=system_prompt_path,
+            system_prompt=system_prompt,
+            top_k=top_k,
+            node_type=node_type,
+            node_name=node_name,
+            node_name_filter_operator=node_name_filter_operator,
+            only_context=only_context,
+            session_id=session_id,
+            wide_search_top_k=wide_search_top_k,
+            triplet_distance_penalty=triplet_distance_penalty,
+            feedback_influence=feedback_influence,
+            retriever_specific_config=retriever_specific_config,
+            neighborhood_depth=neighborhood_depth,
+            neighborhood_seed_top_k=neighborhood_seed_top_k,
+            include_references=include_references,
         )
+
+        async def _search_without_context() -> SearchResultPayload:
+            # No dataset DB context to set when access control is disabled, but
+            # still forward any per-call LLM/embedding overrides onto the async
+            # context (set_database_global_context_variables applies these even
+            # in single-tenant mode and ignores the dataset argument).
+            if llm_config is not None or embedding_config is not None:
+                async with set_database_global_context_variables(
+                    dataset.id if dataset else None,
+                    user.id,
+                    llm_config=llm_config,
+                    embedding_config=embedding_config,
+                ):
+                    return await get_retriever_output(**retriever_kwargs)
+            return await get_retriever_output(**retriever_kwargs)
+
+        tasks.append(_search_without_context())
 
     return await asyncio.gather(*tasks)
 

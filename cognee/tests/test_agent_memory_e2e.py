@@ -1,5 +1,6 @@
 """End-to-end tests for the public cognee.agent_memory feature."""
 
+import os
 from pathlib import Path
 from uuid import uuid4
 
@@ -27,11 +28,11 @@ async def _reset_engines_and_prune() -> None:
     except Exception:
         pass
 
+    from cognee.infrastructure.databases.graph.get_graph_engine import _create_graph_engine
     from cognee.infrastructure.databases.relational.create_relational_engine import (
         create_relational_engine,
     )
     from cognee.infrastructure.databases.vector.create_vector_engine import _create_vector_engine
-    from cognee.infrastructure.databases.graph.get_graph_engine import _create_graph_engine
 
     _create_graph_engine.cache_clear()
     _create_vector_engine.cache_clear()
@@ -48,12 +49,25 @@ async def agent_memory_e2e_env(tmp_path):
     cognee.config.data_root_directory(str(root / "data"))
     cognee.config.system_root_directory(str(root / "system"))
 
+    # Disable session-turn gating (auto_feedback). Memory retrieval runs with
+    # memory_only_context=False, so the turn analysis would otherwise intercept the retrieval
+    # query with a clarifying acknowledgement instead of returning the memory answer. The
+    # turn-gating layer has dedicated coverage (e.g. test_session_context_turn_flow.py).
+    prev_auto_feedback = os.environ.get("AUTO_FEEDBACK")
+    os.environ["AUTO_FEEDBACK"] = "False"
+
     await _reset_engines_and_prune()
     await engine_setup()
 
-    yield
+    try:
+        yield
+    finally:
+        if prev_auto_feedback is None:
+            os.environ.pop("AUTO_FEEDBACK", None)
+        else:
+            os.environ["AUTO_FEEDBACK"] = prev_auto_feedback
 
-    await _reset_engines_and_prune()
+        await _reset_engines_and_prune()
 
 
 @pytest.mark.asyncio
@@ -151,11 +165,11 @@ async def test_agent_memory_e2e_persists_success_and_error_traces(agent_memory_e
 
     success_entry, error_entry = trace_entries
 
-    assert success_entry["origin_function"].endswith("successful_agent")
-    assert success_entry["status"] == "success"
-    assert success_entry["method_return_value"] == success_text
-    assert success_entry["error_message"] == ""
+    assert success_entry.origin_function.endswith("successful_agent")
+    assert success_entry.status == "success"
+    assert success_entry.method_return_value == success_text
+    assert success_entry.error_message == ""
 
-    assert error_entry["origin_function"].endswith("failing_agent")
-    assert error_entry["status"] == "error"
-    assert error_entry["error_message"] == error_text
+    assert error_entry.origin_function.endswith("failing_agent")
+    assert error_entry.status == "error"
+    assert error_entry.error_message == error_text

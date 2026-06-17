@@ -2,7 +2,10 @@ from uuid import UUID
 from typing import Union, Optional, List, Type
 
 from cognee.modules.engine.models.node_set import NodeSet
+from cognee.modules.engine.models import Skill
 from cognee.modules.users.models import User
+from cognee.infrastructure.databases.vector.embeddings.config import EmbeddingConfig
+from cognee.infrastructure.llm.config import LLMConfig
 from cognee.modules.search.types import SearchResult, SearchType
 from cognee.modules.users.methods import get_default_user
 from cognee.modules.search.methods import search as search_function
@@ -32,7 +35,7 @@ async def search(
     dataset_ids: Optional[Union[list[UUID], UUID]] = None,
     system_prompt_path: str = "answer_simple_question.txt",
     system_prompt: Optional[str] = None,
-    top_k: int = 10,
+    top_k: int = 15,
     node_type: Optional[Type] = NodeSet,
     node_name: Optional[List[str]] = None,
     node_name_filter_operator: str = "OR",
@@ -45,6 +48,12 @@ async def search(
     retriever_specific_config: Optional[dict] = None,
     neighborhood_depth: Optional[int] = None,
     neighborhood_seed_top_k: Optional[int] = None,
+    skills: Optional[List[Union[str, Skill]]] = None,
+    tools: Optional[List[str]] = None,
+    max_iter: Optional[int] = None,
+    include_references: bool = False,
+    llm_config: Optional[LLMConfig] = None,
+    embedding_config: Optional[EmbeddingConfig] = None,
 ) -> List[SearchResult]:
     if neighborhood_depth is not None and (
         not isinstance(neighborhood_depth, int) or neighborhood_depth < 1
@@ -59,6 +68,11 @@ async def search(
         raise CogneeValidationError(
             message="neighborhood_seed_top_k must be a positive integer.",
             name="InvalidNeighborhoodSeedTopK",
+        )
+    if max_iter is not None and (not isinstance(max_iter, int) or max_iter < 1):
+        raise CogneeValidationError(
+            message="max_iter must be a positive integer.",
+            name="InvalidMaxIter",
         )
     """
     Search and query the knowledge graph for insights, information, and connections.
@@ -92,9 +106,9 @@ async def search(
             Returns: Ranked list of relevant text chunks with metadata.
 
         **SUMMARIES**:
-            Pre-generated hierarchical summaries of content.
+            Pre-generated summaries of content.
             Best for: Quick overviews, document abstracts, topic summaries.
-            Returns: Multi-level summaries from detailed to high-level.
+            Returns: Generated content summaries.
 
         **CODE**:
             Code-specific search with syntax and semantic understanding.
@@ -112,7 +126,7 @@ async def search(
             Returns: The results from the automatically selected search type.
 
         **CHUNKS_LEXICAL**:
-            Token-based lexical chunk search (e.g., Jaccard). Best for: exact-term matching, stopword-aware lookups.
+            Token-based lexical chunk search (BM25-style lexical ranking). Best for: exact-term matching, stopword-aware lookups.
             Returns: Ranked text chunks (optionally with scores).
 
     Args:
@@ -153,6 +167,9 @@ async def search(
         verbose: If True, returns detailed result information including graph representation (when possible).
 
         retriever_specific_config: Optional dictionary of additional configuration parameters specific to the retriever being used.
+        skills: Explicit skill names or Skill objects to load into the agentic retriever.
+        tools: Optional whitelist of tool names available to the agentic retriever.
+        max_iter: Maximum number of agentic tool-call iterations before forcing a final answer.
 
     Returns:
         list: Search results in format determined by query_type:
@@ -164,7 +181,7 @@ async def search(
                 [List of relevant text passages with source metadata]
 
             **SUMMARIES**:
-                [List of hierarchical summaries from general to specific]
+                [List of generated content summaries]
 
             **CODE**:
                 [List of structured code information with context]
@@ -183,7 +200,7 @@ async def search(
         - **SUMMARIES**: Fast, returns pre-computed summaries
         - **CODE**: Medium speed, specialized for code understanding
         - **FEELING_LUCKY**: Variable speed, uses LLM + search type selection intelligently
-        - **top_k**: Start with 10, increase for comprehensive analysis (max 100)
+        - **top_k**: Start with 15, increase for comprehensive analysis (max 100)
         - **datasets**: Specify datasets to improve speed and relevance
 
     Next Steps After Search:
@@ -202,12 +219,30 @@ async def search(
         - GRAPH_DATABASE_PROVIDER: Must match what was used during cognify
 
     """
+    agentic_overrides = {
+        "skills": skills,
+        "tools": tools,
+        "max_iter": max_iter,
+    }
+
     # Route to remote instance if connected via serve()
     from cognee.api.v1.serve.state import get_remote_client
 
     client = get_remote_client()
     if client is not None:
-        return await client.search(query_text, search_type=query_type, datasets=datasets)
+        return await client.search(
+            query_text,
+            search_type=query_type,
+            datasets=datasets,
+            dataset_ids=dataset_ids,
+            system_prompt=system_prompt,
+            top_k=top_k,
+            node_name=node_name,
+            only_context=only_context,
+            verbose=verbose,
+            include_references=include_references,
+            **{key: value for key, value in agentic_overrides.items() if value is not None},
+        )
 
     with new_span("cognee.api.search") as span:
         span.set_attribute(COGNEE_SEARCH_QUERY, query_text[:500])
@@ -217,6 +252,14 @@ async def search(
         # We use lists from now on for datasets
         if isinstance(datasets, UUID) or isinstance(datasets, str):
             datasets = [datasets]
+
+        if (
+            skills is not None or tools is not None
+        ) and query_type is not SearchType.AGENTIC_COMPLETION:
+            raise CogneeValidationError(
+                message="skills/tools require query_type=SearchType.AGENTIC_COMPLETION.",
+                name="InvalidAgenticSearchConfig",
+            )
 
         allowed_node_name_operators = {"AND", "OR"}
         normalized_node_name_filter_operator = (node_name_filter_operator or "").strip().upper()
@@ -249,6 +292,22 @@ async def search(
             if not datasets:
                 raise DatasetNotFoundError(message="No datasets found.")
 
+        if query_type is SearchType.AGENTIC_COMPLETION:
+            active_dataset_refs = dataset_ids if dataset_ids else datasets
+            if isinstance(active_dataset_refs, UUID):
+                active_dataset_refs = [active_dataset_refs]
+            if not active_dataset_refs or len(active_dataset_refs) != 1:
+                raise CogneeValidationError(
+                    message="Agentic skill search requires exactly one explicit dataset.",
+                    name="InvalidAgenticDatasetScope",
+                )
+
+        if any(v is not None for v in agentic_overrides.values()):
+            retriever_specific_config = dict(retriever_specific_config or {})
+            for key, value in agentic_overrides.items():
+                if value is not None:
+                    retriever_specific_config[key] = value
+
         filtered_search_results = await search_function(
             query_text=query_text,
             query_type=query_type,
@@ -269,6 +328,9 @@ async def search(
             retriever_specific_config=retriever_specific_config,
             neighborhood_depth=neighborhood_depth,
             neighborhood_seed_top_k=neighborhood_seed_top_k,
+            include_references=include_references,
+            llm_config=llm_config,
+            embedding_config=embedding_config,
         )
 
         n = len(filtered_search_results) if filtered_search_results else 0

@@ -8,7 +8,7 @@ import socketserver
 import ssl
 from datetime import datetime, timezone
 from threading import Thread
-from typing import Any, Union
+from typing import Any
 from uuid import NAMESPACE_OID, UUID, uuid4, uuid5
 
 import aiohttp
@@ -22,6 +22,9 @@ proxy_url = "https://test.prometh.ai"
 
 # Timeout for telemetry HTTP request; short to avoid blocking if proxy is unreachable
 TELEMETRY_REQUEST_TIMEOUT: int = int(os.getenv("TELEMETRY_REQUEST_TIMEOUT", "5"))
+_TELEMETRY_API_KEY_TRACKING_SALT_ENV = "TELEMETRY_API_KEY_TRACKING_SALT"
+_DEFAULT_TELEMETRY_API_KEY_TRACKING_SALT = b"cognee.telemetry.api-key-tracking.v1"
+_TELEMETRY_API_KEY_TRACKING_ITERATIONS = 100_000
 
 
 def create_secure_ssl_context() -> ssl.SSLContext:
@@ -43,7 +46,7 @@ _ANON_ID_DIR = pathlib.Path(__file__).parent.parent.parent.resolve()
 _ANON_ID_FILE = _ANON_ID_DIR / ".anon_id"
 
 
-def get_anonymous_id():
+def get_anonymous_id() -> str:
     """Get or create the original anonymous ID (project-root based).
 
     Stored in the project root as .anon_id. This is the original ID
@@ -70,7 +73,7 @@ def get_anonymous_id():
     return anonymous_id
 
 
-def get_persistent_id():
+def get_persistent_id() -> str:
     """Get or create a persistent machine-level ID.
 
     Stored in ~/.cognee/.persistent_id — a user-level directory that
@@ -121,37 +124,101 @@ def _sanitize_nested_properties(obj: Any, property_names: list[str]) -> Any:
         return obj
 
 
+# A single ClientSession is reused across telemetry calls to avoid the
+# per-call DNS + TCP + TLS handshake to `proxy_url`. The session is bound to
+# the asyncio loop it was created on; if the loop changes (tests, reload), the
+# helper rebuilds it transparently.
+_telemetry_session: aiohttp.ClientSession | None = None
+_telemetry_session_loop: asyncio.AbstractEventLoop | None = None
+_telemetry_session_lock: asyncio.Lock | None = None
+_telemetry_session_lock_loop: asyncio.AbstractEventLoop | None = None
+
+
+async def _get_telemetry_session() -> aiohttp.ClientSession:
+    """Return a process-wide aiohttp.ClientSession for telemetry, creating it lazily.
+
+    The session is bound to the asyncio loop it was created on. If the running
+    loop changes (e.g. across tests or `asyncio.run` boundaries) or the session
+    has been closed, a fresh session is built. Concurrent callers are
+    serialized by an `asyncio.Lock` that is itself re-created when the loop
+    changes, because `asyncio.Lock` captures its loop on construction. Intended
+    for use only from inside a running event loop.
+    """
+    global _telemetry_session, _telemetry_session_loop
+    global _telemetry_session_lock, _telemetry_session_lock_loop
+
+    loop = asyncio.get_running_loop()
+
+    # `asyncio.Lock` captures the running loop on creation, so a lock from a
+    # previous loop is unusable. Recreate it when the loop changes.
+    if _telemetry_session_lock is None or _telemetry_session_lock_loop is not loop:
+        _telemetry_session_lock = asyncio.Lock()
+        _telemetry_session_lock_loop = loop
+
+    async with _telemetry_session_lock:
+        if (
+            _telemetry_session is None
+            or _telemetry_session.closed
+            or _telemetry_session_loop is not loop
+        ):
+            timeout = aiohttp.ClientTimeout(total=TELEMETRY_REQUEST_TIMEOUT)
+            _telemetry_session = aiohttp.ClientSession(timeout=timeout)
+            _telemetry_session_loop = loop
+        return _telemetry_session
+
+
 async def _send_telemetry_request(payload: dict) -> None:
-    """Send telemetry payload via async HTTP. Non-blocking, no threads."""
-    timeout = aiohttp.ClientTimeout(total=TELEMETRY_REQUEST_TIMEOUT)
+    """Send telemetry payload via async HTTP. Best-effort, never raises."""
     try:
-        async with aiohttp.ClientSession(timeout=timeout) as session:
-            async with session.post(proxy_url, json=payload) as response:
-                if response.status != 200:
-                    logger.debug("Telemetry proxy returned status %s", response.status)
-    except (aiohttp.ClientError, asyncio.TimeoutError) as e:
+        session = await _get_telemetry_session()
+        async with session.post(proxy_url, json=payload) as response:
+            if response.status != 200:
+                logger.debug("Telemetry proxy returned status %s", response.status)
+    except (aiohttp.ClientError, asyncio.TimeoutError, RuntimeError) as e:
+        # RuntimeError covers the case where the loop was closed between task
+        # creation and session use (fire-and-forget telemetry tasks can outlive
+        # the loop that scheduled them).
         logger.debug("Telemetry request failed: %s", e)
 
 
-def _get_api_key_fingerprint() -> str:
-    """Hash the last 5 chars of the LLM API key into a fingerprint.
+def _get_api_key_tracking_id() -> str:
+    """Return a stable pseudonymous analytics ID derived from the full LLM API key.
 
-    The last 5 characters carry the real entropy — provider prefixes
-    (sk-proj-, sk-ant-, AIzaSy-) are shared across all users. Hashing
-    the tail gives a stable identity signal that works across machines
-    and reinstalls without exposing the key.
+    The raw key and visible key fragments are never included in telemetry. The
+    derived ID is stable across machines for the same key so analytics can group
+    agent/user activity, while avoiding the previous last-characters fingerprint.
 
-    Returns empty string if no key is configured or too short.
+    TELEMETRY_API_KEY_TRACKING_SALT can be set by deployments that want their own
+    namespace. A default public namespace keeps tracking stable for local installs.
     """
     import hashlib
 
     key = os.getenv("LLM_API_KEY", "")
-    if not key or len(key) < 5:
+    if not key:
         return ""
-    return hashlib.sha256(key[-5:].encode()).hexdigest()[:8]
+
+    configured_salt = os.getenv(_TELEMETRY_API_KEY_TRACKING_SALT_ENV)
+    salt = (
+        configured_salt.encode("utf-8")
+        if configured_salt
+        else _DEFAULT_TELEMETRY_API_KEY_TRACKING_SALT
+    )
+    derived = hashlib.pbkdf2_hmac(
+        "sha256",
+        key.encode("utf-8"),
+        salt,
+        _TELEMETRY_API_KEY_TRACKING_ITERATIONS,
+        dklen=16,
+    )
+    return f"ak_{derived.hex()}"
 
 
-def send_telemetry(event_name: str, user_id: Union[str, UUID], additional_properties: dict = None):
+def _get_api_key_fingerprint() -> str:
+    """Backward-compatible alias for the API-key telemetry tracking ID."""
+    return _get_api_key_tracking_id()
+
+
+def send_telemetry(event_name: str, user_id: str | UUID, additional_properties: dict | None = None):
     """Send a product telemetry event.
 
     Three identity layers are sent with every event:
@@ -163,6 +230,9 @@ def send_telemetry(event_name: str, user_id: Union[str, UUID], additional_proper
       correlate a single machine across all user_id changes.
     - **user_id**: Transient Cognee User UUID from the database. Changes
       when the user is deleted and recreated via forget(everything=True).
+    - **api_key_tracking_id**: Stable pseudonymous ID derived from the full
+      LLM API key when configured. Use this to group activity by key without
+      sending the key or visible key fragments.
     """
     if additional_properties is None:
         additional_properties = {}
@@ -177,7 +247,7 @@ def send_telemetry(event_name: str, user_id: Union[str, UUID], additional_proper
     )
     anonymous_id = str(get_anonymous_id())
     persistent_id = str(get_persistent_id())
-    api_key_hash = _get_api_key_fingerprint()
+    api_key_tracking_id = _get_api_key_tracking_id()
     current_time = datetime.now(timezone.utc)
     payload = {
         "anonymous_id": anonymous_id,
@@ -185,14 +255,16 @@ def send_telemetry(event_name: str, user_id: Union[str, UUID], additional_proper
         "user_properties": {
             "user_id": str(user_id),
             "persistent_id": persistent_id,
-            "api_key_hash": api_key_hash,
+            "api_key_tracking_id": api_key_tracking_id,
+            "api_key_hash": api_key_tracking_id,
         },
         "properties": {
             "time": current_time.strftime("%m/%d/%Y"),
             "user_id": str(user_id),
             "anonymous_id": anonymous_id,
             "persistent_id": persistent_id,
-            "api_key_hash": api_key_hash,
+            "api_key_tracking_id": api_key_tracking_id,
+            "api_key_hash": api_key_tracking_id,
             **additional_properties,
         },
     }

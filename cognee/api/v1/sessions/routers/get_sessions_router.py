@@ -9,7 +9,7 @@ from datetime import datetime, timedelta, timezone
 from typing import Literal, Optional
 from uuid import UUID as UUIDType
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Path, Query
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from sqlalchemy import and_, func, or_, select
@@ -58,20 +58,74 @@ async def _permitted_dataset_ids_for(user: User) -> list[UUIDType]:
         return []
 
 
+async def _child_agent_user_ids(user_id: UUIDType) -> list[UUIDType]:
+    """Return user IDs of agents whose parent_user_id matches this user."""
+    engine = get_relational_engine()
+    async with engine.get_async_session() as session:
+        from cognee.modules.users.models import User as UserModel
+
+        rows = (
+            await session.execute(select(UserModel.id).where(UserModel.parent_user_id == user_id))
+        ).all()
+        return [row.id for row in rows]
+
+
+async def _visible_user_ids(user: User) -> list[UUIDType]:
+    """User's own ID plus any child agent IDs."""
+    ids = [user.id]
+    ids.extend(await _child_agent_user_ids(user.id))
+    return ids
+
+
 def get_sessions_router() -> APIRouter:
     router = APIRouter()
 
     @router.get("")
     async def list_sessions(
-        range: _RangeLiteral = Query("30d"),
-        status: Optional[str] = Query(None),
-        limit: int = Query(50, ge=1, le=500),
-        offset: int = Query(0, ge=0),
-        order_by: str = Query("last_activity_at"),
-        descending: bool = Query(True),
+        range: _RangeLiteral = Query(
+            "30d",
+            description=(
+                "Time window filtered on last_activity_at: last 24 hours (24h), "
+                "7 days (7d), 30 days (30d), or all time (all)."
+            ),
+            examples=["30d"],
+        ),
+        status: Optional[str] = Query(
+            None,
+            description=(
+                "Filter by effective status: 'running', 'completed', 'failed', or 'abandoned'. "
+                "'abandoned' is computed at read time: stored status 'running' with "
+                "last_activity_at older than SESSION_ABANDON_AFTER_SECONDS (default 30 min). "
+                "Any other value matches nothing and returns an empty list."
+            ),
+            examples=["completed"],
+        ),
+        limit: int = Query(50, ge=1, le=500, description="Page size (max 500)."),
+        offset: int = Query(0, ge=0, description="Rows to skip for pagination."),
+        order_by: str = Query(
+            "last_activity_at",
+            description=(
+                "Column to sort by: last_activity_at, started_at, ended_at, cost_usd, "
+                "tokens_in, or tokens_out. Unknown values silently fall back to "
+                "last_activity_at."
+            ),
+            examples=["cost_usd"],
+        ),
+        descending: bool = Query(True, description="Sort descending (newest/largest first)."),
         user: User = Depends(get_authenticated_user),
     ):
         """Paginated list of sessions.
+
+        ## Request Parameters
+        - **range** (Literal): Time window on last_activity_at: 24h, 7d, 30d, or all
+          (default: 30d).
+        - **status** (Optional[str]): Effective-status filter: running, completed, failed,
+          or abandoned.
+        - **limit** (int): Page size, 1-500 (default: 50).
+        - **offset** (int): Rows to skip for pagination (default: 0).
+        - **order_by** (str): Sort column: last_activity_at, started_at, ended_at, cost_usd,
+          tokens_in, or tokens_out (default: last_activity_at).
+        - **descending** (bool): Sort newest/largest first (default: true).
 
         Response envelope::
 
@@ -86,8 +140,9 @@ def get_sessions_router() -> APIRouter:
         since = _range_since(range)
         try:
             permitted = await _permitted_dataset_ids_for(user)
+            visible_ids = await _visible_user_ids(user)
             page = await list_session_rows(
-                user_id=user.id,
+                user_ids=visible_ids,
                 permitted_dataset_ids=permitted,
                 since=since,
                 status_filter=status,
@@ -111,17 +166,39 @@ def get_sessions_router() -> APIRouter:
 
     @router.get("/stats")
     async def get_stats(
-        range: _RangeLiteral = Query("30d"),
+        range: _RangeLiteral = Query(
+            "30d",
+            description="Time window filtered on last_activity_at: 24h, 7d, 30d, or all.",
+            examples=["30d"],
+        ),
         user: User = Depends(get_authenticated_user),
     ):
-        """Aggregate counters for the dashboard stat cards + status bar."""
+        """Aggregate counters for the dashboard stat cards + status bar.
+
+        ## Request Parameters
+        - **range** (Literal): Time window on last_activity_at: 24h, 7d, 30d, or all
+          (default: 30d).
+
+        ## Response
+        Returns a JSON object with:
+        - **sessions** (int): Number of sessions in the window.
+        - **total_spend_usd** / **avg_spend_per_session_usd** (float): Cost totals.
+        - **tokens_in** / **tokens_out** / **tokens_total** (int): Token totals.
+        - **agent_time_s** / **avg_session_s** (float): Summed and average session duration
+          in seconds.
+        - **success_rate** (float): completed / (completed + failed + abandoned); 1.0 when
+          no session has ended yet.
+        - **completed** / **failed** / **abandoned** / **running** (int): Effective-status
+          counts.
+        """
         since = _range_since(range)
         eff = get_effective_status_sql()
         permitted = await _permitted_dataset_ids_for(user)
+        visible_ids = await _visible_user_ids(user)
 
         engine = get_relational_engine()
         async with engine.get_async_session() as session:
-            visibility_terms = [SessionRecord.user_id == user.id]
+            visibility_terms = [SessionRecord.user_id.in_(visible_ids)]
             if permitted:
                 visibility_terms.append(SessionRecord.dataset_id.in_(permitted))
             base_filter = [
@@ -197,7 +274,13 @@ def get_sessions_router() -> APIRouter:
 
     @router.get("/cost-by-model")
     async def cost_by_model(
-        range: _RangeLiteral = Query("30d"),
+        range: _RangeLiteral = Query(
+            "30d",
+            description=(
+                "Time window filtered on session_records.last_activity_at: 24h, 7d, 30d, or all."
+            ),
+            examples=["30d"],
+        ),
         user: User = Depends(get_authenticated_user),
     ):
         """Cost + token totals grouped by the model that produced them.
@@ -206,12 +289,16 @@ def get_sessions_router() -> APIRouter:
         so a session that used multiple models splits its cost correctly.
         Filters on ``session_records.last_activity_at`` to scope by
         range — requires a join back to the session row.
+
+        ## Request Parameters
+        - **range** (Literal): Time window: 24h, 7d, 30d, or all (default: 30d).
         """
         since = _range_since(range)
         permitted = await _permitted_dataset_ids_for(user)
+        visible_ids = await _visible_user_ids(user)
         engine = get_relational_engine()
         async with engine.get_async_session() as session:
-            visibility_terms = [SessionRecord.user_id == user.id]
+            visibility_terms = [SessionRecord.user_id.in_(visible_ids)]
             if permitted:
                 visibility_terms.append(SessionRecord.dataset_id.in_(permitted))
             stmt = (
@@ -253,12 +340,23 @@ def get_sessions_router() -> APIRouter:
 
     @router.get("/{session_id}")
     async def get_session_detail(
-        session_id: str,
+        session_id: str = Path(
+            ...,
+            description=(
+                "Client-supplied session identifier; the same value passed as session_id "
+                "to POST /api/v1/remember."
+            ),
+            examples=["claude-code-1718000000"],
+        ),
         user: User = Depends(get_authenticated_user),
     ):
         permitted = await _permitted_dataset_ids_for(user)
+        visible_ids = await _visible_user_ids(user)
         row = await get_session_row(
-            session_id=session_id, user_id=user.id, permitted_dataset_ids=permitted
+            session_id=session_id,
+            user_id=user.id,
+            user_ids=visible_ids,
+            permitted_dataset_ids=permitted,
         )
         if row is None:
             raise HTTPException(status_code=404, detail="session not found")
@@ -291,13 +389,13 @@ def get_sessions_router() -> APIRouter:
         # (so trace-only sessions — the plugin case — still have a label).
         label = None
         for entry in qas:
-            if isinstance(entry, dict) and entry.get("question"):
-                label = str(entry["question"])[:120]
+            if getattr(entry, "question", None):
+                label = str(entry.question)[:120]
                 break
         if label is None:
             for entry in traces:
-                if isinstance(entry, dict) and entry.get("origin_function"):
-                    label = str(entry["origin_function"])
+                if getattr(entry, "origin_function", None):
+                    label = str(entry.origin_function)
                     break
         record["label"] = label
         record["msg_count"] = len(qas)
